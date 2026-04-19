@@ -27,6 +27,9 @@ class UserSeeder extends Seeder
             [
                 'name' => 'Dosen Pembimbing',
                 'password' => Hash::make('password'),
+                'program_studi' => 'Teknik Informatika',
+                'fakultas' => 'Fakultas Teknik',
+                'kuota_pembimbingan' => 10,
             ]
         );
         $dosen->assignRole('dosen');
