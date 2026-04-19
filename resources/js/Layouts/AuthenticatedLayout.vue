@@ -39,6 +39,18 @@ const showingNavigationDropdown = ref(false);
                                 >
                                     Dashboard
                                 </NavLink>
+                                <NavLink
+                                    :href="route('mahasiswa.jadwal-bimbingan.create')"
+                                    :active="route().current('mahasiswa.jadwal-bimbingan.create')"
+                                >
+                                    Input Jadwal Bimbingan
+                                </NavLink>
+                                <NavLink
+                                    :href="route('mahasiswa.jadwal.index')"
+                                    :active="route().current('mahasiswa.jadwal.index')"
+                                >
+                                    Monitoring Jadwal
+                                </NavLink>
                             </div>
                         </div>
 
@@ -145,6 +157,18 @@ const showingNavigationDropdown = ref(false);
                             :active="route().current('dashboard')"
                         >
                             Dashboard
+                        </ResponsiveNavLink>
+                        <ResponsiveNavLink
+                            :href="route('mahasiswa.jadwal-bimbingan.create')"
+                            :active="route().current('mahasiswa.jadwal-bimbingan.create')"
+                        >
+                            Input Jadwal Bimbingan
+                        </ResponsiveNavLink>
+                        <ResponsiveNavLink
+                            :href="route('mahasiswa.jadwal.index')"
+                            :active="route().current('mahasiswa.jadwal.index')"
+                        >
+                            Monitoring Jadwal
                         </ResponsiveNavLink>
                     </div>
 

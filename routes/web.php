@@ -24,6 +24,12 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
+// Rute untuk fitur input jadwal bimbingan
+Route::middleware(['auth'])->group(function () {
+    Route::get('/jadwal-bimbingan/create', [\App\Http\Controllers\JadwalBimbinganController::class, 'create'])->name('jadwal-bimbingan.create');
+    Route::post('/jadwal-bimbingan', [\App\Http\Controllers\JadwalBimbinganController::class, 'store'])->name('jadwal-bimbingan.store');
+});
+
 require __DIR__.'/auth.php';
 
 // Include actor-based routes for isolated PBI development
