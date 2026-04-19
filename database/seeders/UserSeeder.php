@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Models\Dosen;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
@@ -31,15 +30,6 @@ class UserSeeder extends Seeder
             ]
         );
         $dosen->assignRole('dosen');
-
-        Dosen::firstOrCreate(
-            ['user_id' => $dosen->id],
-            [
-                'nidn' => '1234567890',
-                'nama_lengkap' => $dosen->name,
-                'program_studi' => 'S1 Rekayasa Perangkat Lunak',
-            ]
-        );
 
         $mahasiswa = User::firstOrCreate(
             ['email' => 'mahasiswa@sibima.test'],
