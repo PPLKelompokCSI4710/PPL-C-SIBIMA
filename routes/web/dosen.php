@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\MonitoringJadwalBimbinganController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -13,4 +14,10 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth', 'role:dosen'])->prefix('dosen')->name('dosen.')->group(function () {
     // Route::get('/bimbingan', [BimbinganController::class, 'index'])->name('bimbingan.index'); // Contoh untuk PBI-YYY
+
+    // Fitur Monitoring Jadwal Bimbingan
+    Route::get('/jadwal-bimbingan', [MonitoringJadwalBimbinganController::class, 'index'])->name('jadwal.index');
+    Route::patch('/jadwal-bimbingan/{id}/cancel', [MonitoringJadwalBimbinganController::class, 'cancel'])->name('jadwal.cancel');
+    Route::patch('/jadwal-bimbingan/{id}/approve', [MonitoringJadwalBimbinganController::class, 'approve'])->name('jadwal.approve');
+    Route::patch('/jadwal-bimbingan/{id}/reject', [MonitoringJadwalBimbinganController::class, 'reject'])->name('jadwal.reject');
 });
