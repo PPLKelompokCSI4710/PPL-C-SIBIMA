@@ -3,7 +3,6 @@
 namespace App\Filament\Resources\Mahasiswas\Schemas;
 
 use App\Enums\AkademikStatus;
-use App\Models\User;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
@@ -12,7 +11,6 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
-use Illuminate\Database\Eloquent\Builder;
 
 class MahasiswaForm
 {
@@ -23,28 +21,23 @@ class MahasiswaForm
 
                 // ─── Section 1: Akun Pengguna ────────────────────────────────
                 Section::make('Akun Pengguna')
-                    ->description('Hubungkan profil ini dengan akun login mahasiswa.')
+                    ->description('Masukkan email mahasiswa. Sistem akan membuat akun login secara otomatis.')
                     ->icon('heroicon-o-user-circle')
                     ->schema([
-                        Select::make('user_id')
-                            ->label('Akun User')
-                            ->relationship(
-                                name: 'user',
-                                titleAttribute: 'email',
-                                modifyQueryUsing: fn (Builder $query) => $query->role('mahasiswa'),
-                            )
-                            ->getOptionLabelFromRecordUsing(
-                                fn (User $record) => "{$record->name} ({$record->email})"
-                            )
-                            ->searchable(['name', 'email'])
-                            ->preload()
+                        TextInput::make('email')
+                            ->label('Email Mahasiswa')
+                            ->placeholder('contoh@email.com')
+                            ->email()
                             ->required()
-                            ->unique(table: 'mahasiswa', column: 'user_id', ignoreRecord: true)
+                            ->unique(table: 'users', column: 'email')
                             ->validationMessages([
-                                'unique' => 'Akun user ini sudah terhubung dengan profil mahasiswa lain.',
-                            ]),
+                                'unique' => 'Email ini sudah terdaftar sebagai akun pengguna.',
+                            ])
+                            ->helperText('Password default akan di-set menggunakan NIM mahasiswa.')
+                            ->hiddenOn('edit'),
                     ])
-                    ->columnSpanFull(),
+                    ->columnSpanFull()
+                    ->hiddenOn('edit'),
 
                 // ─── Section 2: Data Akademik ────────────────────────────────
                 Section::make('Data Akademik')
