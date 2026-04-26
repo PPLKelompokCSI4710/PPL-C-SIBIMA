@@ -1,6 +1,6 @@
 <script setup>
     import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-    import { Head } from '@inertiajs/vue3';
+    import { Head, usePage, router } from '@inertiajs/vue3';
 
     defineProps({
         jadwalBimbingans: {
@@ -8,6 +8,30 @@
             default: () => [],
         },
     });
+
+    const page = usePage();
+    const basePath = page.url.startsWith('/dosen') ? '/dosen' : '/mahasiswa';
+
+    const handleAction = (id, action) => {
+        let confirmText =
+            action === 'cancel'
+                ? 'Batalkan bimbingan ini?'
+                : action === 'approve'
+                  ? 'Setujui bimbingan ini?'
+                  : 'Tolak bimbingan ini?';
+
+        if (confirm(confirmText)) {
+            router.post(
+                `${basePath}/jadwal-bimbingan/${id}/${action}`,
+                {
+                    _method: 'patch',
+                },
+                {
+                    preserveScroll: true,
+                },
+            );
+        }
+    };
 
     const statusConfig = (status) => {
         switch (status) {
@@ -64,22 +88,20 @@
         <template #header>
             <div class="flex flex-col md:flex-row md:items-center md:justify-between">
                 <div>
-                    <!-- Font Gradient Super Keren -->
-                    <h2
-                        class="text-3xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600"
-                    >
+                    <!-- Heading -->
+                    <h2 class="text-3xl font-extrabold tracking-tight text-primary-dark">
                         Monitoring Jadwal Bimbingan
                     </h2>
-                    <p class="mt-2 text-sm font-medium text-indigo-900/60">
+                    <p class="mt-2 text-sm font-medium text-neutral-medium">
                         Pantau dan kelola jadwal bimbingan akademik dengan mudah.
                     </p>
                 </div>
                 <div class="mt-4 md:mt-0 flex items-center">
                     <div
-                        class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100 text-blue-700 shadow-sm"
+                        class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white border border-neutral-medium text-primary shadow-sm"
                     >
                         <svg
-                            class="w-5 h-5 text-blue-500"
+                            class="w-5 h-5 text-secondary"
                             fill="none"
                             stroke="currentColor"
                             viewBox="0 0 24 24"
@@ -99,17 +121,17 @@
             </div>
         </template>
 
-        <!-- BACKGROUND MODERN DENGAN BLOBS GLOWING -->
-        <div class="py-4 relative min-h-[calc(100vh-100px)] overflow-hidden bg-slate-50">
-            <!-- Decorative Glowing Blobs -->
+        <!-- Latar Belakang -->
+        <div class="py-4 relative min-h-[calc(100vh-100px)] overflow-hidden bg-[#F5F7FA]">
+            <!-- Ornamen Background SIBIMA (Hex Langsung, Lebih Jelas) -->
             <div
-                class="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-gradient-to-br from-blue-400/40 to-indigo-500/40 blur-[100px] pointer-events-none"
+                class="absolute top-[-10%] left-[-5%] w-[500px] h-[500px] rounded-full bg-[#1F4C7A]/30 blur-[90px] pointer-events-none"
             />
             <div
-                class="absolute bottom-[-10%] right-[-5%] w-[35%] h-[35%] rounded-full bg-gradient-to-tr from-rose-400/40 to-pink-500/40 blur-[100px] pointer-events-none"
+                class="absolute bottom-[-10%] right-[-5%] w-[600px] h-[600px] rounded-full bg-[#6CCBC3]/40 blur-[90px] pointer-events-none"
             />
             <div
-                class="absolute top-[20%] right-[15%] w-[25%] h-[25%] rounded-full bg-gradient-to-bl from-amber-300/30 to-orange-400/30 blur-[80px] pointer-events-none"
+                class="absolute top-[25%] right-[20%] w-[350px] h-[350px] rounded-full bg-[#F39C12]/30 blur-[80px] pointer-events-none animate-pulse"
             />
 
             <div class="max-w-6xl mx-auto sm:px-6 lg:px-8 relative z-10">
@@ -117,7 +139,7 @@
                 <transition name="slide-fade">
                     <div
                         v-if="$page.props.flash?.success"
-                        class="mb-6 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 px-6 py-4 text-white shadow-lg shadow-emerald-500/20 flex items-center justify-between border border-emerald-400"
+                        class="mb-6 rounded-xl bg-success px-6 py-4 text-white shadow-lg shadow-success/20 flex items-center justify-between border border-success/80"
                     >
                         <div class="flex items-center gap-3">
                             <div class="bg-white/20 p-2 rounded-full">
@@ -190,33 +212,34 @@
                                 >
                                     <!-- Kolom Topik & Waktu -->
                                     <td class="whitespace-normal py-3 pl-4 pr-3">
-                                        <div class="flex flex-col gap-1">
-                                            <span
-                                                class="text-xs font-bold text-indigo-600 bg-indigo-50 w-max px-2 py-0.5 rounded-md flex items-center gap-1"
-                                            >
-                                                <svg
-                                                    class="w-3.5 h-3.5"
-                                                    fill="none"
-                                                    stroke="currentColor"
-                                                    viewBox="0 0 24 24"
-                                                >
-                                                    <path
-                                                        stroke-linecap="round"
-                                                        stroke-linejoin="round"
-                                                        stroke-width="2"
-                                                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                                                    />
-                                                </svg>
-                                                {{ jadwal.tanggal }} &bull; {{ jadwal.waktu }} WIB
-                                            </span>
+                                        <div class="flex flex-col gap-1.5">
                                             <div
-                                                class="font-extrabold text-slate-800 text-sm leading-snug group-hover:text-blue-600 transition-colors max-w-sm"
+                                                class="font-extrabold text-neutral-dark text-sm leading-snug group-hover:text-primary transition-colors max-w-sm"
                                             >
                                                 {{ jadwal.topik_bimbingan }}
                                             </div>
-                                            <div class="flex items-center gap-2">
+                                            <div class="flex items-center gap-2 flex-wrap">
                                                 <span
-                                                    class="inline-flex items-center rounded bg-slate-100 px-2 py-0.5 text-[10px] font-bold text-slate-500 uppercase tracking-wider"
+                                                    class="text-[11px] font-bold text-secondary bg-white border border-secondary px-2 py-0.5 rounded-md flex items-center gap-1"
+                                                >
+                                                    <svg
+                                                        class="w-3.5 h-3.5"
+                                                        fill="none"
+                                                        stroke="currentColor"
+                                                        viewBox="0 0 24 24"
+                                                    >
+                                                        <path
+                                                            stroke-linecap="round"
+                                                            stroke-linejoin="round"
+                                                            stroke-width="2"
+                                                            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                                                        />
+                                                    </svg>
+                                                    {{ jadwal.tanggal }} &bull;
+                                                    {{ jadwal.waktu }} WIB
+                                                </span>
+                                                <span
+                                                    class="inline-flex items-center rounded-md bg-white border border-neutral-medium px-2 py-0.5 text-[10px] font-bold text-neutral-medium uppercase tracking-wider"
                                                 >
                                                     {{ jadwal.tipe }}
                                                 </span>
@@ -227,9 +250,9 @@
                                     <!-- Kolom Dosen -->
                                     <td class="whitespace-nowrap px-3 py-3">
                                         <div class="flex items-center gap-2">
-                                            <!-- AVATAR GRADIENT KEREN -->
+                                            <!-- Avatar Dosen -->
                                             <div
-                                                class="h-8 w-8 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 text-white flex items-center justify-center font-bold text-xs shadow-md shadow-blue-500/20"
+                                                class="h-8 w-8 rounded-lg bg-primary text-white flex items-center justify-center font-bold text-xs"
                                             >
                                                 {{
                                                     jadwal.dosen
@@ -254,9 +277,9 @@
                                     <!-- Kolom Mahasiswa -->
                                     <td class="whitespace-nowrap px-3 py-3">
                                         <div class="flex items-center gap-2">
-                                            <!-- AVATAR GRADIENT KEREN -->
+                                            <!-- Avatar Mahasiswa -->
                                             <div
-                                                class="h-8 w-8 rounded-lg bg-gradient-to-br from-emerald-400 to-teal-500 text-white flex items-center justify-center font-bold text-xs shadow-md shadow-emerald-500/20"
+                                                class="h-8 w-8 rounded-lg bg-secondary text-white flex items-center justify-center font-bold text-xs"
                                             >
                                                 {{
                                                     jadwal.mahasiswa
@@ -295,12 +318,49 @@
                                     <!-- Kolom Aksi -->
                                     <td class="whitespace-nowrap py-3 pl-3 pr-4 text-right">
                                         <div class="flex justify-end gap-2">
-                                            <!-- Tampilan Aksi (Dosen & Mahasiswa sama-sama hanya melihat untuk PBI 1) -->
-                                            <span
-                                                class="inline-flex items-center text-indigo-500 font-bold text-[10px] bg-indigo-50 px-3 py-1.5 rounded-md border border-indigo-100"
-                                            >
-                                                Detail (Segera Hadir)
-                                            </span>
+                                            <!-- Aksi Khusus Dosen -->
+                                            <template v-if="basePath === '/dosen'">
+                                                <template v-if="jadwal.status === 'pending'">
+                                                    <!-- Primary Button -->
+                                                    <button
+                                                        class="inline-flex items-center text-[10px] font-bold text-white bg-primary hover:bg-primary-dark px-4 py-2 rounded-lg transition-colors"
+                                                        @click="handleAction(jadwal.id, 'approve')"
+                                                    >
+                                                        Setujui
+                                                    </button>
+                                                    <button
+                                                        class="inline-flex items-center text-[10px] font-bold text-neutral-dark bg-white border border-neutral-medium hover:bg-neutral-light px-4 py-2 rounded-lg transition-colors"
+                                                        @click="handleAction(jadwal.id, 'reject')"
+                                                    >
+                                                        Tolak
+                                                    </button>
+                                                </template>
+                                                <template v-else-if="jadwal.status === 'approved'">
+                                                    <!-- CTA Button / Accent -->
+                                                    <button
+                                                        class="inline-flex items-center text-[10px] font-bold text-white bg-accent hover:bg-accent-light px-4 py-2 rounded-lg transition-colors"
+                                                        @click="handleAction(jadwal.id, 'cancel')"
+                                                    >
+                                                        Batalkan
+                                                    </button>
+                                                </template>
+                                                <template v-else>
+                                                    <span
+                                                        class="inline-flex items-center text-slate-400 font-bold text-[10px] bg-slate-50 px-3 py-1.5 rounded-md border border-slate-200"
+                                                    >
+                                                        Terkunci
+                                                    </span>
+                                                </template>
+                                            </template>
+
+                                            <!-- Tampilan Mahasiswa (Tanpa Aksi) -->
+                                            <template v-else>
+                                                <span
+                                                    class="inline-flex items-center text-indigo-500 font-bold text-[10px] bg-indigo-50 px-3 py-1.5 rounded-md border border-indigo-100"
+                                                >
+                                                    Lihat Saja
+                                                </span>
+                                            </template>
                                         </div>
                                     </td>
                                 </tr>
