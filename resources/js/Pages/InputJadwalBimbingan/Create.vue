@@ -48,8 +48,16 @@ const submit = () => {
                 >
                     <div class="flex">
                         <div class="flex-shrink-0">
-                            <svg class="h-5 w-5 text-green-400" viewBox="0 0 20 20" fill="currentColor">
-                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                            <svg
+                                class="h-5 w-5 text-green-400"
+                                viewBox="0 0 20 20"
+                                fill="currentColor"
+                            >
+                                <path
+                                    fill-rule="evenodd"
+                                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                                    clip-rule="evenodd"
+                                />
                             </svg>
                         </div>
                         <div class="ml-3">
@@ -62,10 +70,16 @@ const submit = () => {
 
                 <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg">
                     <div class="p-6 text-gray-900">
-                        <form @submit.prevent="submit" class="space-y-6">
+                        <form
+                            class="space-y-6"
+                            @submit.prevent="submit"
+                        >
                             <!-- Dosen Pembimbing -->
                             <div>
-                                <label for="dosen_id" class="block text-sm font-medium text-gray-700">
+                                <label
+                                    for="dosen_id"
+                                    class="block text-sm font-medium text-gray-700"
+                                >
                                     Dosen Pembimbing
                                 </label>
                                 <select
@@ -74,7 +88,12 @@ const submit = () => {
                                     class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                                     required
                                 >
-                                    <option value="" disabled>-- Pilih Dosen Pembimbing --</option>
+                                    <option
+                                        value=""
+                                        disabled
+                                    >
+                                        -- Pilih Dosen Pembimbing --
+                                    </option>
                                     <option
                                         v-for="dosen in dosenList"
                                         :key="dosen.id"
@@ -83,48 +102,66 @@ const submit = () => {
                                         {{ dosen.nama_lengkap }}
                                     </option>
                                 </select>
-                                <p v-if="form.errors.dosen_id" class="mt-1 text-sm text-red-600">
+                                <p
+                                    v-if="form.errors.dosen_id"
+                                    class="mt-1 text-sm text-red-600"
+                                >
                                     {{ form.errors.dosen_id }}
                                 </p>
                             </div>
 
                             <!-- Tanggal -->
                             <div>
-                                <label for="tanggal" class="block text-sm font-medium text-gray-700">
+                                <label
+                                    for="tanggal"
+                                    class="block text-sm font-medium text-gray-700"
+                                >
                                     Tanggal Bimbingan
                                 </label>
                                 <input
                                     id="tanggal"
-                                    type="date"
                                     v-model="form.tanggal"
+                                    type="date"
                                     class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                                     required
-                                />
-                                <p v-if="form.errors.tanggal" class="mt-1 text-sm text-red-600">
+                                >
+                                <p
+                                    v-if="form.errors.tanggal"
+                                    class="mt-1 text-sm text-red-600"
+                                >
                                     {{ form.errors.tanggal }}
                                 </p>
                             </div>
 
                             <!-- Waktu -->
                             <div>
-                                <label for="waktu" class="block text-sm font-medium text-gray-700">
+                                <label
+                                    for="waktu"
+                                    class="block text-sm font-medium text-gray-700"
+                                >
                                     Waktu Bimbingan
                                 </label>
                                 <input
                                     id="waktu"
-                                    type="time"
                                     v-model="form.waktu"
+                                    type="time"
                                     class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                                     required
-                                />
-                                <p v-if="form.errors.waktu" class="mt-1 text-sm text-red-600">
+                                >
+                                <p
+                                    v-if="form.errors.waktu"
+                                    class="mt-1 text-sm text-red-600"
+                                >
                                     {{ form.errors.waktu }}
                                 </p>
                             </div>
 
                             <!-- Topik Bimbingan -->
                             <div>
-                                <label for="topik_bimbingan" class="block text-sm font-medium text-gray-700">
+                                <label
+                                    for="topik_bimbingan"
+                                    class="block text-sm font-medium text-gray-700"
+                                >
                                     Topik Bimbingan
                                 </label>
                                 <textarea
@@ -134,8 +171,11 @@ const submit = () => {
                                     class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                                     placeholder="Tuliskan topik atau materi yang ingin dibahas..."
                                     required
-                                ></textarea>
-                                <p v-if="form.errors.topik_bimbingan" class="mt-1 text-sm text-red-600">
+                                />
+                                <p
+                                    v-if="form.errors.topik_bimbingan"
+                                    class="mt-1 text-sm text-red-600"
+                                >
                                     {{ form.errors.topik_bimbingan }}
                                 </p>
                             </div>
@@ -148,24 +188,27 @@ const submit = () => {
                                 <div class="mt-2 flex space-x-6">
                                     <label class="inline-flex items-center">
                                         <input
-                                            type="radio"
                                             v-model="form.tipe"
+                                            type="radio"
                                             value="offline"
                                             class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-500"
-                                        />
+                                        >
                                         <span class="ml-2 text-sm text-gray-700">Offline (Tatap Muka)</span>
                                     </label>
                                     <label class="inline-flex items-center">
                                         <input
-                                            type="radio"
                                             v-model="form.tipe"
+                                            type="radio"
                                             value="online"
                                             class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-500"
-                                        />
+                                        >
                                         <span class="ml-2 text-sm text-gray-700">Online (Daring)</span>
                                     </label>
                                 </div>
-                                <p v-if="form.errors.tipe" class="mt-1 text-sm text-red-600">
+                                <p
+                                    v-if="form.errors.tipe"
+                                    class="mt-1 text-sm text-red-600"
+                                >
                                     {{ form.errors.tipe }}
                                 </p>
                             </div>
@@ -184,8 +227,19 @@ const submit = () => {
                                         fill="none"
                                         viewBox="0 0 24 24"
                                     >
-                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                        <circle
+                                            class="opacity-25"
+                                            cx="12"
+                                            cy="12"
+                                            r="10"
+                                            stroke="currentColor"
+                                            stroke-width="4"
+                                        />
+                                        <path
+                                            class="opacity-75"
+                                            fill="currentColor"
+                                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                        />
                                     </svg>
                                     {{ form.processing ? 'Menyimpan...' : 'Ajukan Jadwal Bimbingan' }}
                                 </button>

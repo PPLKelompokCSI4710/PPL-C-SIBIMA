@@ -52,4 +52,26 @@ class MonitoringJadwalBimbinganController extends Controller
 
         return redirect()->back()->with('success', 'Jadwal bimbingan telah ditolak.');
     }
+
+    // Menghapus jadwal (Oleh Mahasiswa, hanya jika status masih pending)
+    public function destroy($id)
+    {
+        $jadwal = JadwalBimbingan::findOrFail($id);
+
+        // Pastikan hanya bisa dihapus jika statusnya masih pending
+        if ($jadwal->status !== 'pending') {
+            return redirect()->back()->with('error', 'Hanya pengajuan dengan status pending yang dapat dihapus.');
+        }
+
+        // Pastikan mahasiswa yang login adalah pemilik jadwal
+        $mahasiswa = Mahasiswa::where('user_id', Auth::id())->first();
+        if ($jadwal->mahasiswa_id !== $mahasiswa?->id) {
+            abort(403, 'Anda tidak memiliki akses untuk menghapus jadwal ini.');
+        }
+
+        $jadwal->delete();
+
+        return redirect()->route('mahasiswa.jadwal.index')
+            ->with('success', 'Pengajuan bimbingan berhasil dihapus.');
+    }
 }
