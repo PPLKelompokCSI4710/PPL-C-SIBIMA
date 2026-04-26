@@ -14,9 +14,9 @@ class DosenForm
     {
         return $schema
             ->components([
-                Section::make('Informasi Akun & Akademik')
-                    ->description('Kelola data dosen secara terpusat di tabel user.')
-                    ->icon('heroicon-o-user')
+                Section::make('Profil & Akademik Dosen')
+                    ->description('Kelola identitas akun dan data pengajaran dosen pembimbing.')
+                    ->icon('heroicon-o-academic-cap')
                     ->columns(2)
                     ->schema([
                         TextInput::make('name')
@@ -50,7 +50,7 @@ class DosenForm
                             ->maxLength(255),
 
                         TextInput::make('kuota_pembimbingan')
-                            ->label('Kuota Pembimbingan')
+                            ->label('Kapasitas Bimbingan')
                             ->numeric()
                             ->default(10)
                             ->required()

@@ -28,17 +28,17 @@ class DosenResource extends Resource
 
     public static function getNavigationLabel(): string
     {
-        return 'Data Dosen';
+        return 'Dosen Pembimbing';
     }
 
     public static function getModelLabel(): string
     {
-        return 'Dosen';
+        return 'Dosen Pembimbing';
     }
 
     public static function getPluralModelLabel(): string
     {
-        return 'Data Dosen';
+        return 'Dosen Pembimbing';
     }
 
     public static function getNavigationGroup(): string|UnitEnum|null

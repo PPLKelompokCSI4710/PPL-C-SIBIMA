@@ -16,8 +16,14 @@ class DosensTable
     {
         return $table
             ->columns([
+                // ─── Penomoran ────────────────────────────────────────────────
+                TextColumn::make('index')
+                    ->label('#')
+                    ->rowIndex(),
+
+                // ─── Identitas ────────────────────────────────────────────────
                 TextColumn::make('name')
-                    ->label('Nama Dosen')
+                    ->label('Nama Lengkap')
                     ->searchable()
                     ->sortable(),
 
@@ -27,20 +33,22 @@ class DosensTable
                     ->sortable()
                     ->copyable(),
 
+                // ─── Akademik ─────────────────────────────────────────────────
                 TextColumn::make('program_studi')
-                    ->label('Program Studi')
+                    ->label('Prodi')
                     ->badge()
                     ->color('info')
                     ->searchable()
                     ->sortable(),
 
                 TextColumn::make('fakultas')
-                    ->label('Fakultas')
+                    ->label('Unit Kerja')
                     ->searchable()
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
 
                 TextColumn::make('kuota_pembimbingan')
-                    ->label('Kuota')
+                    ->label('Kapasitas')
                     ->numeric()
                     ->alignCenter()
                     ->sortable(),
