@@ -15,7 +15,16 @@ class StudentProgressForm
 
                 Select::make('user_id')
                     ->label('Mahasiswa')
-                    ->relationship('user', 'name')
+                    ->relationship('user', 'name', function ($query) {
+                        $query->whereHas('roles', fn ($q) => $q->where('name', 'mahasiswa'));
+
+                        if (auth()->check() && auth()->user()->hasRole('mahasiswa')) {
+                            $query->where('id', auth()->id());
+                        }
+
+                        return $query;
+                    })
+                    ->default(fn () => auth()->check() && auth()->user()->hasRole('mahasiswa') ? auth()->id() : null)
                     ->searchable()
                     ->required(),
 

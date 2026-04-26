@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\StudentProgress;
 
 use App\Filament\Resources\StudentProgress\Pages\CreateStudentProgress;
+use App\Filament\Resources\StudentProgress\Pages\EditStudentProgress;
 use App\Filament\Resources\StudentProgress\Pages\ListStudentProgress;
 use App\Filament\Resources\StudentProgress\Pages\ViewStudentProgress;
 use App\Filament\Resources\StudentProgress\Schemas\StudentProgressForm;
@@ -43,7 +44,11 @@ class StudentProgressResource extends Resource
 
     public static function canEdit($record): bool
     {
-        return false;
+        if (auth()->check() && auth()->user()->hasRole('mahasiswa')) {
+            return $record->user_id === auth()->id();
+        }
+
+        return true;
     }
 
     public static function canDelete($record): bool
@@ -86,6 +91,7 @@ class StudentProgressResource extends Resource
             'index' => ListStudentProgress::route('/'),
             'create' => CreateStudentProgress::route('/create'),
             'view' => ViewStudentProgress::route('/{record}'),
+            'edit' => EditStudentProgress::route('/{record}/edit'),
         ];
     }
 }
