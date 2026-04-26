@@ -27,9 +27,15 @@ class AdminPanelProvider extends PanelProvider
             ->default()
             ->id('admin')
             ->path('admin')
+            ->brandName('SIBIMA')
             ->login()
             ->colors([
-                'primary' => Color::Amber,
+                'primary' => '#1F4C7A', // Deep Blue
+                'secondary' => '#2FA7A0', // Teal
+                'warning' => '#F39C12', // Orange
+                'success' => '#6DBE45', // Leaf Green
+                'info' => '#2FA7A0', // Teal
+                'gray' => Color::Slate,
             ])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages')
