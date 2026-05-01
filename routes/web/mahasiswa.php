@@ -12,5 +12,10 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::middleware(['auth', 'role:mahasiswa'])->prefix('mahasiswa')->name('mahasiswa.')->group(function () {
+    // Dummy route untuk melihat implementasi frontend
+    Route::get('/bimbingan/reminder', function () {
+        return \Inertia\Inertia::render('Mahasiswa/Bimbingan/Reminder');
+    })->name('bimbingan.reminder');
+
     // Route::get('/akademik', [AkademikController::class, 'index'])->name('akademik.index'); // Contoh untuk PBI-ZZZ
 });
