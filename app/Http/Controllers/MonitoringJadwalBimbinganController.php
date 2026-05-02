@@ -4,25 +4,49 @@ namespace App\Http\Controllers;
 
 use App\Models\JadwalBimbingan;
 use App\Models\Mahasiswa;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 class MonitoringJadwalBimbinganController extends Controller
 {
     // Menampilkan daftar jadwal milik mahasiswa yang sedang login
-    public function index()
+    public function index(Request $request)
     {
         // Ambil profil mahasiswa yang sedang login
         $mahasiswa = Mahasiswa::where('user_id', Auth::id())->first();
 
-        // Mengambil jadwal milik mahasiswa ini saja, berserta data dosen
-        $jadwalBimbingans = JadwalBimbingan::with(['dosen', 'mahasiswa'])
-            ->where('mahasiswa_id', $mahasiswa?->id)
-            ->orderBy('tanggal', 'desc')
-            ->get();
+        // Ambil query filter dari request
+        $status = $request->query('status');
+        $search = $request->query('search');
+
+        // Query jadwal milik mahasiswa ini dengan filter opsional
+        $query = JadwalBimbingan::with(['dosen', 'mahasiswa'])
+            ->where('mahasiswa_id', $mahasiswa?->id);
+
+        // Filter berdasarkan status jika dipilih
+        if ($status && $status !== 'all') {
+            $query->where('status', $status);
+        }
+
+        // Filter berdasarkan kata kunci topik atau nama dosen
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('topik_bimbingan', 'like', "%{$search}%")
+                  ->orWhereHas('dosen', function ($q2) use ($search) {
+                      $q2->where('nama_lengkap', 'like', "%{$search}%");
+                  });
+            });
+        }
+
+        $jadwalBimbingans = $query->orderBy('tanggal', 'desc')->get();
 
         return Inertia::render('MonitoringJadwal/Index', [
             'jadwalBimbingans' => $jadwalBimbingans,
+            'filters' => [
+                'status' => $status ?? 'all',
+                'search' => $search ?? '',
+            ],
         ]);
     }
 
@@ -33,24 +57,6 @@ class MonitoringJadwalBimbinganController extends Controller
         $jadwal->update(['status' => 'canceled']);
 
         return redirect()->back()->with('success', 'Jadwal bimbingan berhasil dibatalkan.');
-    }
-
-    // Menyetujui jadwal (Khusus Dosen)
-    public function approve($id)
-    {
-        $jadwal = JadwalBimbingan::findOrFail($id);
-        $jadwal->update(['status' => 'approved']);
-
-        return redirect()->back()->with('success', 'Jadwal bimbingan berhasil disetujui.');
-    }
-
-    // Menolak jadwal (Khusus Dosen)
-    public function reject($id)
-    {
-        $jadwal = JadwalBimbingan::findOrFail($id);
-        $jadwal->update(['status' => 'rejected']);
-
-        return redirect()->back()->with('success', 'Jadwal bimbingan telah ditolak.');
     }
 
     // Menghapus jadwal (Oleh Mahasiswa, hanya jika status masih pending)
