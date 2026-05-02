@@ -17,7 +17,12 @@ class Mahasiswa extends Model
         'angkatan', 'semester', 'ipk', 'sks_lulus', 'sks_total',
         'status_akademik', 'no_telepon', 'foto', 'tanggal_lahir',
         'alamat', 'status_kelulusan_bimbingan', 'progress_reminder_frequency_days',
-        'progress_reminder_enabled'
+        'progress_reminder_frequency', 'progress_reminder_enabled', 'last_progress_reminder_sent_at',
+    ];
+
+    protected $casts = [
+        'last_progress_reminder_sent_at' => 'datetime',
+        'progress_reminder_enabled' => 'boolean',
     ];
 
     public function user()

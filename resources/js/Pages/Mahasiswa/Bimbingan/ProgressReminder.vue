@@ -24,7 +24,7 @@
     const isEditing = ref(false);
 
     const form = useForm({
-        frequency_days: props.reminderSettings.frequency_days,
+        frequency: props.reminderSettings.frequency,
         enabled: props.reminderSettings.enabled,
     });
 
@@ -47,7 +47,7 @@
                 iconColor: 'bg-brand-accent/10 text-brand-accent',
                 title: 'Perhatian!',
                 message: `Sudah ${props.progressData.daysSinceLastBimbingan} Hari Anda Belum Bimbingan`,
-                subText: 'Dosen pembimbing telah menerima notifikasi tembusan.',
+                subText: 'Dosen pembimbing akan menerima notifikasi tembusan.',
             };
         }
         return {
@@ -240,25 +240,27 @@
                             <div
                                 class="bg-brand-bg p-6 rounded-2xl border border-brand-text-secondary/10"
                             >
-                                <label class="block text-sm font-bold text-brand-text-primary mb-3"
-                                    >Frekuensi Reminder (Hari)</label
+                                <label class="block text-sm font-bold text-brand-text-primary mb-3">
+                                    Frekuensi Reminder
+                                </label>
+                                <select
+                                    v-model="form.frequency"
+                                    :disabled="!isEditing"
+                                    class="w-full bg-brand-white border border-brand-text-secondary/30 text-brand-text-primary text-base rounded-lg focus:ring-brand-primary focus:border-brand-primary block p-3 disabled:bg-gray-100 disabled:text-gray-500 rounded-lg"
                                 >
-                                <div class="flex items-center">
-                                    <input
-                                        v-model="form.frequency_days"
-                                        type="number"
-                                        :disabled="!isEditing"
-                                        class="w-full bg-brand-white border border-brand-text-secondary/30 text-brand-text-primary text-base rounded-lg focus:ring-brand-primary focus:border-brand-primary block p-3 disabled:bg-gray-100 disabled:text-gray-500"
-                                    />
-                                </div>
+                                    <option value="weekly">Mingguan</option>
+                                    <option value="biweekly">Dua Mingguan</option>
+                                </select>
                                 <p class="text-xs text-brand-text-secondary mt-2">
-                                    Default rekomendasi adalah 14 hari (2 Minggu).
+                                    Reminder dikirim berkala, tetapi hanya jika Anda melewati ambang
+                                    tidak bimbingan selama
+                                    {{ props.reminderSettings.inactive_threshold_days }} hari.
                                 </p>
                                 <div
-                                    v-if="form.errors.frequency_days"
+                                    v-if="form.errors.frequency"
                                     class="text-brand-accent text-sm mt-1"
                                 >
-                                    {{ form.errors.frequency_days }}
+                                    {{ form.errors.frequency }}
                                 </div>
                             </div>
 

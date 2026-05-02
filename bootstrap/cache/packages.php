@@ -85,6 +85,11 @@ return [
             0 => 'Laravel\\Breeze\\BreezeServiceProvider',
         ],
     ],
+    'laravel/dusk' => [
+        'providers' => [
+            0 => 'Laravel\\Dusk\\DuskServiceProvider',
+        ],
+    ],
     'laravel/pail' => [
         'providers' => [
             0 => 'Laravel\\Pail\\PailServiceProvider',

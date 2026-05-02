@@ -3,35 +3,21 @@
     import { Head } from '@inertiajs/vue3';
     import { ref, onMounted } from 'vue';
 
-    // Mock data (Normally passed via props from controller)
     const props = defineProps({
         upcomingBimbingan: {
             type: Object,
-            default: () => ({
-                dosen: 'Dr. Budi Santoso, M.Kom',
-                topic: 'Review Draft Bab 3 & Analisis Data',
-                date: '2026-04-25',
-                dateFormatted: '25 April 2026',
-                timeFormatted: '10:00 - 11:30 WIB',
-                location: 'Ruang Rapat Gedung Kuliah Utama (Lantai 2)',
-                status: 'Upcoming',
-                preparationNotes: [
-                    'Cetak draft Bab 3 sebanyak 1 rangkap',
-                    'Siapkan dataset yang akan dianalisis',
-                    'Isi logbook progres sebelumnya',
-                ],
-                type: 'Offline',
-            }),
+            default: () => null,
         },
     });
 
     // Calculate countdown
     const daysLeft = ref(0);
     onMounted(() => {
+        if (!props.upcomingBimbingan?.date) return;
         const target = new Date(props.upcomingBimbingan.date);
         const today = new Date();
-        const diffTime = Math.abs(target - today);
-        daysLeft.value = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        const diffTime = target - today;
+        daysLeft.value = Math.max(0, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
     });
 </script>
 
@@ -78,8 +64,22 @@
             />
 
             <div class="mx-auto max-w-5xl sm:px-6 lg:px-8 relative z-10">
+                <div
+                    v-if="!props.upcomingBimbingan"
+                    class="bg-brand-white p-10 rounded-3xl shadow-sm border border-brand-text-secondary/10 text-center"
+                >
+                    <h3 class="text-2xl font-black text-brand-primary-dark mb-2">
+                        Belum ada jadwal bimbingan
+                    </h3>
+                    <p class="text-brand-text-secondary">
+                        Jadwal bimbingan yang sudah disetujui akan muncul di sini dan akan
+                        diingatkan otomatis (H-3, H-1, H-2 jam).
+                    </p>
+                </div>
+
                 <!-- Main Card -->
                 <div
+                    v-else
                     class="bg-brand-white backdrop-blur-xl shadow-2xl rounded-3xl border border-white/60 overflow-hidden transition-all duration-500 hover:shadow-brand-primary/10"
                 >
                     <div class="grid grid-cols-1 md:grid-cols-3">

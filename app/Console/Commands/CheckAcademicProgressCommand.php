@@ -2,11 +2,12 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
-use App\Models\Mahasiswa;
+use App\Models\AppSetting;
 use App\Models\Bimbingan;
-use Carbon\Carbon;
+use App\Models\Mahasiswa;
 use App\Notifications\AcademicProgressNotification;
+use Carbon\Carbon;
+use Illuminate\Console\Command;
 
 class CheckAcademicProgressCommand extends Command
 {
@@ -30,16 +31,16 @@ class CheckAcademicProgressCommand extends Command
     public function handle()
     {
         $this->info('Starting academic progress check...');
-        
-        $mahasiswas = Mahasiswa::where('progress_reminder_enabled', true)->with(['user', 'dosens', 'bimbingans' => function($query) {
+
+        $inactiveThresholdDays = (int) (AppSetting::get('progress_reminder_inactive_days', 14) ?? 14);
+
+        $mahasiswas = Mahasiswa::where('progress_reminder_enabled', true)->with(['user', 'dosens', 'bimbingans' => function ($query) {
             $query->where('status', 'selesai')->orderBy('waktu_selesai', 'desc');
         }])->get();
 
         foreach ($mahasiswas as $mahasiswa) {
-            $frequencyDays = $mahasiswa->progress_reminder_frequency_days ?? 14; // Default 14 days
-            
             $lastBimbingan = $mahasiswa->bimbingans->first();
-            
+
             if ($lastBimbingan) {
                 $daysSinceLast = Carbon::now()->diffInDays($lastBimbingan->waktu_selesai);
             } else {
@@ -47,19 +48,34 @@ class CheckAcademicProgressCommand extends Command
                 $daysSinceLast = Carbon::now()->diffInDays($mahasiswa->created_at);
             }
 
-            if ($daysSinceLast >= $frequencyDays) {
+            $cooldownDays = ($mahasiswa->progress_reminder_frequency ?? 'biweekly') === 'weekly' ? 7 : 14;
+            $lastSentAt = $mahasiswa->last_progress_reminder_sent_at;
+            $eligibleByCooldown = ! $lastSentAt || $lastSentAt->copy()->addDays($cooldownDays)->isPast();
+
+            if ($daysSinceLast >= $inactiveThresholdDays && $eligibleByCooldown) {
+                $progressSummary = [
+                    'sks_lulus' => $mahasiswa->sks_lulus,
+                    'sks_total' => $mahasiswa->sks_total,
+                    'ipk' => $mahasiswa->ipk,
+                    'semester' => $mahasiswa->semester,
+                ];
+
                 // Send reminder to Mahasiswa
                 if ($mahasiswa->user) {
-                    $mahasiswa->user->notify(new AcademicProgressNotification($daysSinceLast, false));
+                    $mahasiswa->user->notify(new AcademicProgressNotification($daysSinceLast, false, '', $progressSummary));
                 }
-                
+
                 // Send CC to Dosen(s)
                 foreach ($mahasiswa->dosens as $dosen) {
                     if ($dosen->user) {
-                        $dosen->user->notify(new AcademicProgressNotification($daysSinceLast, true, $mahasiswa->nama_lengkap));
+                        $dosen->user->notify(new AcademicProgressNotification($daysSinceLast, true, $mahasiswa->nama_lengkap, $progressSummary));
                     }
                 }
-                
+
+                $mahasiswa->forceFill([
+                    'last_progress_reminder_sent_at' => now(),
+                ])->save();
+
                 $this->info("Reminder sent to Mahasiswa NIM {$mahasiswa->nim} and CC'd Dosen.");
             }
         }
