@@ -156,7 +156,7 @@ class KalenderAkademikController extends Controller
 
     public function dosenStore(Request $request)
     {
-        $validated = $request->validate([
+        $request->validate([
             'nama_kegiatan' => 'required|string|max:255',
             'tipe_kegiatan' => 'required|string|in:kuliah,rapat',
             'tanggal_mulai' => 'required|date',
@@ -165,10 +165,16 @@ class KalenderAkademikController extends Controller
             'deskripsi' => 'nullable|string',
         ]);
 
-        $validated['user_id'] = Auth::id() ?? $request->dosen_id ?? 1; // Mendukung ID dari form untuk testing tanpa login
-        $validated['status'] = 'Active';
-
-        KalenderAkademik::create($validated);
+        KalenderAkademik::create([
+            'user_id' => $request->dosen_id ?? Auth::id() ?? 1,
+            'nama_kegiatan' => $request->nama_kegiatan,
+            'tipe_kegiatan' => $request->tipe_kegiatan,
+            'tanggal_mulai' => $request->tanggal_mulai,
+            'tanggal_selesai' => $request->tanggal_selesai,
+            'jam_mulai' => $request->jam_mulai,
+            'deskripsi' => $request->deskripsi,
+            'status' => 'Active',
+        ]);
 
         return redirect()->back()->with('success', 'Jadwal berhasil ditambahkan.');
     }

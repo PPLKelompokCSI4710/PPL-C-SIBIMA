@@ -50,9 +50,9 @@ class JadwalRequestController extends Controller
         // If approved by admin, insert to Kalender Akademik
         if ($request->status === 'approved_admin') {
             KalenderAkademik::create([
-                'user_id' => $jadwalRequest->dosen_id, // Hubungkan ke kalender pribadi dosen tersebut
+                'user_id' => $jadwalRequest->dosen_id,
                 'nama_kegiatan' => $jadwalRequest->judul,
-                'tipe_kegiatan' => $jadwalRequest->tipe_request,
+                'tipe_kegiatan' => 'bimbingan',
                 'tanggal_mulai' => $jadwalRequest->tanggal,
                 'tanggal_selesai' => $jadwalRequest->tanggal,
                 'jam_mulai' => $jadwalRequest->jam,

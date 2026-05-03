@@ -161,6 +161,28 @@
         return allEvents.value.filter((e) => (e.type || '').toLowerCase() === activeFilter.value);
     });
 
+    // ── Google Calendar Integration ──────────────────────────────────────────────
+    function getGoogleCalendarUrl(ev) {
+        const k = props.kalender.find((item) => 'db-' + item.id === ev.id);
+        if (!k) return '#';
+
+        const title = encodeURIComponent(k.nama_kegiatan);
+        const details = encodeURIComponent(k.deskripsi || '');
+        const location = encodeURIComponent('SIBIMA - Universitas');
+
+        let startStr = k.tanggal_mulai.replace(/-/g, '');
+        let endStr = (k.tanggal_selesai || k.tanggal_mulai).replace(/-/g, '');
+
+        if (k.jam_mulai) {
+            const time = k.jam_mulai.replace(/[:.]/g, '').padEnd(4, '0') + '00';
+            startStr += 'T' + time;
+            const endH = (parseInt(time.substring(0, 2)) + 1).toString().padStart(2, '0');
+            endStr += 'T' + endH + time.substring(2);
+        }
+
+        return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&details=${details}&location=${location}&dates=${startStr}/${endStr}`;
+    }
+
     // ── Type badge style helper ───────────────────────────────────────────────────
     function typeClass(tipe) {
         const t = (tipe ?? '').toLowerCase();
@@ -816,9 +838,29 @@
                                         ev.time !== '-' ? ev.time : ''
                                     }}</span>
                                 </div>
-                                <h4 class="font-bold text-slate-900 text-sm leading-snug">
-                                    {{ ev.title }}
-                                </h4>
+                                <div class="flex justify-between items-start gap-2">
+                                    <h4
+                                        class="font-bold text-slate-900 text-sm leading-snug flex-1"
+                                    >
+                                        {{ ev.title }}
+                                    </h4>
+                                    <a
+                                        :href="getGoogleCalendarUrl(ev)"
+                                        target="_blank"
+                                        class="p-1.5 rounded-lg bg-white/50 text-[#1F4C7A] hover:bg-white transition group border border-blue-200/50"
+                                        title="Simpan ke Google Calendar"
+                                    >
+                                        <svg
+                                            class="w-4 h-4"
+                                            fill="currentColor"
+                                            viewBox="0 0 24 24"
+                                        >
+                                            <path
+                                                d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"
+                                            />
+                                        </svg>
+                                    </a>
+                                </div>
                                 <p
                                     v-if="ev.location && ev.location !== '-'"
                                     class="text-xs text-slate-500 mt-1.5 flex items-center gap-1"
