@@ -2,8 +2,10 @@
 
 namespace App\Models;
 
+use App\Enums\AkademikStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Mahasiswa extends Model
@@ -21,12 +23,23 @@ class Mahasiswa extends Model
         'consecutive_progress_reminders',
     ];
 
-    protected $casts = [
-        'last_progress_reminder_sent_at' => 'datetime',
-        'progress_reminder_enabled' => 'boolean',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'status_akademik' => AkademikStatus::class,
+            'tanggal_lahir' => 'date',
+            'ipk' => 'decimal:2',
+            'status_kelulusan_bimbingan' => 'boolean',
+            'last_progress_reminder_sent_at' => 'datetime',
+            'progress_reminder_enabled' => 'boolean',
+        ];
+    }
 
-    public function user()
+    // =========================================================================
+    // RELATIONSHIPS
+    // =========================================================================
+
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
@@ -38,6 +51,7 @@ class Mahasiswa extends Model
 
     public function dosens()
     {
-        return $this->belongsToMany(Dosen::class, 'dosen_mahasiswa')->withPivot(['tanggal_penugasan', 'tanggal_berakhir', 'is_active', 'catatan']);
+        return $this->belongsToMany(Dosen::class, 'dosen_mahasiswa')
+            ->withPivot(['tanggal_penugasan', 'tanggal_berakhir', 'is_active', 'catatan']);
     }
 }

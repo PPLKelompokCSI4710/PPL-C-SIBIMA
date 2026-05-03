@@ -13,8 +13,24 @@ class Dosen extends Model
     protected $table = 'dosen';
 
     protected $fillable = [
-        'user_id', 'nidn', 'nama_lengkap', 'program_studi', 'fakultas',
-        'jabatan_akademik', 'keahlian', 'foto', 'no_telepon'
+        'user_id',
+        'nidn',
+        'nama_lengkap',
+        'program_studi',
+        'fakultas',
+        'jabatan_akademik',
+        'jabatan_fungsional',
+        'gelar',
+        'keahlian',
+        'no_telepon',
+        'foto',
+        'is_active',
+        'kuota_mahasiswa',
+        'bio',
+    ];
+
+    protected $casts = [
+        'is_active' => 'boolean',
     ];
 
     public function user()
@@ -29,6 +45,7 @@ class Dosen extends Model
 
     public function mahasiswas()
     {
-        return $this->belongsToMany(Mahasiswa::class, 'dosen_mahasiswa')->withPivot(['tanggal_penugasan', 'tanggal_berakhir', 'is_active', 'catatan']);
+        return $this->belongsToMany(Mahasiswa::class, 'dosen_mahasiswa')
+            ->withPivot(['tanggal_penugasan', 'tanggal_berakhir', 'is_active', 'catatan']);
     }
 }
