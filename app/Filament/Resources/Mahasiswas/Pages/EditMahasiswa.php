@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Mahasiswas\Pages;
 
 use App\Filament\Resources\Mahasiswas\MahasiswaResource;
+use App\Models\Mahasiswa;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\ForceDeleteAction;
 use Filament\Actions\RestoreAction;
@@ -17,8 +18,14 @@ class EditMahasiswa extends EditRecord
     {
         return [
             ViewAction::make(),
-            DeleteAction::make(),
-            ForceDeleteAction::make(),
+            DeleteAction::make()
+                ->after(function (Mahasiswa $record): void {
+                    $record->user?->delete();
+                }),
+            ForceDeleteAction::make()
+                ->after(function (Mahasiswa $record): void {
+                    $record->user?->forceDelete();
+                }),
             RestoreAction::make(),
         ];
     }

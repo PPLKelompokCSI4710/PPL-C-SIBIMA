@@ -17,6 +17,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Collection;
 
 class MahasiswasTable
 {
@@ -113,9 +114,19 @@ class MahasiswasTable
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make(),
+                    DeleteBulkAction::make()
+                        ->after(function (Collection $records): void {
+                            $records->each(function (Mahasiswa $record): void {
+                                $record->user?->delete();
+                            });
+                        }),
                     RestoreBulkAction::make(),
-                    ForceDeleteBulkAction::make(),
+                    ForceDeleteBulkAction::make()
+                        ->after(function (Collection $records): void {
+                            $records->each(function (Mahasiswa $record): void {
+                                $record->user?->forceDelete();
+                            });
+                        }),
                 ]),
             ])
             ->defaultSort('created_at', 'desc')
