@@ -22,14 +22,27 @@ class UserSeeder extends Seeder
         );
         $admin->assignRole('admin');
 
-        $dosen = User::firstOrCreate(
+        $dosenBase = User::firstOrCreate(
             ['email' => 'dosen@sibima.test'],
-            [
-                'name' => 'Dosen Pembimbing',
-                'password' => Hash::make('password'),
-            ]
+            ['name' => 'Dosen Pembimbing', 'password' => Hash::make('password')]
         );
-        $dosen->assignRole('dosen');
+        $dosenBase->assignRole('dosen');
+
+        $daftarDosen = [
+            ['name' => 'Dr. Ir. Rahmat Hidayat, M.T.', 'email' => 'rahmat@sibima.test'],
+            ['name' => 'Siti Aminah, S.Kom., M.Cs.', 'email' => 'siti@sibima.test'],
+            ['name' => 'Prof. Dr. Ahmad Subagyo',   'email' => 'ahmad@sibima.test'],
+            ['name' => 'Budi Setiawan, S.T., M.T.', 'email' => 'budi@sibima.test'],
+            ['name' => 'Dr. Linda Kusuma, M.Kom.',  'email' => 'linda@sibima.test'],
+        ];
+
+        foreach ($daftarDosen as $d) {
+            $u = User::firstOrCreate(
+                ['email' => $d['email']],
+                ['name' => $d['name'], 'password' => Hash::make('password')]
+            );
+            $u->assignRole('dosen');
+        }
 
         $mahasiswa = User::firstOrCreate(
             ['email' => 'mahasiswa@sibima.test'],

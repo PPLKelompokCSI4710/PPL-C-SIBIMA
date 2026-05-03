@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\JadwalRequestController;
+use App\Http\Controllers\KalenderAkademikController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -25,6 +27,37 @@ Route::middleware('auth')->group(function () {
 });
 
 require __DIR__.'/auth.php';
+
+// Preview routes for Kalender Akademik
+Route::prefix('preview')->group(function () {
+    Route::get('/kalender-admin', function () {
+        Inertia::share('auth', ['user' => ['name' => 'Admin Preview', 'email' => 'admin@preview.com']]);
+
+        return app(KalenderAkademikController::class)->adminIndex();
+    })->name('preview.kalender-admin');
+
+    Route::post('/kalender-admin', [KalenderAkademikController::class, 'adminStore'])->name('admin.kalender-akademik.store');
+    Route::put('/kalender-admin/{kalenderAkademik}', [KalenderAkademikController::class, 'adminUpdate'])->name('admin.kalender-akademik.update');
+    Route::delete('/kalender-admin/{kalenderAkademik}', [KalenderAkademikController::class, 'adminDestroy'])->name('admin.kalender-akademik.destroy');
+
+    Route::get('/kalender-dosen', function () {
+        Inertia::share('auth', ['user' => ['name' => 'Dosen Preview', 'email' => 'dosen@preview.com']]);
+
+        return app(KalenderAkademikController::class)->dosenIndex();
+    })->name('preview.kalender-dosen');
+
+    Route::get('/kalender-mahasiswa', function () {
+        Inertia::share('auth', ['user' => ['name' => 'Mahasiswa Preview', 'email' => 'mahasiswa@preview.com']]);
+
+        return app(KalenderAkademikController::class)->mahasiswaIndex();
+    })->name('preview.kalender-mahasiswa');
+
+    Route::post('/jadwal-request', [JadwalRequestController::class, 'store'])->name('jadwal-request.store');
+    Route::put('/jadwal-request/{id}/status', [JadwalRequestController::class, 'updateStatus'])->name('jadwal-request.updateStatus');
+
+    // Dosen can add their own non-bimbingan schedules directly
+    Route::post('/kalender-dosen', [KalenderAkademikController::class, 'dosenStore'])->name('dosen.kalender.store');
+});
 
 // Include actor-based routes for isolated PBI development
 require __DIR__.'/web/admin.php';

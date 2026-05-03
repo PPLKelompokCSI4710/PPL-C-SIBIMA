@@ -81,6 +81,7 @@
 
     const props = defineProps({
         kalender: { type: Array, default: () => [] },
+        requests: { type: Array, default: () => [] },
         flash: { type: Object, default: () => ({}) },
     });
 
@@ -184,6 +185,18 @@
             item.nama_kegiatan.toLowerCase().includes(searchQuery.value.toLowerCase()),
         );
     });
+
+    function getTipeLabel(tipe) {
+        const labels = {
+            semester: 'Semester',
+            uts: 'Ujian Tengah Semester',
+            libur: 'Libur',
+            krs: 'Pendaftaran KRS',
+            wisuda: 'Wisuda',
+            lainnya: 'Lainnya',
+        };
+        return labels[tipe] || tipe;
+    }
 </script>
 
 <template>
@@ -244,24 +257,6 @@
                                 </div>
 
                                 <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
-                                    <div
-                                        class="flex items-center gap-3 rounded-full border border-slate-200 bg-slate-50 px-4 py-3 shadow-sm"
-                                    >
-                                        <svg
-                                            class="h-5 w-5 text-slate-400"
-                                            viewBox="0 0 24 24"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            stroke-width="2"
-                                        >
-                                            <rect x="3" y="4" width="18" height="18" rx="4" />
-                                            <path d="M16 2v4" />
-                                            <path d="M8 2v4" />
-                                            <path d="M3 10h18" />
-                                        </svg>
-                                        <span class="text-sm text-slate-600">Oct 2023</span>
-                                    </div>
-
                                     <div class="relative w-full max-w-xs">
                                         <span
                                             class="pointer-events-none absolute inset-y-0 left-4 flex items-center text-slate-400"
@@ -286,12 +281,130 @@
                                     </div>
 
                                     <button
-                                        class="inline-flex items-center justify-center rounded-full bg-emerald-500 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-emerald-500/20 transition hover:bg-emerald-600"
+                                        class="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-emerald-500 text-2xl font-bold text-white shadow-lg shadow-emerald-500/20 transition hover:bg-emerald-600"
+                                        title="Add New Event"
                                         @click="openCreate"
                                     >
-                                        + Add New Event
+                                        +
                                     </button>
                                 </div>
+                            </div>
+                        </div>
+
+                        <div class="rounded-[32px] bg-white p-6 shadow-xl shadow-slate-900/5">
+                            <div class="flex items-center justify-between mb-6">
+                                <div>
+                                    <h2 class="text-xl font-semibold text-slate-900">
+                                        Daftar Permintaan Jadwal
+                                    </h2>
+                                    <p class="text-sm text-slate-500">
+                                        Permintaan dari Mahasiswa / Dosen
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="overflow-x-auto">
+                                <table class="min-w-full border-separate border-spacing-0 text-sm">
+                                    <thead class="bg-slate-50 text-slate-500">
+                                        <tr>
+                                            <th class="px-6 py-4 text-left font-semibold">
+                                                Pemohon
+                                            </th>
+                                            <th class="px-6 py-4 text-left font-semibold">
+                                                Kegiatan
+                                            </th>
+                                            <th class="px-6 py-4 text-left font-semibold">
+                                                Tgl & Jam
+                                            </th>
+                                            <th class="px-6 py-4 text-left font-semibold">
+                                                Status
+                                            </th>
+                                            <th class="px-6 py-4 text-right font-semibold">Aksi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody
+                                        class="divide-y divide-slate-200 bg-white text-slate-700"
+                                    >
+                                        <tr v-if="requests.length === 0">
+                                            <td
+                                                colspan="5"
+                                                class="px-6 py-8 text-center text-slate-500"
+                                            >
+                                                Tidak ada permintaan jadwal.
+                                            </td>
+                                        </tr>
+                                        <tr
+                                            v-for="req in requests"
+                                            :key="req.id"
+                                            class="hover:bg-slate-50"
+                                        >
+                                            <td class="px-6 py-4">
+                                                <div class="font-semibold text-slate-900">
+                                                    {{
+                                                        req.user ? req.user.name : 'Mahasiswa/Dosen'
+                                                    }}
+                                                </div>
+                                            </td>
+                                            <td class="px-6 py-4">
+                                                <div class="font-semibold text-slate-900">
+                                                    {{ req.judul }}
+                                                </div>
+                                                <div class="text-xs text-slate-500">
+                                                    {{ req.tipe_request }}
+                                                </div>
+                                            </td>
+                                            <td class="px-6 py-4">
+                                                {{ req.tanggal }} <br />
+                                                <span class="text-xs text-slate-500">{{
+                                                    req.jam
+                                                }}</span>
+                                            </td>
+                                            <td class="px-6 py-4">
+                                                <span
+                                                    class="inline-flex rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-wider"
+                                                    :class="{
+                                                        'bg-amber-100 text-amber-700':
+                                                            req.status === 'pending_dosen' ||
+                                                            req.status === 'pending_admin',
+                                                        'bg-blue-100 text-blue-700':
+                                                            req.status === 'approved_dosen',
+                                                        'bg-emerald-100 text-emerald-700':
+                                                            req.status === 'approved_admin',
+                                                        'bg-rose-100 text-rose-700':
+                                                            req.status === 'rejected_dosen' ||
+                                                            req.status === 'rejected_admin',
+                                                    }"
+                                                >
+                                                    {{ req.status.replace('_', ' ') }}
+                                                </span>
+                                            </td>
+                                            <td class="px-6 py-4 text-right">
+                                                <!-- If it's approved by dosen and waiting for admin -->
+                                                <button
+                                                    v-if="req.status === 'approved_dosen'"
+                                                    class="inline-flex px-4 py-2 items-center justify-center rounded-xl bg-emerald-500 text-white font-semibold transition hover:bg-emerald-600 text-xs"
+                                                    @click="
+                                                        $inertia.put(
+                                                            route(
+                                                                'jadwal-request.updateStatus',
+                                                                req.id,
+                                                            ),
+                                                            { status: 'approved_admin' },
+                                                        )
+                                                    "
+                                                >
+                                                    Masukan ke Kalender
+                                                </button>
+                                                <button
+                                                    v-else-if="req.status === 'rejected_dosen'"
+                                                    class="inline-flex px-4 py-2 items-center justify-center rounded-xl bg-slate-100 text-slate-500 font-semibold transition hover:bg-slate-200 text-xs cursor-not-allowed"
+                                                    disabled
+                                                >
+                                                    Ditolak Dosen
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
 
