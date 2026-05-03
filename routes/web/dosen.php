@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\KetersediaanJadwalController;
 use App\Http\Controllers\MonitoringJadwalBimbinganController;
 use Illuminate\Support\Facades\Route;
 
@@ -20,4 +21,9 @@ Route::middleware(['auth', 'role:dosen'])->prefix('dosen')->name('dosen.')->grou
     Route::patch('/jadwal-bimbingan/{id}/cancel', [MonitoringJadwalBimbinganController::class, 'cancel'])->name('jadwal.cancel');
     Route::patch('/jadwal-bimbingan/{id}/approve', [MonitoringJadwalBimbinganController::class, 'approve'])->name('jadwal.approve');
     Route::patch('/jadwal-bimbingan/{id}/reject', [MonitoringJadwalBimbinganController::class, 'reject'])->name('jadwal.reject');
+
+    // Ketersediaan Jadwal
+    Route::get('/ketersediaan-jadwal', [KetersediaanJadwalController::class, 'index'])->name('ketersediaan.index');
+    Route::post('/ketersediaan-jadwal', [KetersediaanJadwalController::class, 'store'])->name('ketersediaan.store');
+    Route::delete('/ketersediaan-jadwal/{id}', [KetersediaanJadwalController::class, 'destroy'])->name('ketersediaan.destroy');
 });
