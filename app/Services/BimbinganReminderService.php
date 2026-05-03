@@ -58,15 +58,11 @@ class BimbinganReminderService
         ];
 
         DB::transaction(function () use ($bimbingan, $payload, $stages, $mahasiswaUserId, $dosenUserId) {
-            // Cancel old pending reminders (so updates don't double-send)
+            // Remove pending rows so updateOrCreate does not resurrect rows we just marked canceled (unique key).
             BimbinganReminder::query()
                 ->where('bimbingan_id', $bimbingan->id)
                 ->where('status', 'pending')
-                ->update([
-                    'status' => 'canceled',
-                    'canceled_at' => now(),
-                    'updated_at' => now(),
-                ]);
+                ->delete();
 
             $this->upsertStagesForUser($bimbingan->id, $mahasiswaUserId, $payload, $stages);
             $this->upsertStagesForUser($bimbingan->id, $dosenUserId, $payload, $stages);

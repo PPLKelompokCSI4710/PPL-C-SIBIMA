@@ -2,14 +2,10 @@
 
 namespace App\Notifications;
 
-use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Notification;
 
-class BimbinganScheduleReminderNotification extends Notification implements ShouldQueue
+class BimbinganScheduleReminderNotification extends Notification
 {
-    use Queueable;
-
     public function __construct(
         private readonly array $payload,
         private readonly string $stage,

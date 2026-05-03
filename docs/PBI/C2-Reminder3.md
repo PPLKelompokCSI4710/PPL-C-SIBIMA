@@ -1,47 +1,42 @@
-# Fitur C2 — Reminder3 (PBI 15–16)
+# Fitur C2 — Reminder & Eskalasi (PBI 32–34)
 
-Dokumen ini merekam **Product Backlog Item (PBI)** untuk fitur reminder pada modul bimbingan.
+Dokumen ini menyelaraskan **Product Backlog Item (PBI)** dengan implementasi di repositori.
 
-## PBI 15 — Reminder jadwal bimbingan multi-tahap otomatis
+## PBI 32 — Reminder jadwal bimbingan multi-tahap otomatis
 
-### User story
+| AC   | Ringkas                    | Implementasi                                                                                           |
+| ---- | -------------------------- | ------------------------------------------------------------------------------------------------------ |
+| 32.1 | H-3, H-1, H-2 jam          | `BimbinganReminderService`, `bimbingan_reminders`, `bimbingan:dispatch-schedule-reminders`             |
+| 32.2 | Konten lengkap             | `BimbinganScheduleReminderNotification` (`detail`: nama, waktu, lokasi/tipe, topik)                    |
+| 32.3 | Nonaktifkan tahap          | `reminder_preferences` + `/settings/reminders`                                                         |
+| 32.4 | Ubah jadwal → jadwal ulang | Sync pada perubahan field relevan di `Bimbingan` (lihat `Bimbingan::booted`)                           |
+| 32.5 | Tidak duplikasi kirim      | Baris `sent` tidak di-dispatch ulang; tes `test_dispatch_does_not_resend_already_sent_stage_reminders` |
 
-Sebagai **mahasiswa/dosen**, saya ingin menerima reminder otomatis bertahap (H-3, H-1, dan H-2 jam sebelum jadwal), sehingga saya memiliki waktu yang cukup untuk mempersiapkan diri dan tidak lupa terhadap jadwal bimbingan.
+## PBI 33 — Reminder progres & target akademik periodik
 
-### Acceptance criteria
+| AC   | Ringkas                      | Implementasi                                                      |
+| ---- | ---------------------------- | ----------------------------------------------------------------- |
+| 33.1 | Deteksi tidak aktif ≥ N hari | `CheckAcademicProgressCommand`, `progress_reminder_inactive_days` |
+| 33.2 | CC dosen                     | Notifikasi `AcademicProgressNotification` (`isDosenCc`)           |
+| 33.3 | Ringkasan progres            | `progress_summary`: SKS lulus/total, IPK, semester                |
+| 33.4 | Frekuensi & cooldown         | `last_progress_reminder_sent_at` + `weekly` / `biweekly`          |
+| 33.5 | Threshold admin              | `/admin/settings/reminders` → `AppSetting`                        |
 
-- Sistem mengirim reminder pada **H-3**, **H-1**, dan **H-2 jam** sebelum jadwal.
-- Pengguna dapat memilih dan menonaktifkan tahap reminder tertentu.
-- Reminder berisi detail lengkap: **nama dosen/mahasiswa**, **waktu**, **lokasi/link**, dan **topik**.
-- Jika jadwal diubah, reminder lama dibatalkan dan jadwal reminder diperbarui otomatis.
+## PBI 34 — Eskalasi ke admin
 
-### Implementasi (repo)
-
-- **Preferensi user**: `reminder_preferences` (`/settings/reminders`)
-- **Antrian reminder**: `bimbingan_reminders` (dibuat/di-sync otomatis saat `Bimbingan` disimpan)
-- **Pengirim**: `php artisan bimbingan:dispatch-schedule-reminders` (direkomendasikan dijalankan tiap menit via scheduler)
-- **Notifikasi**: `BimbinganScheduleReminderNotification` (channel: `database`)
-
-## PBI 16 — Reminder progres & target akademik periodik
-
-### User story
-
-Sebagai **mahasiswa**, saya ingin mendapat reminder otomatis ketika target akademik saya belum tercapai atau saya belum melakukan bimbingan dalam periode tertentu, sehingga saya dapat tetap on-track dalam studi.
-
-### Acceptance criteria
-
-- Sistem mendeteksi mahasiswa yang tidak melakukan bimbingan selama **N hari** (**konfigurasi admin**).
-- Reminder dikirim ke mahasiswa dan **tembusan ke dosen pembimbing**.
-- Reminder menyertakan ringkasan progres: **target tercapai vs belum tercapai**.
-- Frekuensi reminder progres dapat diatur: **mingguan** atau **dua mingguan**.
-
-### Implementasi (repo)
-
-- **Konfigurasi admin (N hari)**: `app_settings.key=progress_reminder_inactive_days` (`/admin/settings/reminders`)
-- **Frekuensi user**: `mahasiswa.progress_reminder_frequency` (`weekly|biweekly`)
-- **Deteksi & kirim**: `php artisan bimbingan:check-progress`
-- **Notifikasi**: `AcademicProgressNotification` (channel: `database`, termasuk `progress_summary`)
+| AC   | Ringkas               | Implementasi                                                                                            |
+| ---- | --------------------- | ------------------------------------------------------------------------------------------------------- |
+| 34.1 | Record eskalasi       | `eskalasis`, threshold `escalation_reminder_threshold`, `consecutive_progress_reminders`                |
+| 34.2 | Notifikasi admin      | `EskalasiNotification` (detail: mahasiswa, jumlah sesi selesai, terakhir bimbingan, ringkasan akademik) |
+| 34.3 | Monitoring            | `/admin/eskalasi`, `EskalasiController@index`                                                           |
+| 34.4 | Tutup setelah booking | `Bimbingan::saved` → `resolved` + reset `consecutive_progress_reminders`                                |
+| 34.5 | Tidak duplikat        | Cek `Eskalasi` aktif sebelum `create`                                                                   |
 
 ## Testing (Laravel Dusk)
 
-- Dusk test: `tests/Browser/ReminderFeatureTest.php`
+- `tests/Browser/LoginTest.php` — prasyarat login
+- `tests/Browser/Pbi32ScheduleReminderTest.php` — PBI 32
+- `tests/Browser/Pbi33ProgressReminderTest.php` — PBI 33
+- `tests/Browser/Pbi34EskalasiTest.php` — PBI 34
+
+Laporan langkah uji: `docs/PBI/Test_Report_Reminder_Dusk.md`.

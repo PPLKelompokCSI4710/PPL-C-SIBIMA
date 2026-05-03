@@ -8,6 +8,7 @@
 
     const form = useForm({
         progress_reminder_inactive_days: props.settings.progress_reminder_inactive_days,
+        escalation_reminder_threshold: props.settings.escalation_reminder_threshold,
     });
 
     const submit = () => {
@@ -65,6 +66,32 @@
                                 class="text-brand-accent text-sm mt-2"
                             >
                                 {{ form.errors.progress_reminder_inactive_days }}
+                            </div>
+                        </div>
+
+                        <div
+                            class="bg-brand-bg p-6 rounded-2xl border border-brand-text-secondary/10"
+                        >
+                            <label class="block text-sm font-bold text-brand-text-primary mb-3">
+                                Ambang Eskalasi (Jumlah Reminder Progres Berturut-turut)
+                            </label>
+                            <p class="text-brand-text-secondary text-sm mb-3">
+                                Setelah mahasiswa menerima reminder progres sebanyak N kali
+                                berturut-turut tanpa booking baru, sistem membuat eskalasi dan
+                                mengirim notifikasi ke admin.
+                            </p>
+                            <input
+                                v-model="form.escalation_reminder_threshold"
+                                type="number"
+                                min="1"
+                                max="50"
+                                class="w-full bg-brand-white border border-brand-text-secondary/30 text-brand-text-primary text-base rounded-lg focus:ring-brand-primary focus:border-brand-primary block p-3"
+                            />
+                            <div
+                                v-if="form.errors.escalation_reminder_threshold"
+                                class="text-brand-accent text-sm mt-2"
+                            >
+                                {{ form.errors.escalation_reminder_threshold }}
                             </div>
                         </div>
 

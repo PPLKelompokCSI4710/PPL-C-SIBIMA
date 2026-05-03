@@ -2,14 +2,10 @@
 
 namespace App\Notifications;
 
-use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Notification;
 
-class AcademicProgressNotification extends Notification implements ShouldQueue
+class AcademicProgressNotification extends Notification
 {
-    use Queueable;
-
     private $daysSinceLastBimbingan;
 
     private $isDosenCc;

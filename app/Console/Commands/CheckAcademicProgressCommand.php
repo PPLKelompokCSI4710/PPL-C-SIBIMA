@@ -3,10 +3,11 @@
 namespace App\Console\Commands;
 
 use App\Models\AppSetting;
-use App\Models\Bimbingan;
+use App\Models\Eskalasi;
 use App\Models\Mahasiswa;
+use App\Models\User;
 use App\Notifications\AcademicProgressNotification;
-use Carbon\Carbon;
+use App\Notifications\EskalasiNotification;
 use Illuminate\Console\Command;
 
 class CheckAcademicProgressCommand extends Command
@@ -32,7 +33,8 @@ class CheckAcademicProgressCommand extends Command
     {
         $this->info('Starting academic progress check...');
 
-        $inactiveThresholdDays = (int) (AppSetting::get('progress_reminder_inactive_days', 14) ?? 14);
+        $inactiveThresholdDays = max(1, (int) (AppSetting::get('progress_reminder_inactive_days') ?? 14));
+        $escalationThreshold = max(1, (int) (AppSetting::get('escalation_reminder_threshold') ?? 3));
 
         $mahasiswas = Mahasiswa::where('progress_reminder_enabled', true)->with(['user', 'dosens', 'bimbingans' => function ($query) {
             $query->where('status', 'selesai')->orderBy('waktu_selesai', 'desc');
@@ -42,11 +44,12 @@ class CheckAcademicProgressCommand extends Command
             $lastBimbingan = $mahasiswa->bimbingans->first();
 
             if ($lastBimbingan) {
-                $daysSinceLast = Carbon::now()->diffInDays($lastBimbingan->waktu_selesai);
+                $daysSinceLast = (int) $lastBimbingan->waktu_selesai->copy()->startOfDay()->diffInDays(now()->startOfDay());
             } else {
-                // If no bimbingan ever, check against creation or semester start (for simplicity we use created_at)
-                $daysSinceLast = Carbon::now()->diffInDays($mahasiswa->created_at);
+                $daysSinceLast = (int) $mahasiswa->created_at->copy()->startOfDay()->diffInDays(now()->startOfDay());
             }
+
+            $daysSinceLast = max(0, $daysSinceLast);
 
             $cooldownDays = ($mahasiswa->progress_reminder_frequency ?? 'biweekly') === 'weekly' ? 7 : 14;
             $lastSentAt = $mahasiswa->last_progress_reminder_sent_at;
@@ -60,23 +63,51 @@ class CheckAcademicProgressCommand extends Command
                     'semester' => $mahasiswa->semester,
                 ];
 
-                // Send reminder to Mahasiswa
                 if ($mahasiswa->user) {
                     $mahasiswa->user->notify(new AcademicProgressNotification($daysSinceLast, false, '', $progressSummary));
                 }
 
-                // Send CC to Dosen(s)
                 foreach ($mahasiswa->dosens as $dosen) {
                     if ($dosen->user) {
                         $dosen->user->notify(new AcademicProgressNotification($daysSinceLast, true, $mahasiswa->nama_lengkap, $progressSummary));
                     }
                 }
 
+                $nextConsecutive = (int) ($mahasiswa->consecutive_progress_reminders ?? 0) + 1;
+
                 $mahasiswa->forceFill([
                     'last_progress_reminder_sent_at' => now(),
+                    'consecutive_progress_reminders' => $nextConsecutive,
                 ])->save();
 
                 $this->info("Reminder sent to Mahasiswa NIM {$mahasiswa->nim} and CC'd Dosen.");
+
+                if ($nextConsecutive >= $escalationThreshold) {
+                    $existingActive = Eskalasi::where('mahasiswa_id', $mahasiswa->id)
+                        ->where('status', 'active')
+                        ->exists();
+
+                    if (! $existingActive) {
+                        Eskalasi::create([
+                            'mahasiswa_id' => $mahasiswa->id,
+                            'status' => 'active',
+                        ]);
+
+                        $admins = User::role('admin')->get();
+                        $sesiSelesai = $mahasiswa->bimbingans->count();
+                        $terakhir = $lastBimbingan?->waktu_selesai?->toDateTimeString();
+                        foreach ($admins as $admin) {
+                            $admin->notify(new EskalasiNotification(
+                                $progressSummary,
+                                $mahasiswa->nama_lengkap,
+                                $sesiSelesai,
+                                $terakhir,
+                            ));
+                        }
+
+                        $this->info("Eskalasi created for Mahasiswa NIM {$mahasiswa->nim} and notified Admins.");
+                    }
+                }
             }
         }
 
