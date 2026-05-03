@@ -289,6 +289,7 @@
                             </div>
                             <div class="flex gap-3">
                                 <button
+                                    id="btn-request-jadwal"
                                     class="inline-flex items-center justify-center rounded-full bg-emerald-500 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-emerald-500/20 transition hover:bg-emerald-600"
                                     @click="showRequestModal = true"
                                 >
@@ -617,6 +618,7 @@
                                 >
                                     <div
                                         v-for="ev in filteredEvents"
+                                        :id="'agenda-item-' + ev.id"
                                         :key="ev.id"
                                         class="bg-white p-3.5 rounded-2xl border border-slate-100 shadow-sm flex items-center gap-4 hover:shadow-md transition cursor-pointer"
                                         @click="
@@ -699,6 +701,7 @@
                                     >Judul / Topik</label
                                 >
                                 <input
+                                    id="mhs-judul"
                                     v-model="form.judul"
                                     type="text"
                                     class="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
@@ -710,6 +713,7 @@
                                     >Dosen Pembimbing</label
                                 >
                                 <select
+                                    id="mhs-dosen-id"
                                     v-model="form.dosen_id"
                                     class="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
                                     required
@@ -726,6 +730,7 @@
                                         >Tanggal</label
                                     >
                                     <input
+                                        id="mhs-tanggal"
                                         v-model="form.tanggal"
                                         type="date"
                                         class="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
@@ -737,6 +742,7 @@
                                         >Jam</label
                                     >
                                     <input
+                                        id="mhs-jam"
                                         v-model="form.jam"
                                         type="time"
                                         class="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
@@ -763,6 +769,7 @@
                                     Batal
                                 </button>
                                 <button
+                                    id="btn-submit-request"
                                     type="submit"
                                     class="rounded-full bg-emerald-500 px-6 py-3 text-sm font-semibold text-white hover:bg-emerald-600"
                                 >
@@ -845,6 +852,7 @@
                                         {{ ev.title }}
                                     </h4>
                                     <a
+                                        :id="'btn-sync-google-' + ev.id"
                                         :href="getGoogleCalendarUrl(ev)"
                                         target="_blank"
                                         class="p-1.5 rounded-lg bg-white/50 text-[#1F4C7A] hover:bg-white transition group border border-blue-200/50"

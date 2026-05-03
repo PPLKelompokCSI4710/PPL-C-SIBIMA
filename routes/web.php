@@ -29,9 +29,13 @@ Route::middleware('auth')->group(function () {
 require __DIR__.'/auth.php';
 
 // Preview routes for Kalender Akademik
+// Jika user sudah login, data auth sungguhan digunakan.
+// Jika belum login, fallback ke mock data sehingga route tetap bisa diakses untuk dev.
 Route::prefix('preview')->group(function () {
     Route::get('/kalender-admin', function () {
-        Inertia::share('auth', ['user' => ['name' => 'Admin Preview', 'email' => 'admin@preview.com']]);
+        if (! auth()->check()) {
+            Inertia::share('auth', ['user' => ['name' => 'Admin Preview', 'email' => 'admin@preview.com']]);
+        }
 
         return app(KalenderAkademikController::class)->adminIndex();
     })->name('preview.kalender-admin');
@@ -41,13 +45,17 @@ Route::prefix('preview')->group(function () {
     Route::delete('/kalender-admin/{kalenderAkademik}', [KalenderAkademikController::class, 'adminDestroy'])->name('admin.kalender-akademik.destroy');
 
     Route::get('/kalender-dosen', function () {
-        Inertia::share('auth', ['user' => ['name' => 'Dosen Preview', 'email' => 'dosen@preview.com']]);
+        if (! auth()->check()) {
+            Inertia::share('auth', ['user' => ['name' => 'Dosen Preview', 'email' => 'dosen@preview.com']]);
+        }
 
         return app(KalenderAkademikController::class)->dosenIndex();
     })->name('preview.kalender-dosen');
 
     Route::get('/kalender-mahasiswa', function () {
-        Inertia::share('auth', ['user' => ['name' => 'Mahasiswa Preview', 'email' => 'mahasiswa@preview.com']]);
+        if (! auth()->check()) {
+            Inertia::share('auth', ['user' => ['name' => 'Mahasiswa Preview', 'email' => 'mahasiswa@preview.com']]);
+        }
 
         return app(KalenderAkademikController::class)->mahasiswaIndex();
     })->name('preview.kalender-mahasiswa');

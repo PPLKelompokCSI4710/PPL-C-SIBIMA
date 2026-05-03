@@ -102,6 +102,7 @@
         jam_mulai: '',
         tanggal_selesai: '',
         deskripsi: '',
+        status: 'Active',
     });
 
     function openCreate() {
@@ -132,6 +133,11 @@
     }
 
     function submitForm() {
+        // Ensure tanggal_selesai is provided
+        if (!form.tanggal_selesai) {
+            form.tanggal_selesai = form.tanggal_mulai;
+        }
+
         if (isEditing.value) {
             form.put(route('admin.kalender-akademik.update', editingId.value), {
                 onSuccess: () => {
@@ -273,6 +279,7 @@
                                             </svg>
                                         </span>
                                         <input
+                                            id="search-input"
                                             v-model="searchQuery"
                                             type="text"
                                             placeholder="Search"
@@ -281,6 +288,7 @@
                                     </div>
 
                                     <button
+                                        id="btn-add-event"
                                         class="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-emerald-500 text-2xl font-bold text-white shadow-lg shadow-emerald-500/20 transition hover:bg-emerald-600"
                                         title="Add New Event"
                                         @click="openCreate"
@@ -381,6 +389,7 @@
                                                 <!-- If it's approved by dosen and waiting for admin -->
                                                 <button
                                                     v-if="req.status === 'approved_dosen'"
+                                                    :id="'btn-publish-' + req.id"
                                                     class="inline-flex px-4 py-2 items-center justify-center rounded-xl bg-emerald-500 text-white font-semibold transition hover:bg-emerald-600 text-xs"
                                                     @click="
                                                         $inertia.put(
@@ -565,8 +574,10 @@
                                     >Nama Kegiatan</label
                                 >
                                 <input
+                                    id="admin-nama-kegiatan"
                                     v-model="form.nama_kegiatan"
                                     type="text"
+                                    name="nama_kegiatan"
                                     placeholder="Contoh: Ujian Tengah Semester"
                                     class="w-full rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
                                 />
@@ -576,8 +587,10 @@
                                     >Start Date</label
                                 >
                                 <input
+                                    id="admin-tanggal-mulai"
                                     v-model="form.tanggal_mulai"
                                     type="date"
+                                    name="tanggal_mulai"
                                     class="w-full rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
                                 />
                             </div>
@@ -586,8 +599,10 @@
                                     >Start Time</label
                                 >
                                 <input
+                                    id="admin-jam-mulai"
                                     v-model="form.jam_mulai"
                                     type="time"
+                                    name="jam_mulai"
                                     class="w-full rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
                                 />
                             </div>
@@ -596,8 +611,10 @@
                                     >End Date</label
                                 >
                                 <input
+                                    id="admin-tanggal-selesai"
                                     v-model="form.tanggal_selesai"
                                     type="date"
+                                    name="tanggal_selesai"
                                     class="w-full rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
                                 />
                             </div>
@@ -606,7 +623,9 @@
                                     >Description</label
                                 >
                                 <textarea
+                                    id="admin-deskripsi"
                                     v-model="form.deskripsi"
+                                    name="deskripsi"
                                     rows="4"
                                     class="w-full rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
                                 />

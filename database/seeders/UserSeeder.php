@@ -52,5 +52,15 @@ class UserSeeder extends Seeder
             ]
         );
         $mahasiswa->assignRole('mahasiswa');
+
+        // Mahasiswa kedua – bimbingan dengan Rahmat
+        $mahasiswa2 = User::firstOrCreate(
+            ['email' => 'mahasiswa2@sibima.test'],
+            [
+                'name' => 'Budi Santoso',
+                'password' => Hash::make('password'),
+            ]
+        );
+        $mahasiswa2->assignRole('mahasiswa');
     }
 }

@@ -634,12 +634,14 @@
                                         </p>
                                         <div class="flex gap-2 mt-1">
                                             <button
+                                                :id="'btn-acc-' + req.id"
                                                 class="px-4 py-1.5 bg-emerald-500 text-white text-xs font-semibold rounded-full hover:bg-emerald-600 transition"
                                                 @click="updateStatus(req.id, 'approved_dosen')"
                                             >
                                                 ACC
                                             </button>
                                             <button
+                                                :id="'btn-reject-' + req.id"
                                                 class="px-4 py-1.5 bg-rose-500 text-white text-xs font-semibold rounded-full hover:bg-rose-600 transition"
                                                 @click="openRejectModal(req.id)"
                                             >
@@ -878,6 +880,7 @@
                                 <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
                                     <button
                                         v-for="opt in tipeOptions"
+                                        :id="'opt-' + opt.value"
                                         :key="opt.value"
                                         type="button"
                                         :class="[
@@ -907,6 +910,7 @@
                                     >Judul / Nama Kegiatan</label
                                 >
                                 <input
+                                    id="add-nama-kegiatan"
                                     v-model="addForm.nama_kegiatan"
                                     type="text"
                                     required
@@ -921,6 +925,7 @@
                                         >Tanggal Mulai</label
                                     >
                                     <input
+                                        id="add-tanggal-mulai"
                                         v-model="addForm.tanggal_mulai"
                                         type="date"
                                         required
@@ -932,6 +937,7 @@
                                         >Jam Mulai</label
                                     >
                                     <input
+                                        id="add-jam-mulai"
                                         v-model="addForm.jam_mulai"
                                         type="time"
                                         class="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm focus:border-[#1F4C7A] focus:ring-2 focus:ring-blue-100 outline-none"
