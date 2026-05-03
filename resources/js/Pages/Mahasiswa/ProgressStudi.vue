@@ -123,6 +123,7 @@
                                 >
                                 <div class="relative">
                                     <input
+                                        id="ipk"
                                         v-model="form.ipk"
                                         type="number"
                                         step="0.01"
@@ -139,6 +140,7 @@
                                     >Total SKS Lulus <span class="text-red-500">*</span></label
                                 >
                                 <input
+                                    id="total_sks"
                                     v-model="form.total_sks"
                                     type="number"
                                     min="0"
@@ -153,6 +155,7 @@
                                     >Mata Kuliah Lulus</label
                                 >
                                 <input
+                                    id="passed_courses"
                                     v-model="form.passed_courses"
                                     type="number"
                                     min="0"

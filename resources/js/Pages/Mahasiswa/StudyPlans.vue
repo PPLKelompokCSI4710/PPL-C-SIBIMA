@@ -140,6 +140,7 @@
                             <td class="px-6 py-4 text-right">
                                 <div class="flex items-center justify-end gap-2">
                                     <button
+                                        dusk="edit-button"
                                         class="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors"
                                         title="Edit"
                                         @click="openEditModal(course)"
@@ -147,6 +148,7 @@
                                         <Edit2Icon class="w-4 h-4" />
                                     </button>
                                     <button
+                                        dusk="delete-button"
                                         class="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors"
                                         title="Delete"
                                         @click="openDeleteModal(course)"
@@ -215,6 +217,7 @@
                                     >
                                     <select
                                         v-model="form.course_id"
+                                        name="course_id"
                                         class="w-full rounded-lg border-slate-300 border px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all bg-white text-slate-700"
                                         @change="onCourseSelect"
                                     >
@@ -263,6 +266,7 @@
                                     >
                                     <select
                                         v-model="form.semester"
+                                        name="semester"
                                         class="w-full rounded-lg border-slate-300 border px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all bg-white text-slate-700"
                                     >
                                         <option v-for="n in 8" :key="n" :value="n">
