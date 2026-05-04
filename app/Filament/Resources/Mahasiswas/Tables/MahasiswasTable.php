@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Mahasiswas\Tables;
 
 use App\Enums\AkademikStatus;
 use App\Models\Mahasiswa;
+use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -14,6 +15,7 @@ use Filament\Support\Enums\FontWeight;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Enums\FiltersLayout;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
@@ -90,8 +92,11 @@ class MahasiswasTable
                 SelectFilter::make('status_akademik')
                     ->label('Status Akademik')
                     ->options(AkademikStatus::class)
-                    ->multiple()
-                    ->preload(),
+                    ->native()
+                    ->preload()
+                    ->modifyFormFieldUsing(fn ($field) => $field->extraInputAttributes([
+                        'dusk' => 'status-akademik',
+                    ])),
 
                 // Filter berdasarkan Angkatan
                 SelectFilter::make('angkatan')
@@ -107,7 +112,13 @@ class MahasiswasTable
 
                 // Filter tampilkan yang sudah di-soft delete
                 TrashedFilter::make(),
-            ])
+            ], FiltersLayout::Modal)
+            ->filtersTriggerAction(fn (Action $action) => $action->extraAttributes([
+                'dusk' => 'filter-button',
+            ]))
+            ->filtersApplyAction(fn (Action $action) => $action->extraAttributes([
+                'dusk' => 'apply-filter',
+            ]))
             ->recordActions([
                 ViewAction::make(),
                 EditAction::make(),

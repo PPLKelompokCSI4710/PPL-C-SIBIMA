@@ -44,7 +44,6 @@
                 <!-- Logo -->
                 <Link href="/" class="navbar-brand">
                     <img src="/images/logo-sibima.svg" alt="SIBIMA Logo" class="navbar-logo" />
-                    <!-- <span class="navbar-wordmark">SIBIMA</span> -->
                 </Link>
 
                 <!-- Auth Links -->
@@ -350,7 +349,6 @@
             <div class="site-footer-inner">
                 <div class="footer-brand">
                     <img src="/images/logo-sibima.svg" alt="SIBIMA Logo" class="footer-logo" />
-                    <span class="footer-wordmark">SIBIMA</span>
                 </div>
                 <p class="footer-copy">
                     &copy; 2026 SIBIMA — Telkom University. All rights reserved.
@@ -367,7 +365,7 @@
     /* ─────────────────────────────────────────────────────────
    DESIGN TOKENS
 ───────────────────────────────────────────────────────── */
-    :root {
+    .sibima-root {
         --color-primary: #4f46e5; /* indigo-600 */
         --color-primary-dark: #3730a3; /* indigo-800 */
         --color-primary-light: #e0e7ff; /* indigo-100 */
