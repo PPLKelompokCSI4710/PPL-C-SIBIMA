@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreBookingRequest;
 use App\Models\Dosen;
 use App\Models\JadwalBimbingan;
 use App\Models\Mahasiswa;
-use Illuminate\Http\Request;
+use App\Models\Schedule;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
 class InputJadwalBimbinganController extends Controller
@@ -26,31 +28,67 @@ class InputJadwalBimbinganController extends Controller
         ]);
     }
 
-    // Menyimpan jadwal bimbingan baru (Oleh Mahasiswa)
-    public function store(Request $request)
+    // Mendapatkan jadwal dosen (dipanggil via axios/fetch API)
+    public function getSchedules($dosenId)
     {
-        $validated = $request->validate([
-            'dosen_id' => 'required|exists:dosen,id',
-            'tanggal' => 'required|date|after_or_equal:today',
-            'waktu' => 'required',
-            'topik_bimbingan' => 'required|string|max:500',
-            'tipe' => 'required|in:online,offline',
-        ]);
+        $schedules = Schedule::where('dosen_id', $dosenId)
+            ->where('tanggal', '>=', now()->toDateString())
+            ->where('kuota', '>', 0)
+            ->orderBy('tanggal', 'asc')
+            ->orderBy('waktu_mulai', 'asc')
+            ->get();
 
-        // Ambil profil mahasiswa yang sedang login
+        return response()->json($schedules);
+    }
+
+    // Menyimpan jadwal bimbingan baru (Oleh Mahasiswa)
+    public function store(StoreBookingRequest $request)
+    {
+        $validated = $request->validated();
+
         $mahasiswa = Mahasiswa::where('user_id', Auth::id())->first();
 
-        JadwalBimbingan::create([
-            'dosen_id' => $validated['dosen_id'],
-            'mahasiswa_id' => $mahasiswa->id,
-            'tanggal' => $validated['tanggal'],
-            'waktu' => $validated['waktu'],
-            'topik_bimbingan' => $validated['topik_bimbingan'],
-            'tipe' => $validated['tipe'],
-            'status' => 'pending',
-        ]);
+        try {
+            DB::beginTransaction();
 
-        return redirect()->route('mahasiswa.jadwal.index')
-            ->with('success', 'Jadwal bimbingan berhasil diajukan.');
+            // Kunci baris jadwal agar tidak terjadi race condition
+            $schedule = Schedule::where('id', $validated['schedule_id'])
+                ->lockForUpdate()
+                ->first();
+
+            if (! $schedule || $schedule->kuota <= 0) {
+                DB::rollBack();
+
+                return redirect()->back()->withErrors([
+                    'schedule_id' => 'Jadwal yang dipilih sudah penuh atau tidak tersedia.',
+                ]);
+            }
+
+            // Kurangi kuota jadwal
+            $schedule->decrement('kuota');
+
+            // Simpan data booking ke jadwal_bimbingans
+            JadwalBimbingan::create([
+                'dosen_id' => $validated['dosen_id'],
+                'mahasiswa_id' => $mahasiswa->id,
+                'schedule_id' => $schedule->id,
+                'tanggal' => $schedule->tanggal,
+                'waktu' => $schedule->waktu_mulai,
+                'topik_bimbingan' => $validated['topik_bimbingan'],
+                'tipe' => $validated['tipe'],
+                'status' => 'pending',
+            ]);
+
+            DB::commit();
+
+            return redirect()->route('mahasiswa.jadwal.index')
+                ->with('success', 'Jadwal bimbingan berhasil diajukan.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            return redirect()->back()->withErrors([
+                'error' => 'Terjadi kesalahan saat memproses pengajuan Anda. Silakan coba lagi.',
+            ]);
+        }
     }
 }

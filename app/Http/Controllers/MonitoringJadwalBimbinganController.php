@@ -33,9 +33,9 @@ class MonitoringJadwalBimbinganController extends Controller
         if ($search) {
             $query->where(function ($q) use ($search) {
                 $q->where('topik_bimbingan', 'like', "%{$search}%")
-                  ->orWhereHas('dosen', function ($q2) use ($search) {
-                      $q2->where('nama_lengkap', 'like', "%{$search}%");
-                  });
+                    ->orWhereHas('dosen', function ($q2) use ($search) {
+                        $q2->where('nama_lengkap', 'like', "%{$search}%");
+                    });
             });
         }
 
@@ -54,6 +54,13 @@ class MonitoringJadwalBimbinganController extends Controller
     public function cancel($id)
     {
         $jadwal = JadwalBimbingan::findOrFail($id);
+
+        // Pastikan mahasiswa yang login adalah pemilik jadwal
+        $mahasiswa = Mahasiswa::where('user_id', Auth::id())->first();
+        if ($jadwal->mahasiswa_id !== $mahasiswa?->id) {
+            abort(403, 'Anda tidak memiliki akses untuk membatalkan jadwal ini.');
+        }
+
         $jadwal->update(['status' => 'canceled']);
 
         return redirect()->back()->with('success', 'Jadwal bimbingan berhasil dibatalkan.');

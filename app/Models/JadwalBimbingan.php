@@ -14,6 +14,7 @@ class JadwalBimbingan extends Model
     protected $fillable = [
         'dosen_id',
         'mahasiswa_id',
+        'schedule_id',
         'tanggal',
         'waktu',
         'topik_bimbingan',
@@ -29,5 +30,10 @@ class JadwalBimbingan extends Model
     public function mahasiswa()
     {
         return $this->belongsTo(Mahasiswa::class, 'mahasiswa_id');
+    }
+
+    public function schedule()
+    {
+        return $this->belongsTo(Schedule::class, 'schedule_id');
     }
 }

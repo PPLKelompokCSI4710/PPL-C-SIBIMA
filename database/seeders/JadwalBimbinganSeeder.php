@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\Dosen;
 use App\Models\JadwalBimbingan;
 use App\Models\Mahasiswa;
+use App\Models\Schedule;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
@@ -13,33 +14,7 @@ class JadwalBimbinganSeeder extends Seeder
 {
     public function run(): void
     {
-        // Ambil atau buat user dosen
-        $dosenUser = User::firstOrCreate(
-            ['email' => 'dosen@sibima.test'],
-            [
-                'name' => 'Dosen Pembimbing',
-                'password' => Hash::make('password'),
-            ]
-        );
-        $dosenUser->assignRole('dosen');
-
-        // Buat profil dosen
-        $dosenProfile = Dosen::firstOrCreate(
-            ['user_id' => $dosenUser->id],
-            [
-                'nidn' => '0012345678',
-                'nama_lengkap' => 'Dr. Budi Santoso, M.Kom.',
-                'program_studi' => 'Teknik Informatika',
-                'fakultas' => 'FMIPA',
-                'jabatan_fungsional' => 'Lektor Kepala',
-                'gelar' => 'Dr., M.Kom.',
-                'no_telepon' => '081234567890',
-                'is_active' => true,
-                'kuota_mahasiswa' => 10,
-            ]
-        );
-
-        // Ambil atau buat user mahasiswa
+        // 1. Ambil atau buat user mahasiswa
         $mahasiswaUser = User::firstOrCreate(
             ['email' => 'mahasiswa@sibima.test'],
             [
@@ -49,7 +24,6 @@ class JadwalBimbinganSeeder extends Seeder
         );
         $mahasiswaUser->assignRole('mahasiswa');
 
-        // Buat profil mahasiswa
         $mahasiswaProfile = Mahasiswa::firstOrCreate(
             ['user_id' => $mahasiswaUser->id],
             [
@@ -66,66 +40,123 @@ class JadwalBimbinganSeeder extends Seeder
             ]
         );
 
-        // Data dummy jadwal bimbingan
-        $jadwalData = [
+        // 2. Data beberapa Dosen
+        $dosenList = [
             [
-                'dosen_id' => $dosenProfile->id,
-                'mahasiswa_id' => $mahasiswaProfile->id,
-                'tanggal' => now()->addDays(3)->toDateString(),
-                'waktu' => '09:00:00',
-                'topik_bimbingan' => 'Konsultasi Bab 1 - Pendahuluan & Latar Belakang',
-                'tipe' => 'offline',
-                'status' => 'pending',
+                'email' => 'dosen@sibima.test',
+                'name' => 'Dr. Budi Santoso, M.Kom.',
+                'nidn' => '0012345678',
+                'jabatan_fungsional' => 'Lektor Kepala',
+                'gelar' => 'Dr., M.Kom.',
             ],
             [
-                'dosen_id' => $dosenProfile->id,
-                'mahasiswa_id' => $mahasiswaProfile->id,
-                'tanggal' => now()->addDays(5)->toDateString(),
-                'waktu' => '13:00:00',
-                'topik_bimbingan' => 'Review Bab 2 - Tinjauan Pustaka & Landasan Teori',
-                'tipe' => 'online',
-                'status' => 'pending',
+                'email' => 'dosen2@sibima.test',
+                'name' => 'Dr. Siti Aminah, M.T.',
+                'nidn' => '0012345679',
+                'jabatan_fungsional' => 'Lektor',
+                'gelar' => 'Dr., M.T.',
             ],
             [
-                'dosen_id' => $dosenProfile->id,
-                'mahasiswa_id' => $mahasiswaProfile->id,
-                'tanggal' => now()->subDays(2)->toDateString(),
-                'waktu' => '10:00:00',
-                'topik_bimbingan' => 'Diskusi Metodologi Penelitian - Bab 3',
-                'tipe' => 'offline',
-                'status' => 'completed',
-            ],
-            [
-                'dosen_id' => $dosenProfile->id,
-                'mahasiswa_id' => $mahasiswaProfile->id,
-                'tanggal' => now()->subDays(4)->toDateString(),
-                'waktu' => '14:30:00',
-                'topik_bimbingan' => 'Bimbingan Proposal Skripsi Awal',
-                'tipe' => 'online',
-                'status' => 'rejected',
-            ],
-            [
-                'dosen_id' => $dosenProfile->id,
-                'mahasiswa_id' => $mahasiswaProfile->id,
-                'tanggal' => now()->addDays(7)->toDateString(),
-                'waktu' => '11:00:00',
-                'topik_bimbingan' => 'Evaluasi Progress Analisis Data - Bab 4',
-                'tipe' => 'offline',
-                'status' => 'approved',
-            ],
-            [
-                'dosen_id' => $dosenProfile->id,
-                'mahasiswa_id' => $mahasiswaProfile->id,
-                'tanggal' => now()->addDays(14)->toDateString(),
-                'waktu' => '15:00:00',
-                'topik_bimbingan' => 'Konsultasi Persiapan Sidang Akhir',
-                'tipe' => 'online',
-                'status' => 'canceled',
+                'email' => 'dosen3@sibima.test',
+                'name' => 'Prof. Dr. Antonius, M.Sc.',
+                'nidn' => '0012345680',
+                'jabatan_fungsional' => 'Guru Besar',
+                'gelar' => 'Prof. Dr., M.Sc.',
             ],
         ];
 
-        foreach ($jadwalData as $jadwal) {
-            JadwalBimbingan::create($jadwal);
+        $dosenProfiles = [];
+
+        foreach ($dosenList as $d) {
+            $user = User::firstOrCreate(
+                ['email' => $d['email']],
+                [
+                    'name' => $d['name'],
+                    'password' => Hash::make('password'),
+                ]
+            );
+            $user->assignRole('dosen');
+
+            $profile = Dosen::firstOrCreate(
+                ['user_id' => $user->id],
+                [
+                    'nidn' => $d['nidn'],
+                    'nama_lengkap' => $d['name'],
+                    'program_studi' => 'Teknik Informatika',
+                    'fakultas' => 'FMIPA',
+                    'jabatan_fungsional' => $d['jabatan_fungsional'],
+                    'gelar' => $d['gelar'],
+                    'no_telepon' => '08'.rand(1000000000, 9999999999),
+                    'is_active' => true,
+                    'kuota_mahasiswa' => 10,
+                ]
+            );
+            $dosenProfiles[] = $profile;
+
+            // Buat beberapa jadwal (schedules) untuk tiap dosen
+            for ($i = 1; $i <= 5; $i++) {
+                Schedule::create([
+                    'dosen_id' => $profile->id,
+                    'tanggal' => now()->addDays($i)->toDateString(),
+                    'waktu_mulai' => '09:00:00',
+                    'waktu_selesai' => '10:00:00',
+                    'kuota' => 2, // Kuota awal
+                ]);
+                Schedule::create([
+                    'dosen_id' => $profile->id,
+                    'tanggal' => now()->addDays($i)->toDateString(),
+                    'waktu_mulai' => '13:00:00',
+                    'waktu_selesai' => '14:30:00',
+                    'kuota' => 1,
+                ]);
+            }
+        }
+
+        // 3. Data dummy jadwal bimbingan (menggunakan dosen pertama)
+        $dosenUtama = $dosenProfiles[0];
+        // Ambil beberapa jadwal dosen utama
+        $schedulesUtama = Schedule::where('dosen_id', $dosenUtama->id)->get();
+
+        if ($schedulesUtama->count() >= 3) {
+            $jadwalData = [
+                [
+                    'dosen_id' => $dosenUtama->id,
+                    'mahasiswa_id' => $mahasiswaProfile->id,
+                    'schedule_id' => $schedulesUtama[0]->id,
+                    'tanggal' => $schedulesUtama[0]->tanggal,
+                    'waktu' => $schedulesUtama[0]->waktu_mulai,
+                    'topik_bimbingan' => 'Konsultasi Bab 1 - Pendahuluan & Latar Belakang',
+                    'tipe' => 'offline',
+                    'status' => 'pending',
+                ],
+                [
+                    'dosen_id' => $dosenUtama->id,
+                    'mahasiswa_id' => $mahasiswaProfile->id,
+                    'schedule_id' => $schedulesUtama[1]->id,
+                    'tanggal' => $schedulesUtama[1]->tanggal,
+                    'waktu' => $schedulesUtama[1]->waktu_mulai,
+                    'topik_bimbingan' => 'Review Bab 2 - Tinjauan Pustaka & Landasan Teori',
+                    'tipe' => 'online',
+                    'status' => 'approved',
+                ],
+                [
+                    'dosen_id' => $dosenUtama->id,
+                    'mahasiswa_id' => $mahasiswaProfile->id,
+                    'schedule_id' => $schedulesUtama[2]->id,
+                    'tanggal' => $schedulesUtama[2]->tanggal,
+                    'waktu' => $schedulesUtama[2]->waktu_mulai,
+                    'topik_bimbingan' => 'Diskusi Metodologi Penelitian - Bab 3',
+                    'tipe' => 'offline',
+                    'status' => 'completed',
+                ],
+            ];
+
+            foreach ($jadwalData as $jadwal) {
+                JadwalBimbingan::create($jadwal);
+                // Kurangi kuota schedule
+                $sched = Schedule::find($jadwal['schedule_id']);
+                $sched->decrement('kuota');
+            }
         }
     }
 }

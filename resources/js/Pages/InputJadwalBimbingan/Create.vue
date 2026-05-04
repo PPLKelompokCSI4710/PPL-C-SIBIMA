@@ -1,32 +1,58 @@
 <script setup>
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import { Head, useForm } from '@inertiajs/vue3';
-defineProps({
-    dosenList: {
-        type: Array,
-        default: () => [],
-    },
-    mahasiswa: {
-        type: Object,
-        default: () => ({}),
-    },
-});
+    import { ref, watch } from 'vue';
+    import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+    import { Head, useForm } from '@inertiajs/vue3';
+    import axios from 'axios';
 
-const form = useForm({
-    dosen_id: '',
-    tanggal: '',
-    waktu: '',
-    topik_bimbingan: '',
-    tipe: 'offline',
-});
-
-const submit = () => {
-    form.post(route('mahasiswa.jadwal-bimbingan.store'), {
-        onSuccess: () => {
-            form.reset();
+    defineProps({
+        dosenList: {
+            type: Array,
+            default: () => [],
+        },
+        mahasiswa: {
+            type: Object,
+            default: () => ({}),
         },
     });
-};
+
+    const form = useForm({
+        dosen_id: '',
+        schedule_id: '',
+        topik_bimbingan: '',
+        tipe: 'offline',
+    });
+
+    const schedules = ref([]);
+    const isLoadingSchedules = ref(false);
+
+    watch(
+        () => form.dosen_id,
+        async (newDosenId) => {
+            form.schedule_id = '';
+            schedules.value = [];
+            if (!newDosenId) return;
+
+            isLoadingSchedules.value = true;
+            try {
+                const response = await axios.get(
+                    route('mahasiswa.jadwal-bimbingan.schedules', newDosenId),
+                );
+                schedules.value = response.data;
+            } catch (error) {
+                console.error('Failed to load schedules', error);
+            } finally {
+                isLoadingSchedules.value = false;
+            }
+        },
+    );
+
+    const submit = () => {
+        form.post(route('mahasiswa.jadwal-bimbingan.store'), {
+            onSuccess: () => {
+                form.reset();
+            },
+        });
+    };
 </script>
 
 <template>
@@ -42,10 +68,7 @@ const submit = () => {
         <div class="py-12">
             <div class="mx-auto max-w-3xl sm:px-6 lg:px-8">
                 <!-- Flash Message -->
-                <div
-                    v-if="$page.props.flash?.success"
-                    class="mb-4 rounded-md bg-green-50 p-4"
-                >
+                <div v-if="$page.props.flash?.success" class="mb-4 rounded-md bg-green-50 p-4">
                     <div class="flex">
                         <div class="flex-shrink-0">
                             <svg
@@ -70,10 +93,7 @@ const submit = () => {
 
                 <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg">
                     <div class="p-6 text-gray-900">
-                        <form
-                            class="space-y-6"
-                            @submit.prevent="submit"
-                        >
+                        <form class="space-y-6" @submit.prevent="submit">
                             <!-- Dosen Pembimbing -->
                             <div>
                                 <label
@@ -88,12 +108,7 @@ const submit = () => {
                                     class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                                     required
                                 >
-                                    <option
-                                        value=""
-                                        disabled
-                                    >
-                                        -- Pilih Dosen Pembimbing --
-                                    </option>
+                                    <option value="" disabled>-- Pilih Dosen Pembimbing --</option>
                                     <option
                                         v-for="dosen in dosenList"
                                         :key="dosen.id"
@@ -102,57 +117,56 @@ const submit = () => {
                                         {{ dosen.nama_lengkap }}
                                     </option>
                                 </select>
-                                <p
-                                    v-if="form.errors.dosen_id"
-                                    class="mt-1 text-sm text-red-600"
-                                >
+                                <p v-if="form.errors.dosen_id" class="mt-1 text-sm text-red-600">
                                     {{ form.errors.dosen_id }}
                                 </p>
                             </div>
 
-                            <!-- Tanggal -->
+                            <!-- Jadwal Tersedia -->
                             <div>
                                 <label
-                                    for="tanggal"
+                                    for="schedule_id"
                                     class="block text-sm font-medium text-gray-700"
                                 >
-                                    Tanggal Bimbingan
+                                    Pilih Jadwal
                                 </label>
-                                <input
-                                    id="tanggal"
-                                    v-model="form.tanggal"
-                                    type="date"
-                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                <select
+                                    id="schedule_id"
+                                    v-model="form.schedule_id"
+                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm disabled:bg-gray-100"
                                     required
+                                    :disabled="
+                                        !form.dosen_id ||
+                                        isLoadingSchedules ||
+                                        schedules.length === 0
+                                    "
                                 >
-                                <p
-                                    v-if="form.errors.tanggal"
-                                    class="mt-1 text-sm text-red-600"
-                                >
-                                    {{ form.errors.tanggal }}
-                                </p>
-                            </div>
-
-                            <!-- Waktu -->
-                            <div>
-                                <label
-                                    for="waktu"
-                                    class="block text-sm font-medium text-gray-700"
-                                >
-                                    Waktu Bimbingan
-                                </label>
-                                <input
-                                    id="waktu"
-                                    v-model="form.waktu"
-                                    type="time"
-                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                                    required
-                                >
-                                <p
-                                    v-if="form.errors.waktu"
-                                    class="mt-1 text-sm text-red-600"
-                                >
-                                    {{ form.errors.waktu }}
+                                    <option value="" disabled>
+                                        <template v-if="isLoadingSchedules">
+                                            Memuat jadwal...
+                                        </template>
+                                        <template v-else-if="!form.dosen_id">
+                                            Pilih dosen terlebih dahulu
+                                        </template>
+                                        <template v-else-if="schedules.length === 0">
+                                            Tidak ada jadwal tersedia
+                                        </template>
+                                        <template v-else> -- Pilih Jadwal Tersedia -- </template>
+                                    </option>
+                                    <option
+                                        v-for="schedule in schedules"
+                                        :key="schedule.id"
+                                        :value="schedule.id"
+                                        :disabled="schedule.kuota <= 0"
+                                    >
+                                        {{ schedule.tanggal }} |
+                                        {{ schedule.waktu_mulai.substring(0, 5) }} -
+                                        {{ schedule.waktu_selesai.substring(0, 5) }} (Sisa Kuota:
+                                        {{ schedule.kuota }})
+                                    </option>
+                                </select>
+                                <p v-if="form.errors.schedule_id" class="mt-1 text-sm text-red-600">
+                                    {{ form.errors.schedule_id }}
                                 </p>
                             </div>
 
@@ -192,8 +206,10 @@ const submit = () => {
                                             type="radio"
                                             value="offline"
                                             class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                                        />
+                                        <span class="ml-2 text-sm text-gray-700"
+                                            >Offline (Tatap Muka)</span
                                         >
-                                        <span class="ml-2 text-sm text-gray-700">Offline (Tatap Muka)</span>
                                     </label>
                                     <label class="inline-flex items-center">
                                         <input
@@ -201,14 +217,13 @@ const submit = () => {
                                             type="radio"
                                             value="online"
                                             class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                                        />
+                                        <span class="ml-2 text-sm text-gray-700"
+                                            >Online (Daring)</span
                                         >
-                                        <span class="ml-2 text-sm text-gray-700">Online (Daring)</span>
                                     </label>
                                 </div>
-                                <p
-                                    v-if="form.errors.tipe"
-                                    class="mt-1 text-sm text-red-600"
-                                >
+                                <p v-if="form.errors.tipe" class="mt-1 text-sm text-red-600">
                                     {{ form.errors.tipe }}
                                 </p>
                             </div>
@@ -241,7 +256,9 @@ const submit = () => {
                                             d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                                         />
                                     </svg>
-                                    {{ form.processing ? 'Menyimpan...' : 'Ajukan Jadwal Bimbingan' }}
+                                    {{
+                                        form.processing ? 'Menyimpan...' : 'Ajukan Jadwal Bimbingan'
+                                    }}
                                 </button>
                             </div>
                         </form>
