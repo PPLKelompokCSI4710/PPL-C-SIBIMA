@@ -68,7 +68,7 @@
             </div>
         </template>
 
-        <div class="py-12 min-h-screen bg-slate-50 relative overflow-hidden">
+        <div class="py-12 min-h-screen bg-brand-bg relative overflow-hidden">
             <!-- Decorative background elements -->
             <div
                 class="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 rounded-full bg-blue-400/20 blur-3xl mix-blend-multiply"
@@ -78,6 +78,19 @@
             />
 
             <div class="mx-auto max-w-5xl sm:px-6 lg:px-8 relative z-10">
+                <div
+                    v-if="!props.upcomingBimbingan"
+                    class="bg-brand-white p-10 rounded-3xl shadow-sm border border-brand-text-secondary/10 text-center"
+                >
+                    <h3 class="text-2xl font-black text-brand-primary-dark mb-2">
+                        Belum ada jadwal bimbingan
+                    </h3>
+                    <p class="text-brand-text-secondary">
+                        Jadwal bimbingan yang sudah disetujui akan muncul di sini dan akan
+                        diingatkan otomatis (H-3, H-1, H-2 jam).
+                    </p>
+                </div>
+
                 <!-- Main Card -->
                 <div
                     class="bg-white/80 backdrop-blur-xl shadow-2xl rounded-3xl border border-white/60 overflow-hidden transition-all duration-500 hover:shadow-blue-500/10"
@@ -123,8 +136,10 @@
                                         </svg>
                                     </div>
                                     <div>
-                                        <p class="text-sm text-blue-200">Dosen Pembimbing</p>
-                                        <p class="font-bold text-lg">
+                                        <p class="text-sm text-brand-secondary-light">
+                                            Dosen Pembimbing
+                                        </p>
+                                        <p class="font-bold text-lg text-brand-white">
                                             {{ props.upcomingBimbingan.dosen }}
                                         </p>
                                     </div>
@@ -134,14 +149,16 @@
 
                         <!-- Right/Bottom Section: Details -->
                         <div class="p-8 md:col-span-2">
-                            <h4 class="text-2xl font-bold text-gray-800 mb-6 drop-shadow-sm">
+                            <h4
+                                class="text-2xl font-bold text-brand-primary-dark mb-6 drop-shadow-sm"
+                            >
                                 {{ props.upcomingBimbingan.topic }}
                             </h4>
 
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
                                 <div class="flex items-start">
                                     <div
-                                        class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center mr-4 flex-shrink-0 shadow-sm border border-blue-100"
+                                        class="w-10 h-10 rounded-xl bg-brand-bg text-brand-primary flex items-center justify-center mr-4 flex-shrink-0 shadow-sm border border-brand-primary/10"
                                     >
                                         <svg
                                             class="w-5 h-5"
@@ -160,21 +177,21 @@
                                     </div>
                                     <div>
                                         <p
-                                            class="text-sm font-semibold text-gray-500 uppercase tracking-wider"
+                                            class="text-sm font-semibold text-brand-text-secondary uppercase tracking-wider"
                                         >
                                             Tanggal & Waktu
                                         </p>
-                                        <p class="font-bold text-gray-900 mt-1">
+                                        <p class="font-bold text-brand-text-primary mt-1">
                                             {{ props.upcomingBimbingan.dateFormatted }}
                                         </p>
-                                        <p class="text-gray-600">
+                                        <p class="text-brand-text-secondary">
                                             {{ props.upcomingBimbingan.timeFormatted }}
                                         </p>
                                     </div>
                                 </div>
                                 <div class="flex items-start">
                                     <div
-                                        class="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center mr-4 flex-shrink-0 shadow-sm border border-indigo-100"
+                                        class="w-10 h-10 rounded-xl bg-brand-bg text-brand-secondary flex items-center justify-center mr-4 flex-shrink-0 shadow-sm border border-brand-secondary/10"
                                     >
                                         <svg
                                             class="w-5 h-5"
@@ -199,19 +216,21 @@
                                     </div>
                                     <div>
                                         <p
-                                            class="text-sm font-semibold text-gray-500 uppercase tracking-wider"
+                                            class="text-sm font-semibold text-brand-text-secondary uppercase tracking-wider"
                                         >
                                             Lokasi
                                         </p>
-                                        <p class="font-bold text-gray-900 mt-1">
+                                        <p class="font-bold text-brand-text-primary mt-1">
                                             {{ props.upcomingBimbingan.location }}
                                         </p>
                                     </div>
                                 </div>
                             </div>
 
-                            <div class="bg-amber-50/50 rounded-2xl p-6 border border-amber-100">
-                                <h5 class="text-amber-800 font-bold mb-3 flex items-center">
+                            <div
+                                class="bg-brand-accent-light/10 rounded-2xl p-6 border border-brand-accent-light/20"
+                            >
+                                <h5 class="text-brand-accent font-bold mb-3 flex items-center">
                                     <svg
                                         class="w-5 h-5 mr-2"
                                         fill="none"
@@ -236,23 +255,25 @@
                                         class="flex items-start"
                                     >
                                         <div
-                                            class="mt-1 w-5 h-5 rounded-full bg-amber-200 text-amber-700 flex items-center justify-center flex-shrink-0 mr-3 text-xs font-bold"
+                                            class="mt-1 w-5 h-5 rounded-full bg-brand-accent text-white flex items-center justify-center flex-shrink-0 mr-3 text-xs font-bold shadow-sm"
                                         >
                                             {{ index + 1 }}
                                         </div>
-                                        <span class="text-gray-700 font-medium">{{ note }}</span>
+                                        <span class="text-brand-text-primary font-medium">{{
+                                            note
+                                        }}</span>
                                     </li>
                                 </ul>
                             </div>
 
                             <div class="mt-8 flex flex-col sm:flex-row items-center gap-4">
                                 <button
-                                    class="w-full sm:w-auto px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-xl font-bold shadow-lg shadow-blue-500/30 hover:shadow-blue-500/50 transform transition-all duration-300 hover:-translate-y-1 focus:ring-4 focus:ring-blue-300"
+                                    class="w-full sm:w-auto px-6 py-3 bg-brand-primary hover:bg-brand-primary-dark text-white rounded-xl font-bold shadow-lg shadow-brand-primary/30 hover:shadow-brand-primary/50 transform transition-all duration-300 hover:-translate-y-1 focus:ring-4 focus:ring-brand-primary/30"
                                 >
                                     Siap Hadir
                                 </button>
                                 <button
-                                    class="w-full sm:w-auto px-6 py-3 bg-white hover:bg-gray-50 text-gray-700 rounded-xl font-bold font-medium shadow-sm border border-gray-200 transition-all duration-300 hover:text-blue-600 focus:ring-4 focus:ring-gray-100 flex items-center justify-center"
+                                    class="w-full sm:w-auto px-6 py-3 bg-brand-white hover:bg-brand-bg text-brand-text-primary rounded-xl font-bold font-medium shadow-sm border border-brand-text-secondary/20 transition-all duration-300 hover:text-brand-primary focus:ring-4 focus:ring-brand-bg flex items-center justify-center"
                                 >
                                     <svg
                                         class="w-4 h-4 mr-2"
@@ -278,10 +299,10 @@
                 <!-- Tips / Extra Card -->
                 <div class="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <div
-                        class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow"
+                        class="bg-brand-white p-6 rounded-2xl shadow-sm border border-brand-text-secondary/10 hover:shadow-md transition-shadow"
                     >
                         <div class="flex items-center mb-4">
-                            <div class="bg-green-100 p-2 rounded-lg text-green-600 mr-3">
+                            <div class="bg-brand-success/10 p-2 rounded-lg text-brand-success mr-3">
                                 <svg
                                     class="w-6 h-6"
                                     fill="none"
@@ -297,9 +318,11 @@
                                     />
                                 </svg>
                             </div>
-                            <h4 class="font-bold text-lg text-gray-800">Tips Bimbingan Sukses</h4>
+                            <h4 class="font-bold text-lg text-brand-primary-dark">
+                                Tips Bimbingan Sukses
+                            </h4>
                         </div>
-                        <p class="text-gray-600 leading-relaxed mb-4">
+                        <p class="text-brand-text-secondary leading-relaxed mb-4">
                             Selalu catat poin-poin revisi yang diberikan oleh dosen pembimbing.
                             Konsistensi dalam memperbaiki draft akan mempercepat proses penyelesaian
                             tugas akhir.
@@ -307,18 +330,18 @@
                     </div>
 
                     <div
-                        class="bg-white p-6 rounded-2xl shadow-sm border border-indigo-100 hover:shadow-md transition-shadow flex items-center justify-between"
+                        class="bg-brand-white p-6 rounded-2xl shadow-sm border border-brand-secondary/10 hover:shadow-md transition-shadow flex items-center justify-between"
                     >
                         <div>
-                            <h4 class="font-bold text-lg text-gray-800 mb-1">
+                            <h4 class="font-bold text-lg text-brand-primary-dark mb-1">
                                 Butuh Dokumen Pendukung?
                             </h4>
-                            <p class="text-gray-600 text-sm">
+                            <p class="text-brand-text-secondary text-sm">
                                 Unduh template logbook & form bimbingan.
                             </p>
                         </div>
                         <button
-                            class="px-4 py-2 bg-indigo-50 text-indigo-600 hover:bg-indigo-100 rounded-lg font-bold transition-colors"
+                            class="px-4 py-2 bg-brand-secondary/10 text-brand-secondary hover:bg-brand-secondary/20 rounded-lg font-bold transition-colors"
                         >
                             Unduh Form
                         </button>

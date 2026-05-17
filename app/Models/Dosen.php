@@ -18,8 +18,10 @@ class Dosen extends Model
         'nama_lengkap',
         'program_studi',
         'fakultas',
+        'jabatan_akademik',
         'jabatan_fungsional',
         'gelar',
+        'keahlian',
         'no_telepon',
         'foto',
         'is_active',
@@ -34,5 +36,16 @@ class Dosen extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function bimbingans()
+    {
+        return $this->hasMany(Bimbingan::class);
+    }
+
+    public function mahasiswas()
+    {
+        return $this->belongsToMany(Mahasiswa::class, 'dosen_mahasiswa')
+            ->withPivot(['tanggal_penugasan', 'tanggal_berakhir', 'is_active', 'catatan']);
     }
 }

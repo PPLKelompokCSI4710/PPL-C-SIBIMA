@@ -14,21 +14,17 @@ class Mahasiswa extends Model
 {
     use HasFactory, SoftDeletes;
 
-    /**
-     * The table associated with the model.
-     * Eksplisit karena nama tabel tidak mengikuti konvensi plural Laravel.
-     */
     protected $table = 'mahasiswa';
 
-    /**
-     * Menggunakan $guarded = [] agar semua kolom dapat di-mass assign.
-     * Form Filament sendiri sudah bertindak sebagai whitelist implisit.
-     */
-    protected $guarded = [];
+    protected $fillable = [
+        'user_id', 'nim', 'nama_lengkap', 'program_studi', 'fakultas',
+        'angkatan', 'semester', 'ipk', 'sks_lulus', 'sks_total',
+        'status_akademik', 'no_telepon', 'foto', 'tanggal_lahir',
+        'alamat', 'status_kelulusan_bimbingan', 'progress_reminder_frequency_days',
+        'progress_reminder_frequency', 'progress_reminder_enabled', 'last_progress_reminder_sent_at',
+        'consecutive_progress_reminders',
+    ];
 
-    /**
-     * The attributes that should be cast.
-     */
     protected function casts(): array
     {
         return [
@@ -36,6 +32,8 @@ class Mahasiswa extends Model
             'tanggal_lahir' => 'date',
             'ipk' => 'decimal:2',
             'status_kelulusan_bimbingan' => 'boolean',
+            'last_progress_reminder_sent_at' => 'datetime',
+            'progress_reminder_enabled' => 'boolean',
         ];
     }
 
@@ -43,10 +41,6 @@ class Mahasiswa extends Model
     // RELATIONSHIPS
     // =========================================================================
 
-    /**
-     * Mendapatkan akun User yang terhubung dengan profil mahasiswa ini.
-     * (Inverse of One-to-One)
-     */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
