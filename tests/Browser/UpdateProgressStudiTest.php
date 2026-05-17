@@ -24,9 +24,9 @@ class UpdateProgressStudiTest extends DuskTestCase
 
                     // Gunakan waitFor() sebelum mengetik
                 ->waitFor('#ipk', 10)
-                ->type('#ipk', '3.99')
+                ->type('#ipk', '3.77')
                 ->waitFor('#total_sks', 10)
-                ->type('#total_sks', '97')
+                ->type('#total_sks', '125')
                 ->waitFor('#passed_courses', 10)
                 ->type('#passed_courses', '39')
                 ->press('Simpan Perubahan')
@@ -36,11 +36,11 @@ class UpdateProgressStudiTest extends DuskTestCase
                 ->pause(2000)
 
                     // Verifikasi apakah statistik di sisi kiri sudah terupdate
-                ->assertSee('4')             // Cek angka IPK terbaru
-                ->assertSee('122')           // Cek angka SKS terbaru
+                ->assertSee('3.77')          // Cek angka IPK terbaru
+                ->assertSee('125')           // Cek angka SKS terbaru
                 ->assertSee('/ 144 SKS')
-                ->assertSee('42')            // Cek jumlah mata kuliah terbaru
-                ->assertSee('85%')           // Cek persentase progres terbaru
+                ->assertSee('39')            // Cek jumlah mata kuliah terbaru
+                ->assertSee('87%')           // Cek persentase progres terbaru
 
                     // Ambil bukti untuk laporan PBI-18
                 ->screenshot('PBI-18_Update_Progres_Sukses');
