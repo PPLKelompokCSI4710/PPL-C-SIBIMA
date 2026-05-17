@@ -1,0 +1,402 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Study Plans - SIBIMA Wireframe</title>
+        <style>
+            /* Base Styles */
+            body {
+                margin: 0;
+                font-family: 'Courier New', Courier, monospace;
+                color: #333;
+                background-color: #f4f4f4;
+                display: flex;
+                height: 100vh;
+                overflow: hidden;
+            }
+            * {
+                box-sizing: border-box;
+            }
+
+            /* Wireframe Elements */
+            .wf-border {
+                border: 2px solid #555;
+            }
+            .wf-bg {
+                background-color: #e0e0e0;
+            }
+            .wf-bg-light {
+                background-color: #fff;
+            }
+
+            /* Layout */
+            .sidebar {
+                width: 250px;
+                border-right: 2px solid #555;
+                background-color: #fff;
+                display: flex;
+                flex-direction: column;
+            }
+            .sidebar-header {
+                padding: 20px;
+                border-bottom: 2px solid #555;
+                font-weight: bold;
+                text-align: center;
+                background-color: #e0e0e0;
+                font-size: 1.2rem;
+            }
+            .nav-menu {
+                padding: 15px;
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+            }
+            .nav-item {
+                padding: 12px;
+                border: 2px solid #555;
+                background-color: #fff;
+                cursor: pointer;
+                font-weight: bold;
+            }
+            .nav-item.active {
+                background-color: #ccc;
+            }
+
+            .main-content {
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                overflow-y: auto;
+            }
+
+            /* Header Area */
+            .header {
+                padding: 20px 30px;
+                border-bottom: 2px solid #555;
+                background-color: #fff;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+            .header h1 {
+                margin: 0;
+                font-size: 1.6rem;
+            }
+            .header-actions {
+                display: flex;
+                gap: 15px;
+            }
+            .header-actions input {
+                padding: 8px;
+                border: 2px solid #555;
+                width: 200px;
+            }
+            .btn {
+                padding: 8px 15px;
+                border: 2px solid #555;
+                background-color: #e0e0e0;
+                font-weight: bold;
+                font-family: inherit;
+                cursor: pointer;
+            }
+            .btn-primary {
+                background-color: #ccc;
+                border-width: 3px;
+            }
+
+            /* Content Area */
+            .content {
+                padding: 30px;
+            }
+
+            /* Summary Card */
+            .summary-card {
+                padding: 20px;
+                border: 2px solid #555;
+                background-color: #fff;
+                margin-bottom: 30px;
+                display: flex;
+                align-items: center;
+                gap: 20px;
+            }
+            .stat-value {
+                font-size: 2rem;
+                font-weight: bold;
+            }
+            .stat-label {
+                font-size: 1rem;
+            }
+            .status-badge {
+                padding: 5px 10px;
+                border: 2px dashed #555;
+                background-color: #eee;
+                font-style: italic;
+                font-weight: bold;
+            }
+            .status-badge.warning {
+                background-color: #d0d0d0;
+            }
+
+            /* Table Container */
+            .table-container {
+                border: 2px solid #555;
+                background-color: #fff;
+                padding: 20px;
+            }
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-top: 10px;
+            }
+            th,
+            td {
+                border-bottom: 2px solid #555;
+                padding: 12px;
+                text-align: left;
+            }
+            th {
+                border-bottom-width: 3px;
+            }
+            .badge {
+                padding: 4px 8px;
+                border: 1px solid #555;
+                background-color: #eee;
+                font-size: 0.85rem;
+                font-weight: bold;
+            }
+            .actions {
+                display: flex;
+                gap: 10px;
+            }
+
+            /* Modal Simulation */
+            .modal-overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-color: rgba(0, 0, 0, 0.5);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            .modal {
+                width: 500px;
+                background-color: #fff;
+                border: 3px solid #333;
+                box-shadow: 10px 10px 0px #333;
+                padding: 25px;
+            }
+            .modal-header {
+                font-size: 1.3rem;
+                font-weight: bold;
+                border-bottom: 2px solid #555;
+                padding-bottom: 15px;
+                margin-bottom: 20px;
+                display: flex;
+                justify-content: space-between;
+            }
+            .form-group {
+                margin-bottom: 15px;
+                display: flex;
+                flex-direction: column;
+                gap: 5px;
+            }
+            .form-group label {
+                font-weight: bold;
+            }
+            .form-group select,
+            .form-group input {
+                padding: 10px;
+                border: 2px solid #555;
+                font-family: inherit;
+                width: 100%;
+            }
+            .modal-footer {
+                margin-top: 25px;
+                display: flex;
+                justify-content: flex-end;
+                gap: 10px;
+            }
+        </style>
+    </head>
+    <body>
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">[ SIBIMA ]</div>
+            <div class="nav-menu">
+                <div class="nav-item">Dashboard</div>
+                <div class="nav-item">Courses</div>
+                <div class="nav-item active">Study Plans</div>
+                <div class="nav-item">Progress Studi</div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Header -->
+            <div class="header">
+                <h1>Study Plans</h1>
+                <div class="header-actions">
+                    <input type="text" placeholder="Search..." />
+                    <button class="btn btn-primary">[+] New Study Plan</button>
+                </div>
+            </div>
+
+            <!-- Content Area -->
+            <div class="content">
+                <!-- Summary Card -->
+                <div class="summary-card">
+                    <div>
+                        <div class="stat-value">18</div>
+                        <div class="stat-label">Total Credits (SKS)</div>
+                    </div>
+                    <div class="status-badge">✓ Within limit</div>
+                    <!-- Example of Warning Status 
+        <div class="status-badge warning">⚠️ Warning: Exceeds 24 SKS limit!</div>
+        -->
+                </div>
+
+                <!-- Study Plan Table -->
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Student Name</th>
+                                <th>Course Name</th>
+                                <th>Course Code</th>
+                                <th>Credits (SKS)</th>
+                                <th>Semester</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>John Doe</td>
+                                <td>Software Engineering</td>
+                                <td>CS301</td>
+                                <td>3</td>
+                                <td>5</td>
+                                <td><span class="badge">Approved</span></td>
+                                <td class="actions">
+                                    <button class="btn">Edit</button>
+                                    <button class="btn">Delete</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>John Doe</td>
+                                <td>Database Systems</td>
+                                <td>CS302</td>
+                                <td>4</td>
+                                <td>5</td>
+                                <td>
+                                    <span class="badge" style="border-style: dashed">Pending</span>
+                                </td>
+                                <td class="actions">
+                                    <button class="btn">Edit</button>
+                                    <button class="btn">Delete</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>John Doe</td>
+                                <td>Web Development</td>
+                                <td>CS305</td>
+                                <td>3</td>
+                                <td>5</td>
+                                <td>
+                                    <span class="badge" style="border-style: dashed">Pending</span>
+                                </td>
+                                <td class="actions">
+                                    <button class="btn">Edit</button>
+                                    <button class="btn">Delete</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Create / Edit Form Modal Simulation -->
+        <!-- Uncomment the div below to see the modal overlay -->
+        <div class="modal-overlay" style="display: none">
+            <div class="modal">
+                <div class="modal-header">
+                    <span>Create Study Plan</span>
+                    <span style="cursor: pointer">[X]</span>
+                </div>
+
+                <div class="form-group">
+                    <label>Course Name</label>
+                    <select>
+                        <option>-- Select Course --</option>
+                        <option>Software Engineering</option>
+                        <option>Artificial Intelligence</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Course Code</label>
+                    <input
+                        type="text"
+                        value="Auto-filled"
+                        readonly
+                        style="background-color: #eee"
+                    />
+                </div>
+
+                <div class="form-group">
+                    <label>Credits (SKS)</label>
+                    <input
+                        type="text"
+                        value="Auto-filled"
+                        readonly
+                        style="background-color: #eee"
+                    />
+                </div>
+
+                <div class="form-group">
+                    <label>Semester</label>
+                    <select>
+                        <option>1</option>
+                        <option>2</option>
+                        <option>3</option>
+                        <option>4</option>
+                        <option>5</option>
+                        <option>6</option>
+                        <option>7</option>
+                        <option>8</option>
+                    </select>
+                </div>
+
+                <!-- Simulated validation warning -->
+                <!-- <div style="padding: 10px; border: 1px dashed #555; background: #eee; font-style: italic; margin-top: 10px;">
+        Warning: Adding this course will exceed the maximum limit of 24 SKS.
+      </div> -->
+
+                <div class="modal-footer">
+                    <button class="btn">Cancel</button>
+                    <button class="btn btn-primary">Save Study Plan</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Delete Confirmation Modal Simulation -->
+        <!-- Uncomment to see the delete modal -->
+        <div class="modal-overlay" style="display: none">
+            <div class="modal" style="width: 400px; text-align: center">
+                <h3 style="margin-top: 0">Delete Record</h3>
+                <p>Are you sure you want to remove this course?</p>
+                <div class="modal-footer" style="justify-content: center">
+                    <button class="btn">Cancel</button>
+                    <button class="btn" style="background-color: #bbb; border-width: 3px">
+                        Yes, Delete
+                    </button>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

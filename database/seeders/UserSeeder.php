@@ -24,7 +24,13 @@ class UserSeeder extends Seeder
 
         $dosenBase = User::firstOrCreate(
             ['email' => 'dosen@sibima.test'],
-            ['name' => 'Dosen Pembimbing', 'password' => Hash::make('password')]
+            [
+                'name' => 'Dosen Pembimbing',
+                'password' => Hash::make('password'),
+                'program_studi' => 'Teknik Informatika',
+                'fakultas' => 'Fakultas Teknik',
+                'kuota_pembimbingan' => 10,
+            ]
         );
         $dosenBase->assignRole('dosen');
 
