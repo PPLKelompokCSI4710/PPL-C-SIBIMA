@@ -27,8 +27,6 @@ Route::middleware(['auth', 'role:dosen'])->prefix('dosen')->name('dosen.')->grou
     Route::get('/ketersediaan-jadwal', [KetersediaanJadwalController::class, 'index'])->name('ketersediaan.index');
     Route::post('/ketersediaan-jadwal', [KetersediaanJadwalController::class, 'store'])->name('ketersediaan.store');
     Route::delete('/ketersediaan-jadwal/{id}', [KetersediaanJadwalController::class, 'destroy'])->name('ketersediaan.destroy');
-    // Catatan Konsultasi
-    Route::get('/catatan-konsultasi', [CatatanKonsultasiController::class, 'index'])->name('catatan-konsultasi.index');
+    // Catatan Konsultasi (hanya POST, form ada di Monitoring Jadwal)
     Route::post('/catatan-konsultasi', [CatatanKonsultasiController::class, 'store'])->name('catatan-konsultasi.store');
-    Route::delete('/catatan-konsultasi/{id}', [CatatanKonsultasiController::class, 'destroy'])->name('catatan-konsultasi.destroy');
 });

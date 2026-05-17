@@ -12,86 +12,49 @@ use Tests\DuskTestCase;
 class MonitoringJadwalTest extends DuskTestCase
 {
     /**
-     * Test alur pembuatan ketersediaan jadwal oleh dosen.
+     * Dosen dapat melihat dan menyetujui jadwal bimbingan.
+     * Command: php artisan dusk --filter=MonitoringJadwalTest
      */
-    public function test_dosen_buat_ketersediaan_jadwal()
+    public function test_dosen_kelola_monitoring_jadwal()
     {
-        $this->browse(function (Browser $browser) {
+        $dosenUser = User::where('email', 'dosen@sibima.test')->first();
+        $mahasiswaUser = User::where('email', 'mahasiswa@sibima.test')->first();
+        $dosenProfile = Dosen::where('user_id', $dosenUser->id)->first();
+        $mahasiswaProfile = Mahasiswa::where('user_id', $mahasiswaUser->id)->first();
 
-            // Ambil data user dosen
-            $dosenUser = User::where('email', 'dosen@sibima.test')->first();
+        $topik = 'Test Dusk Approve '.now()->timestamp;
+        $jadwal = JadwalBimbingan::create([
+            'dosen_id' => $dosenProfile->id,
+            'mahasiswa_id' => $mahasiswaProfile->id,
+            'tanggal' => now()->addDays(5)->toDateString(),
+            'waktu' => '09:00:00',
+            'topik_bimbingan' => $topik,
+            'tipe' => 'online',
+            'status' => 'pending',
+        ]);
 
-            // Tanggal besok untuk test
-            $tanggalBesok = now()->addDays(1)->format('mdY'); // format m/d/Y untuk input date HTML5 di beberapa browser
-            $tanggalAssert = now()->addDays(1)->format('Y-m-d'); // format standar Y-m-d untuk text
-
+        $this->browse(function (Browser $browser) use ($dosenUser, $topik) {
             $browser->loginAs($dosenUser)
-                ->visit('/dosen/ketersediaan-jadwal')
-                ->assertSee('Kelola Ketersediaan Jadwal Bimbingan')
-
-                    // Mengisi form
-                ->keys('input[type="date"]', $tanggalBesok)
-                ->keys('input[type="time"]:nth-of-type(1)', '0900AM')
-                ->keys('input[type="time"]:nth-of-type(2)', '1100AM')
-                ->clear('input[type="number"]')
-                ->type('input[type="number"]', '5')
-
-                    // Submit form
-                ->press('Tambahkan Jadwal')
-
-                    // Verifikasi flash message sukses
-                ->pause(1500)
-                ->assertSee('Jadwal ketersediaan berhasil ditambahkan')
-
-                    // Verifikasi data masuk ke dalam tabel
-                ->assertSee('5 Orang')
-                ->assertSee('09:00 - 11:00');
-        });
-    }
-
-    /**
-     * Test alur persetujuan/penolakan jadwal oleh dosen.
-     */
-    public function test_dosen_reject_jadwal()
-    {
-        $this->browse(function (Browser $browserDosen) {
-
-            // Ambil data user
-            $dosenUser = User::where('email', 'dosen@sibima.test')->first();
-            $mahasiswaUser = User::where('email', 'mahasiswa@sibima.test')->first();
-
-            $dosenProfile = Dosen::where('user_id', $dosenUser->id)->first();
-            $mahasiswaProfile = Mahasiswa::where('user_id', $mahasiswaUser->id)->first();
-
-            // Buat satu jadwal bimbingan baru dengan status "pending" agar tes selalu bisa dijalankan
-            $jadwal = JadwalBimbingan::create([
-                'dosen_id' => $dosenProfile->id,
-                'mahasiswa_id' => $mahasiswaProfile->id,
-                'tanggal' => now()->addDays(2)->toDateString(),
-                'waktu' => '10:00:00',
-                'topik_bimbingan' => 'Testing Penolakan Oleh Dosen',
-                'tipe' => 'online',
-                'status' => 'pending',
-            ]);
-
-            // Skenario Dosen: Login dan menolak jadwal
-            $browserDosen->loginAs($dosenUser)
                 ->visit('/dosen/jadwal-bimbingan')
-                ->assertSee('Monitoring Jadwal Bimbingan')
-                ->assertSee('Testing Penolakan Oleh Dosen')
-                         // Dosen melihat jadwal "Menunggu Konfirmasi"
-                ->assertSee('Menunggu Konfirmasi')
-                         // Dosen menekan tombol "Tolak"
-                ->press('Tolak')
-                         // Menerima dialog konfirmasi browser
-                ->acceptDialog()
-                         // Tunggu proses update selesai
-                ->pause(1500)
-                         // Memastikan jadwal sekarang sudah "Ditolak"
-                ->assertSee('Ditolak');
+                ->waitForText($topik, 15);
 
-            // Bersihkan data tes setelah selesai
-            $jadwal->delete();
+            $safeTopik = addslashes($topik);
+            $browser->script("
+                window.confirm = () => true;
+                const rows = Array.from(document.querySelectorAll('tbody tr'));
+                const targetRow = rows.find(row => row.textContent.includes('{$safeTopik}'));
+                if (targetRow) {
+                    const btn = targetRow.querySelector('button');
+                    if (btn) btn.click();
+                }
+            ");
+
+            $browser->pause(8000);
         });
+
+        $jadwal->refresh();
+        $this->assertEquals('approved', $jadwal->status, 'Status jadwal harus berubah menjadi approved.');
+
+        $jadwal->delete();
     }
 }

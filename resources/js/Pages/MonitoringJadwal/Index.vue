@@ -1,6 +1,7 @@
 <script setup>
     import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
     import { Head, usePage, router } from '@inertiajs/vue3';
+    import { ref } from 'vue';
 
     defineProps({
         jadwalBimbingans: {
@@ -12,6 +13,41 @@
     const page = usePage();
     const basePath = page.url.startsWith('/dosen') ? '/dosen' : '/mahasiswa';
 
+    // === Modal Catatan ===
+    const showCatatanModal = ref(false);
+    const selectedJadwal = ref(null);
+    const catatanText = ref('');
+    const isViewOnly = ref(false);
+
+    const openCatatanModal = (jadwal, viewOnly = false) => {
+        selectedJadwal.value = jadwal;
+        catatanText.value = jadwal.catatan_konsultasi?.catatan || '';
+        isViewOnly.value = viewOnly;
+        showCatatanModal.value = true;
+    };
+
+    const closeCatatanModal = () => {
+        showCatatanModal.value = false;
+        selectedJadwal.value = null;
+        catatanText.value = '';
+        isViewOnly.value = false;
+    };
+
+    const submitCatatan = () => {
+        router.post(
+            `${basePath}/catatan-konsultasi`,
+            {
+                jadwal_bimbingan_id: selectedJadwal.value.id,
+                catatan: catatanText.value,
+            },
+            {
+                preserveScroll: true,
+                onSuccess: () => closeCatatanModal(),
+            },
+        );
+    };
+
+    // === Aksi Approve/Reject/Cancel ===
     const handleAction = (id, action) => {
         let confirmText =
             action === 'cancel'
@@ -336,12 +372,52 @@
                                                     </button>
                                                 </template>
                                                 <template v-else-if="jadwal.status === 'approved'">
-                                                    <!-- CTA Button / Accent -->
+                                                    <!-- Tombol Tambah Catatan / Lihat Catatan -->
                                                     <button
-                                                        class="inline-flex items-center text-[10px] font-bold text-white bg-accent hover:bg-accent-light px-4 py-2 rounded-lg transition-colors"
-                                                        @click="handleAction(jadwal.id, 'cancel')"
+                                                        v-if="!jadwal.catatan_konsultasi"
+                                                        class="inline-flex items-center gap-1 text-[10px] font-bold text-white bg-indigo-500 hover:bg-indigo-600 px-4 py-2 rounded-lg transition-colors"
+                                                        @click="openCatatanModal(jadwal, false)"
                                                     >
-                                                        Batalkan
+                                                        <svg
+                                                            class="w-3 h-3"
+                                                            fill="none"
+                                                            stroke="currentColor"
+                                                            viewBox="0 0 24 24"
+                                                        >
+                                                            <path
+                                                                stroke-linecap="round"
+                                                                stroke-linejoin="round"
+                                                                stroke-width="2"
+                                                                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                                                            />
+                                                        </svg>
+                                                        Tambah Catatan
+                                                    </button>
+                                                    <button
+                                                        v-else
+                                                        class="inline-flex items-center gap-1 text-[10px] font-bold text-indigo-600 bg-indigo-50 border border-indigo-200 hover:bg-indigo-100 px-4 py-2 rounded-lg transition-colors"
+                                                        @click="openCatatanModal(jadwal, true)"
+                                                    >
+                                                        <svg
+                                                            class="w-3 h-3"
+                                                            fill="none"
+                                                            stroke="currentColor"
+                                                            viewBox="0 0 24 24"
+                                                        >
+                                                            <path
+                                                                stroke-linecap="round"
+                                                                stroke-linejoin="round"
+                                                                stroke-width="2"
+                                                                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                                                            />
+                                                            <path
+                                                                stroke-linecap="round"
+                                                                stroke-linejoin="round"
+                                                                stroke-width="2"
+                                                                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                                                            />
+                                                        </svg>
+                                                        Lihat Catatan
                                                     </button>
                                                 </template>
                                                 <template v-else>
@@ -401,6 +477,95 @@
             </div>
         </div>
     </AuthenticatedLayout>
+
+    <!-- Modal Catatan Konsultasi -->
+    <teleport to="body">
+        <transition name="modal-fade">
+            <div
+                v-if="showCatatanModal"
+                class="fixed inset-0 z-50 flex items-center justify-center p-4"
+            >
+                <!-- Overlay -->
+                <div
+                    class="absolute inset-0 bg-black/50 backdrop-blur-sm"
+                    @click="closeCatatanModal"
+                />
+                <!-- Modal Card -->
+                <div
+                    class="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg z-10 overflow-hidden"
+                >
+                    <!-- Header -->
+                    <div class="bg-gradient-to-r from-indigo-600 to-indigo-500 px-6 py-4">
+                        <h3 class="text-white font-extrabold text-lg tracking-tight">
+                            {{ isViewOnly ? 'Catatan Konsultasi' : 'Tambah Catatan Konsultasi' }}
+                        </h3>
+                        <p class="text-indigo-100 text-xs mt-0.5">
+                            {{ selectedJadwal?.topik_bimbingan }}
+                        </p>
+                    </div>
+                    <!-- Body -->
+                    <div class="px-6 py-5 space-y-4">
+                        <!-- Info Otomatis -->
+                        <div class="grid grid-cols-2 gap-3">
+                            <div class="bg-slate-50 rounded-xl px-4 py-3">
+                                <p
+                                    class="text-[10px] font-bold text-slate-400 uppercase tracking-wider"
+                                >
+                                    Mahasiswa
+                                </p>
+                                <p class="text-sm font-bold text-slate-800 mt-0.5">
+                                    {{ selectedJadwal?.mahasiswa?.nama_lengkap ?? '-' }}
+                                </p>
+                            </div>
+                            <div class="bg-slate-50 rounded-xl px-4 py-3">
+                                <p
+                                    class="text-[10px] font-bold text-slate-400 uppercase tracking-wider"
+                                >
+                                    Tanggal
+                                </p>
+                                <p class="text-sm font-bold text-slate-800 mt-0.5">
+                                    {{ selectedJadwal?.tanggal ?? '-' }}
+                                </p>
+                            </div>
+                        </div>
+                        <!-- Textarea Catatan -->
+                        <div>
+                            <label class="block text-xs font-bold text-slate-600 mb-1.5"
+                                >Isi Catatan</label
+                            >
+                            <textarea
+                                v-model="catatanText"
+                                :readonly="isViewOnly"
+                                rows="5"
+                                placeholder="Tuliskan hasil konsultasi, perkembangan mahasiswa, dll..."
+                                class="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm text-slate-800 placeholder-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-400 resize-none transition"
+                                :class="isViewOnly ? 'bg-slate-50 cursor-default' : 'bg-white'"
+                            />
+                        </div>
+                    </div>
+                    <!-- Footer -->
+                    <div
+                        class="px-6 py-4 bg-slate-50 flex justify-end gap-2 border-t border-slate-100"
+                    >
+                        <button
+                            class="px-5 py-2 rounded-lg text-sm font-bold text-slate-600 bg-white border border-slate-200 hover:bg-slate-100 transition"
+                            @click="closeCatatanModal"
+                        >
+                            Tutup
+                        </button>
+                        <button
+                            v-if="!isViewOnly"
+                            class="px-5 py-2 rounded-lg text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 transition disabled:opacity-50"
+                            :disabled="!catatanText.trim()"
+                            @click="submitCatatan"
+                        >
+                            Simpan Catatan
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </transition>
+    </teleport>
 </template>
 
 <style scoped>
@@ -413,6 +578,15 @@
     .slide-fade-enter-from,
     .slide-fade-leave-to {
         transform: translateY(-20px) scale(0.98);
+        opacity: 0;
+    }
+
+    .modal-fade-enter-active,
+    .modal-fade-leave-active {
+        transition: opacity 0.25s ease;
+    }
+    .modal-fade-enter-from,
+    .modal-fade-leave-to {
         opacity: 0;
     }
 </style>

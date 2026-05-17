@@ -36,14 +36,18 @@
                                     Dashboard
                                 </NavLink>
                                 <NavLink
-                                    v-if="
-                                        $page.props.auth.user.role === 'dosen' ||
-                                        $page.url.startsWith('/dosen')
-                                    "
-                                    :href="route('dosen.catatan-konsultasi.index')"
-                                    :active="route().current('dosen.catatan-konsultasi.*')"
+                                    v-if="$page.props.auth.user.role === 'dosen'"
+                                    :href="route('dosen.ketersediaan.index')"
+                                    :active="route().current('dosen.ketersediaan.*')"
                                 >
-                                    Catatan Konsultasi
+                                    Ketersediaan Jadwal
+                                </NavLink>
+                                <NavLink
+                                    v-if="$page.props.auth.user.role === 'dosen'"
+                                    :href="route('dosen.jadwal.index')"
+                                    :active="route().current('dosen.jadwal.*')"
+                                >
+                                    Monitoring Jadwal
                                 </NavLink>
                             </div>
                         </div>

@@ -11,7 +11,7 @@ class MonitoringJadwalBimbinganController extends Controller
     public function index()
     {
         // Mengambil semua jadwal berserta data dosen & mahasiswa
-        $jadwalBimbingans = JadwalBimbingan::with(['dosen', 'mahasiswa'])
+        $jadwalBimbingans = JadwalBimbingan::with(['dosen', 'mahasiswa', 'catatanKonsultasi'])
             ->orderBy('tanggal', 'desc')
             ->get();
 
@@ -34,6 +34,11 @@ class MonitoringJadwalBimbinganController extends Controller
     {
         $jadwal = JadwalBimbingan::findOrFail($id);
         $jadwal->update(['status' => 'approved']);
+
+        // Kurangi kuota ketersediaan jadwal jika ada relasi
+        if ($jadwal->ketersediaanJadwal) {
+            $jadwal->ketersediaanJadwal->decrement('kuota');
+        }
 
         return redirect()->back()->with('success', 'Jadwal bimbingan berhasil disetujui.');
     }

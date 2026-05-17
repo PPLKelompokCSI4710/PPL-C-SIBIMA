@@ -4,10 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\CatatanKonsultasi;
 use App\Models\Dosen;
-use App\Models\Mahasiswa;
+use App\Models\JadwalBimbingan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
 class CatatanKonsultasiController extends Controller
@@ -19,46 +18,37 @@ class CatatanKonsultasiController extends Controller
             abort(403, 'Profil Dosen tidak ditemukan.');
         }
 
-        // Ambil daftar catatan yang sudah dibuat oleh dosen ini
-        $catatanList = CatatanKonsultasi::with('mahasiswa')
+        // Ambil daftar catatan berdasarkan jadwal bimbingan yang sudah selesai
+        $catatanList = CatatanKonsultasi::with(['mahasiswa', 'jadwalBimbingan'])
             ->where('dosen_id', $dosen->id)
             ->orderBy('tanggal', 'desc')
             ->get();
 
-        // Ambil daftar mahasiswa bimbingan dosen ini
-        $mahasiswaList = DB::table('dosen_mahasiswa')
-            ->join('mahasiswa', 'dosen_mahasiswa.mahasiswa_id', '=', 'mahasiswa.id')
-            ->where('dosen_mahasiswa.dosen_id', $dosen->id)
-            ->where('dosen_mahasiswa.is_active', true)
-            ->select('mahasiswa.id', 'mahasiswa.nama_lengkap', 'mahasiswa.nim')
-            ->get();
-
         return Inertia::render('CatatanKonsultasi/Index', [
             'catatanList' => $catatanList,
-            'mahasiswaList' => $mahasiswaList,
         ]);
     }
 
     public function store(Request $request)
     {
         $request->validate([
-            'mahasiswa_id' => 'required|exists:mahasiswa,id',
-            'tanggal' => 'required|date',
-            'topik' => 'required|string|max:255',
+            'jadwal_bimbingan_id' => 'required|exists:jadwal_bimbingans,id',
             'catatan' => 'required|string',
         ]);
 
         $dosen = Dosen::where('user_id', Auth::id())->first();
+        $jadwal = JadwalBimbingan::findOrFail($request->jadwal_bimbingan_id);
 
         CatatanKonsultasi::create([
+            'jadwal_bimbingan_id' => $jadwal->id,
             'dosen_id' => $dosen->id,
-            'mahasiswa_id' => $request->mahasiswa_id,
-            'tanggal' => $request->tanggal,
-            'topik' => $request->topik,
+            'mahasiswa_id' => $jadwal->mahasiswa_id,
+            'tanggal' => $jadwal->tanggal,
+            'topik' => $jadwal->topik_bimbingan,
             'catatan' => $request->catatan,
         ]);
 
-        return redirect()->back()->with('success', 'Catatan hasil konsultasi berhasil disimpan.');
+        return redirect()->back()->with('success', 'Catatan konsultasi berhasil disimpan.');
     }
 
     public function destroy($id)

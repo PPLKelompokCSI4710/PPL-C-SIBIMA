@@ -15,6 +15,7 @@ class KetersediaanJadwal extends Model
         'waktu_mulai',
         'waktu_selesai',
         'kuota',
+        'tipe_bimbingan',
     ];
 
     public function dosen()

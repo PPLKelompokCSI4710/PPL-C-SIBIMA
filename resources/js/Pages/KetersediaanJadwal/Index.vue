@@ -1,5 +1,6 @@
 <script setup>
     import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+    import { computed } from 'vue';
     import { Head, useForm } from '@inertiajs/vue3';
 
     defineProps({
@@ -14,6 +15,12 @@
         waktu_mulai: '',
         waktu_selesai: '',
         kuota: 1,
+        tipe_bimbingan: 'offline',
+    });
+
+    const today = computed(() => {
+        const d = new Date();
+        return d.toISOString().split('T')[0];
     });
 
     const submit = () => {
@@ -97,6 +104,7 @@
                                     <input
                                         v-model="form.tanggal"
                                         type="date"
+                                        :min="today"
                                         class="w-full rounded-lg border-slate-300 focus:border-primary focus:ring-primary shadow-sm text-sm"
                                         required
                                     />
@@ -155,6 +163,25 @@
                                         {{ form.errors.kuota }}
                                     </p>
                                 </div>
+                                <div>
+                                    <label class="block text-sm font-bold text-slate-700 mb-1"
+                                        >Tipe Bimbingan</label
+                                    >
+                                    <select
+                                        v-model="form.tipe_bimbingan"
+                                        class="w-full rounded-lg border-slate-300 focus:border-primary focus:ring-primary shadow-sm text-sm"
+                                        required
+                                    >
+                                        <option value="offline">Offline</option>
+                                        <option value="online">Online</option>
+                                    </select>
+                                    <p
+                                        v-if="form.errors.tipe_bimbingan"
+                                        class="text-red-500 text-xs mt-1"
+                                    >
+                                        {{ form.errors.tipe_bimbingan }}
+                                    </p>
+                                </div>
                                 <div class="pt-2">
                                     <button
                                         type="submit"
@@ -190,6 +217,11 @@
                                             <th
                                                 class="py-3 px-4 text-left text-xs font-extrabold text-slate-500 uppercase tracking-widest"
                                             >
+                                                Tipe
+                                            </th>
+                                            <th
+                                                class="py-3 px-4 text-left text-xs font-extrabold text-slate-500 uppercase tracking-widest"
+                                            >
                                                 Waktu
                                             </th>
                                             <th
@@ -212,6 +244,18 @@
                                         >
                                             <td class="py-3 px-4 font-bold text-slate-700">
                                                 {{ item.tanggal }}
+                                            </td>
+                                            <td class="py-3 px-4">
+                                                <span
+                                                    :class="
+                                                        item.tipe_bimbingan === 'online'
+                                                            ? 'bg-purple-50 text-purple-700 ring-purple-700/10'
+                                                            : 'bg-amber-50 text-amber-700 ring-amber-700/10'
+                                                    "
+                                                    class="inline-flex items-center rounded-md px-2 py-1 text-xs font-bold ring-1 ring-inset capitalize"
+                                                >
+                                                    {{ item.tipe_bimbingan }}
+                                                </span>
                                             </td>
                                             <td class="py-3 px-4">
                                                 <span

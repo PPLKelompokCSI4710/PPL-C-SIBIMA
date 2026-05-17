@@ -12,6 +12,7 @@ class CatatanKonsultasi extends Model
     protected $table = 'catatan_konsultasis';
 
     protected $fillable = [
+        'jadwal_bimbingan_id',
         'dosen_id',
         'mahasiswa_id',
         'tanggal',
@@ -27,5 +28,10 @@ class CatatanKonsultasi extends Model
     public function mahasiswa()
     {
         return $this->belongsTo(Mahasiswa::class, 'mahasiswa_id');
+    }
+
+    public function jadwalBimbingan()
+    {
+        return $this->belongsTo(JadwalBimbingan::class, 'jadwal_bimbingan_id');
     }
 }

@@ -30,10 +30,11 @@ class KetersediaanJadwalController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'tanggal' => 'required|date',
+            'tanggal' => 'required|date|after_or_equal:today',
             'waktu_mulai' => 'required|date_format:H:i',
             'waktu_selesai' => 'required|date_format:H:i|after:waktu_mulai',
             'kuota' => 'required|integer|min:1',
+            'tipe_bimbingan' => 'required|in:online,offline',
         ]);
 
         $dosen = Dosen::where('user_id', Auth::id())->first();
@@ -44,6 +45,7 @@ class KetersediaanJadwalController extends Controller
             'waktu_mulai' => $request->waktu_mulai,
             'waktu_selesai' => $request->waktu_selesai,
             'kuota' => $request->kuota,
+            'tipe_bimbingan' => $request->tipe_bimbingan,
         ]);
 
         return redirect()->back()->with('success', 'Jadwal ketersediaan berhasil ditambahkan.');
