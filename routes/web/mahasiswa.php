@@ -1,8 +1,11 @@
 <?php
 
-use App\Http\Controllers\Mahasiswa\BimbinganReminderController;
-use App\Http\Controllers\Mahasiswa\ProgressReminderController;
+use App\Http\Controllers\Mahasiswa\CourseController;
+use App\Http\Controllers\Mahasiswa\DashboardController;
+use App\Http\Controllers\Mahasiswa\ProgressController;
+use App\Http\Controllers\Mahasiswa\StudyPlanController;
 use Illuminate\Support\Facades\Route;
+use Inertia\Inertia;
 
 /*
 |--------------------------------------------------------------------------
@@ -14,11 +17,23 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::middleware(['auth', 'role:mahasiswa'])->prefix('mahasiswa')->name('mahasiswa.')->group(function () {
-    Route::get('/bimbingan/reminder', [BimbinganReminderController::class, 'index'])
-        ->name('bimbingan.reminder');
+    Route::get('/bimbingan/reminder', function () {
+        return Inertia::render('Mahasiswa/Bimbingan/Reminder');
+    })->name('bimbingan.reminder');
 
-    Route::get('/bimbingan/progress-reminder', [ProgressReminderController::class, 'index'])->name('bimbingan.progress_reminder');
-    Route::post('/bimbingan/progress-reminder/frequency', [ProgressReminderController::class, 'updateFrequency'])->name('bimbingan.progress_reminder.update');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/calendar', [DashboardController::class, 'calendar'])->name('calendar');
 
-    // Route::get('/akademik', [AkademikController::class, 'index'])->name('akademik.index'); // Contoh untuk PBI-ZZZ
+    // Study Plan routes
+    Route::get('/study-plans', [StudyPlanController::class, 'index'])->name('study-plans.index');
+    Route::post('/study-plans', [StudyPlanController::class, 'store'])->name('study-plans.store');
+    Route::put('/study-plans/{studyPlan}', [StudyPlanController::class, 'update'])->name('study-plans.update');
+    Route::delete('/study-plans/{studyPlan}', [StudyPlanController::class, 'destroy'])->name('study-plans.destroy');
+
+    // Course routes
+    Route::get('/courses', [CourseController::class, 'index'])->name('courses.index');
+
+    // Progress routes
+    Route::get('/progress', [ProgressController::class, 'index'])->name('progress.index');
+    Route::put('/progress', [ProgressController::class, 'update'])->name('progress.update');
 });

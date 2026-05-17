@@ -1,5 +1,6 @@
 <script setup>
-    import { Head, Link, usePage } from '@inertiajs/vue3';
+    import { Head, Link } from '@inertiajs/vue3';
+    import { GraduationCapIcon, LayoutDashboardIcon } from 'lucide-vue-next';
 
     defineProps({
         canLogin: {
@@ -17,8 +18,6 @@
             required: true,
         },
     });
-
-    const page = usePage();
 </script>
 
 <template>
@@ -44,47 +43,33 @@
                 <!-- Logo -->
                 <Link href="/" class="navbar-brand">
                     <img src="/images/logo-sibima.svg" alt="SIBIMA Logo" class="navbar-logo" />
-                    <!-- <span class="navbar-wordmark">SIBIMA</span> -->
                 </Link>
 
                 <!-- Auth Links -->
-                <nav v-if="canLogin" class="navbar-nav" aria-label="Autentikasi">
-                    <template v-if="page.props.auth.user">
-                        <Link
-                            id="nav-dashboard-btn"
-                            :href="route('dashboard')"
-                            class="btn btn-primary"
-                        >
+                <nav v-if="canLogin" class="navbar-nav">
+                    <template v-if="$page.props.auth.user">
+                        <Link :href="route('dashboard')" class="btn btn-primary">
+                            <LayoutDashboardIcon class="w-4 h-4 mr-2" />
                             Dashboard
-                            <!-- arrow icon -->
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                viewBox="0 0 20 20"
-                                fill="currentColor"
-                                class="btn-icon"
-                                aria-hidden="true"
-                            >
-                                <path
-                                    fill-rule="evenodd"
-                                    d="M3 10a.75.75 0 0 1 .75-.75h10.638L10.23 5.29a.75.75 0 1 1 1.04-1.08l5.5 5.25a.75.75 0 0 1 0 1.08l-5.5 5.25a.75.75 0 1 1-1.04-1.08l4.158-3.96H3.75A.75.75 0 0 1 3 10Z"
-                                    clip-rule="evenodd"
-                                />
-                            </svg>
                         </Link>
                     </template>
 
                     <template v-else>
-                        <Link id="nav-login-btn" :href="route('login')" class="btn btn-ghost">
-                            Masuk
-                        </Link>
-                        <Link
-                            v-if="canRegister"
-                            id="nav-register-btn"
-                            :href="route('register')"
-                            class="btn btn-primary"
-                        >
-                            Daftar Sekarang
-                        </Link>
+                        <div class="flex items-center gap-2">
+                            <Link
+                                :href="route('login')"
+                                class="btn btn-ghost hover:!bg-slate-100 !text-slate-600 font-bold"
+                            >
+                                Masuk
+                            </Link>
+                            <Link
+                                v-if="canRegister"
+                                :href="route('register')"
+                                class="btn btn-primary !bg-blue-600 hover:!bg-blue-700 !text-white !rounded-xl !px-6"
+                            >
+                                Daftar Sekarang
+                            </Link>
+                        </div>
                     </template>
                 </nav>
             </div>
@@ -350,7 +335,6 @@
             <div class="site-footer-inner">
                 <div class="footer-brand">
                     <img src="/images/logo-sibima.svg" alt="SIBIMA Logo" class="footer-logo" />
-                    <span class="footer-wordmark">SIBIMA</span>
                 </div>
                 <p class="footer-copy">
                     &copy; 2026 SIBIMA — Telkom University. All rights reserved.
@@ -367,7 +351,7 @@
     /* ─────────────────────────────────────────────────────────
    DESIGN TOKENS
 ───────────────────────────────────────────────────────── */
-    :root {
+    .sibima-root {
         --color-primary: #4f46e5; /* indigo-600 */
         --color-primary-dark: #3730a3; /* indigo-800 */
         --color-primary-light: #e0e7ff; /* indigo-100 */

@@ -3,21 +3,35 @@
     import { Head } from '@inertiajs/vue3';
     import { ref, onMounted } from 'vue';
 
+    // Mock data (Normally passed via props from controller)
     const props = defineProps({
         upcomingBimbingan: {
             type: Object,
-            default: () => null,
+            default: () => ({
+                dosen: 'Dr. Budi Santoso, M.Kom',
+                topic: 'Review Draft Bab 3 & Analisis Data',
+                date: '2026-04-25',
+                dateFormatted: '25 April 2026',
+                timeFormatted: '10:00 - 11:30 WIB',
+                location: 'Ruang Rapat Gedung Kuliah Utama (Lantai 2)',
+                status: 'Upcoming',
+                preparationNotes: [
+                    'Cetak draft Bab 3 sebanyak 1 rangkap',
+                    'Siapkan dataset yang akan dianalisis',
+                    'Isi logbook progres sebelumnya',
+                ],
+                type: 'Offline',
+            }),
         },
     });
 
     // Calculate countdown
     const daysLeft = ref(0);
     onMounted(() => {
-        if (!props.upcomingBimbingan?.date) return;
         const target = new Date(props.upcomingBimbingan.date);
         const today = new Date();
-        const diffTime = target - today;
-        daysLeft.value = Math.max(0, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
+        const diffTime = Math.abs(target - today);
+        daysLeft.value = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     });
 </script>
 
@@ -28,12 +42,12 @@
         <template #header>
             <div class="flex items-center justify-between">
                 <h2
-                    class="text-2xl font-black leading-tight tracking-tight text-brand-primary-dark drop-shadow-sm"
+                    class="text-2xl font-black leading-tight tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-blue-700 to-indigo-600 drop-shadow-sm"
                 >
                     Reminder Bimbingan
                 </h2>
                 <span
-                    class="inline-flex items-center px-4 py-1.5 rounded-full text-sm font-semibold bg-brand-secondary/10 text-brand-secondary ring-1 ring-brand-secondary/30"
+                    class="inline-flex items-center px-4 py-1.5 rounded-full text-sm font-semibold bg-blue-100 text-blue-800 ring-1 ring-blue-400"
                 >
                     <svg
                         class="w-4 h-4 mr-2"
@@ -57,10 +71,10 @@
         <div class="py-12 min-h-screen bg-brand-bg relative overflow-hidden">
             <!-- Decorative background elements -->
             <div
-                class="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 rounded-full bg-brand-secondary-light/20 blur-3xl mix-blend-multiply"
+                class="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 rounded-full bg-blue-400/20 blur-3xl mix-blend-multiply"
             />
             <div
-                class="absolute bottom-0 left-0 -ml-20 -mb-20 w-80 h-80 rounded-full bg-brand-primary/10 blur-3xl mix-blend-multiply"
+                class="absolute bottom-0 left-0 -ml-20 -mb-20 w-80 h-80 rounded-full bg-indigo-400/20 blur-3xl mix-blend-multiply"
             />
 
             <div class="mx-auto max-w-5xl sm:px-6 lg:px-8 relative z-10">
@@ -79,13 +93,12 @@
 
                 <!-- Main Card -->
                 <div
-                    v-else
-                    class="bg-brand-white backdrop-blur-xl shadow-2xl rounded-3xl border border-white/60 overflow-hidden transition-all duration-500 hover:shadow-brand-primary/10"
+                    class="bg-white/80 backdrop-blur-xl shadow-2xl rounded-3xl border border-white/60 overflow-hidden transition-all duration-500 hover:shadow-blue-500/10"
                 >
                     <div class="grid grid-cols-1 md:grid-cols-3">
                         <!-- Left/Top Section: Highlight -->
                         <div
-                            class="bg-brand-primary p-8 text-white flex flex-col justify-between relative overflow-hidden"
+                            class="bg-gradient-to-br from-blue-600 to-indigo-700 p-8 text-white flex flex-col justify-between relative overflow-hidden"
                         >
                             <!-- Abstract pattern overlay -->
                             <div
@@ -94,12 +107,12 @@
 
                             <div class="relative z-10">
                                 <div
-                                    class="inline-block px-3 py-1 rounded-full bg-white/20 backdrop-blur-md text-xs font-bold uppercase tracking-wider mb-6 border border-white/30 text-white"
+                                    class="inline-block px-3 py-1 rounded-full bg-white/20 backdrop-blur-md text-xs font-bold uppercase tracking-wider mb-6 border border-white/30"
                                 >
                                     {{ props.upcomingBimbingan.type }} Meeting
                                 </div>
                                 <h3 class="text-4xl font-black mb-2">{{ daysLeft }} Hari Lagi!</h3>
-                                <p class="text-brand-secondary-light text-lg font-medium">
+                                <p class="text-blue-100 text-lg font-medium">
                                     Bimbingan Selanjutnya
                                 </p>
                             </div>
@@ -107,7 +120,7 @@
                             <div class="relative z-10 mt-10 md:mt-0">
                                 <div class="flex items-center space-x-4">
                                     <div
-                                        class="w-14 h-14 rounded-full bg-brand-white text-brand-primary flex items-center justify-center font-bold text-xl shadow-inner"
+                                        class="w-14 h-14 rounded-full bg-white text-blue-600 flex items-center justify-center font-bold text-xl shadow-inner"
                                     >
                                         <svg
                                             class="w-6 h-6"

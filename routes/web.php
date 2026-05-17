@@ -16,6 +16,16 @@ Route::get('/', function () {
 });
 
 Route::get('/dashboard', function () {
+    $user = auth()->user();
+
+    if ($user->hasRole('mahasiswa')) {
+        return redirect()->route('mahasiswa.dashboard');
+    }
+
+    if ($user->hasRole('admin') || $user->hasRole('dosen') || $user->hasRole('staff')) {
+        return redirect()->route('staff.dashboard');
+    }
+
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
@@ -34,3 +44,4 @@ require __DIR__.'/auth.php';
 require __DIR__.'/web/admin.php';
 require __DIR__.'/web/dosen.php';
 require __DIR__.'/web/mahasiswa.php';
+require __DIR__.'/web/staff.php';

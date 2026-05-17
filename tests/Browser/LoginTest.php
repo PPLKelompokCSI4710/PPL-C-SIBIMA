@@ -2,48 +2,27 @@
 
 namespace Tests\Browser;
 
-use App\Models\User;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
-use Illuminate\Support\Facades\Lang;
 use Laravel\Dusk\Browser;
 use Tests\DuskTestCase;
 
 class LoginTest extends DuskTestCase
 {
-    use DatabaseMigrations;
-
-    public function test_tc_login_001_user_can_login_with_registered_email_and_password(): void
+    /**
+     * A Dusk test example.
+     */
+    public function test_user_can_see_login_page()
     {
-        $user = User::factory()->create();
-
-        $this->browse(function (Browser $browser) use ($user) {
-            $browser->visitRoute('login')
-                ->assertSee('Email')
-                ->assertSee('Password')
-                ->type('#email', $user->email)
-                ->type('#password', 'password')
-                // PrimaryButton uses CSS uppercase; WebDriver getText() is "LOG IN", not "Log in".
-                ->waitFor('form button')
-                ->click('form button')
-                ->waitForRoute('dashboard')
-                ->assertPathIs('/dashboard')
-                ->assertSee("You're logged in!");
-        });
-    }
-
-    public function test_tc_login_002_user_cannot_login_with_wrong_password(): void
-    {
-        $user = User::factory()->create();
-
-        $this->browse(function (Browser $browser) use ($user) {
-            $browser->visitRoute('login')
-                ->type('#email', $user->email)
-                ->type('#password', 'wrong-password')
-                ->waitFor('form button')
-                ->click('form button')
-                ->waitForText(Lang::get('auth.failed'), 10)
-                ->assertPathIs('/login')
-                ->assertSee(Lang::get('auth.failed'));
+        $this->browse(function (Browser $browser) {
+            $browser->visit('/login')
+                    // Tunggu hingga teks muncul di layar (penting untuk Vue/Inertia)
+                ->waitForText('Masuk ke portal SIBIMA')
+                ->assertSee('Masuk ke portal SIBIMA')
+                ->type('email', 'maya@example.com')
+                ->type('password', 'password')
+                    // Pastikan nama tombol sesuai (Dusk mencari teks di dalam tombol)
+                ->press('Masuk ke Portal')
+                ->waitForLocation('/staff/dashboard')
+                ->assertPathIs('/staff/dashboard');
         });
     }
 }

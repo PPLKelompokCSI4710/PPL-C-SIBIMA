@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Models\Dosen;
 use App\Models\Mahasiswa;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
@@ -57,19 +56,17 @@ class RegisteredUserController extends Controller
                 'angkatan' => date('Y'),
                 'status_akademik' => 'aktif',
             ]);
-        } elseif ($request->role === 'dosen') {
-            Dosen::create([
-                'user_id' => $user->id,
-                'nidn' => 'NIDN-'.$user->id.'-'.rand(1000, 9999),
-                'nama_lengkap' => $user->name,
-                'program_studi' => 'Belum Diatur',
-            ]);
         }
 
         event(new Registered($user));
 
         Auth::login($user);
 
-        return redirect('/admin');
+        // Redirect based on role
+        if ($user->hasRole('admin') || $user->hasRole('dosen') || $user->hasRole('staff')) {
+            return redirect()->route('staff.dashboard');
+        }
+
+        return redirect()->route('mahasiswa.dashboard');
     }
 }
