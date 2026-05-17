@@ -6,6 +6,7 @@ use App\Enums\AkademikStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -54,5 +55,15 @@ class Mahasiswa extends Model
     public function studentProgress(): HasOne
     {
         return $this->hasOne(StudentProgress::class, 'user_id', 'user_id');
+    }
+
+    public function bimbingans(): HasMany
+    {
+        return $this->hasMany(Bimbingan::class);
+    }
+
+    public function dosens(): BelongsToMany
+    {
+        return $this->belongsToMany(Dosen::class, 'dosen_mahasiswa')->withPivot(['tanggal_penugasan', 'tanggal_berakhir', 'is_active', 'catatan']);
     }
 }

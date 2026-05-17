@@ -19,7 +19,7 @@ return new class extends Migration
         });
 
         // 2. Hapus tabel dosen (karena data tidak perlu dipindahkan sesuai instruksi)
-        Schema::dropIfExists('dosen');
+        // Schema::dropIfExists('dosen');
     }
 
     /**

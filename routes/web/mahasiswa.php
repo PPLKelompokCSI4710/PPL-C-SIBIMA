@@ -1,8 +1,10 @@
 <?php
 
+use App\Http\Controllers\Mahasiswa\BimbinganReminderController;
 use App\Http\Controllers\Mahasiswa\CourseController;
 use App\Http\Controllers\Mahasiswa\DashboardController;
 use App\Http\Controllers\Mahasiswa\ProgressController;
+use App\Http\Controllers\Mahasiswa\ProgressReminderController;
 use App\Http\Controllers\Mahasiswa\StudyPlanController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -17,9 +19,9 @@ use Inertia\Inertia;
 */
 
 Route::middleware(['auth', 'role:mahasiswa'])->prefix('mahasiswa')->name('mahasiswa.')->group(function () {
-    Route::get('/bimbingan/reminder', function () {
-        return Inertia::render('Mahasiswa/Bimbingan/Reminder');
-    })->name('bimbingan.reminder');
+    Route::get('/bimbingan/reminder', [BimbinganReminderController::class, 'index'])->name('bimbingan.reminder');
+    Route::get('/bimbingan/progress-reminder', [ProgressReminderController::class, 'index'])->name('bimbingan.progress_reminder');
+    Route::post('/bimbingan/progress-reminder/frequency', [ProgressReminderController::class, 'updateFrequency'])->name('bimbingan.progress_reminder.update');
 
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/calendar', [DashboardController::class, 'calendar'])->name('calendar');
