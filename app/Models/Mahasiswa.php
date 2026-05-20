@@ -55,4 +55,19 @@ class Mahasiswa extends Model
     {
         return $this->hasOne(StudentProgress::class, 'user_id', 'user_id');
     }
+
+    // =========================================================================
+    // LIFECYCLE HOOKS
+    // =========================================================================
+
+    protected static function booted(): void
+    {
+        // Ketika mahasiswa dihapus (soft-delete), hapus juga akun User-nya
+        // agar email tidak menghalangi import ulang di masa mendatang.
+        static::deleting(function (Mahasiswa $mahasiswa) {
+            if ($mahasiswa->user) {
+                $mahasiswa->user->delete();
+            }
+        });
+    }
 }

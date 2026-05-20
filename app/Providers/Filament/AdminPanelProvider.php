@@ -49,6 +49,7 @@ class AdminPanelProvider extends PanelProvider
             // ─── Typography & UI Preferences ─────────────────────────────
             ->font('Inter')
             ->darkMode()
+            ->databaseNotifications()
             ->sidebarCollapsibleOnDesktop()
 
             // ─── Resource & Page Discovery ────────────────────────────────
