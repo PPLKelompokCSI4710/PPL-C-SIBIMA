@@ -10,13 +10,12 @@ return new class extends Migration
     {
         Schema::create('jadwal_bimbingans', function (Blueprint $table) {
             $table->id();
-            // Nanti bisa disesuaikan dengan tipe relasinya (foreign key ke users/mahasiswa/dosen)
-            $table->unsignedBigInteger('dosen_id');
-            $table->unsignedBigInteger('mahasiswa_id');
-            $table->date('tanggal');
-            $table->time('waktu');
-            $table->text('topik_bimbingan');
-            $table->enum('tipe', ['online', 'offline']);
+            $table->foreignId('ketersediaan_jadwal_id')->nullable()->constrained('ketersediaan_jadwals')->nullOnDelete();
+            $table->foreignId('dosen_id')->constrained('dosen')->cascadeOnDelete();
+            $table->foreignId('mahasiswa_id')->constrained('mahasiswa')->cascadeOnDelete();
+            $table->string('judul_ta')->nullable();
+            $table->text('topik_bimbingan')->nullable();
+            $table->enum('tipe', ['online', 'offline'])->nullable();
             $table->enum('status', ['pending', 'rejected', 'approved', 'completed', 'canceled'])->default('pending');
             $table->timestamps();
         });

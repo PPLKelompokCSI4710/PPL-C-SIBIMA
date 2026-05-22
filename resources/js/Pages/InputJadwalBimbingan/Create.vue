@@ -17,9 +17,9 @@
 
     const form = useForm({
         dosen_id: '',
-        schedule_id: '',
+        ketersediaan_jadwal_id: '',
+        judul_ta: '',
         topik_bimbingan: '',
-        tipe: 'offline',
     });
 
     const schedules = ref([]);
@@ -28,7 +28,7 @@
     watch(
         () => form.dosen_id,
         async (newDosenId) => {
-            form.schedule_id = '';
+            form.ketersediaan_jadwal_id = '';
             schedules.value = [];
             if (!newDosenId) return;
 
@@ -99,9 +99,8 @@
                                 <label
                                     for="dosen_id"
                                     class="block text-sm font-medium text-gray-700"
+                                    >Dosen Pembimbing</label
                                 >
-                                    Dosen Pembimbing
-                                </label>
                                 <select
                                     id="dosen_id"
                                     v-model="form.dosen_id"
@@ -125,14 +124,13 @@
                             <!-- Jadwal Tersedia -->
                             <div>
                                 <label
-                                    for="schedule_id"
+                                    for="ketersediaan_jadwal_id"
                                     class="block text-sm font-medium text-gray-700"
+                                    >Pilih Jadwal</label
                                 >
-                                    Pilih Jadwal
-                                </label>
                                 <select
-                                    id="schedule_id"
-                                    v-model="form.schedule_id"
+                                    id="ketersediaan_jadwal_id"
+                                    v-model="form.ketersediaan_jadwal_id"
                                     class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm disabled:bg-gray-100"
                                     required
                                     :disabled="
@@ -165,8 +163,31 @@
                                         {{ schedule.kuota }})
                                     </option>
                                 </select>
-                                <p v-if="form.errors.schedule_id" class="mt-1 text-sm text-red-600">
-                                    {{ form.errors.schedule_id }}
+                                <p
+                                    v-if="form.errors.ketersediaan_jadwal_id"
+                                    class="mt-1 text-sm text-red-600"
+                                >
+                                    {{ form.errors.ketersediaan_jadwal_id }}
+                                </p>
+                            </div>
+
+                            <!-- Judul TA -->
+                            <div>
+                                <label
+                                    for="judul_ta"
+                                    class="block text-sm font-medium text-gray-700"
+                                    >Judul Skripsi / Tugas Akhir</label
+                                >
+                                <input
+                                    id="judul_ta"
+                                    v-model="form.judul_ta"
+                                    type="text"
+                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                    placeholder="Masukkan judul skripsi Anda..."
+                                    required
+                                />
+                                <p v-if="form.errors.judul_ta" class="mt-1 text-sm text-red-600">
+                                    {{ form.errors.judul_ta }}
                                 </p>
                             </div>
 
@@ -175,9 +196,8 @@
                                 <label
                                     for="topik_bimbingan"
                                     class="block text-sm font-medium text-gray-700"
+                                    >Topik Bimbingan</label
                                 >
-                                    Topik Bimbingan
-                                </label>
                                 <textarea
                                     id="topik_bimbingan"
                                     v-model="form.topik_bimbingan"
@@ -191,40 +211,6 @@
                                     class="mt-1 text-sm text-red-600"
                                 >
                                     {{ form.errors.topik_bimbingan }}
-                                </p>
-                            </div>
-
-                            <!-- Tipe Bimbingan -->
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700">
-                                    Tipe Bimbingan
-                                </label>
-                                <div class="mt-2 flex space-x-6">
-                                    <label class="inline-flex items-center">
-                                        <input
-                                            v-model="form.tipe"
-                                            type="radio"
-                                            value="offline"
-                                            class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-500"
-                                        />
-                                        <span class="ml-2 text-sm text-gray-700"
-                                            >Offline (Tatap Muka)</span
-                                        >
-                                    </label>
-                                    <label class="inline-flex items-center">
-                                        <input
-                                            v-model="form.tipe"
-                                            type="radio"
-                                            value="online"
-                                            class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-500"
-                                        />
-                                        <span class="ml-2 text-sm text-gray-700"
-                                            >Online (Daring)</span
-                                        >
-                                    </label>
-                                </div>
-                                <p v-if="form.errors.tipe" class="mt-1 text-sm text-red-600">
-                                    {{ form.errors.tipe }}
                                 </p>
                             </div>
 

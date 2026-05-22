@@ -4,8 +4,8 @@ namespace Database\Seeders;
 
 use App\Models\Dosen;
 use App\Models\JadwalBimbingan;
+use App\Models\KetersediaanJadwal;
 use App\Models\Mahasiswa;
-use App\Models\Schedule;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
@@ -95,14 +95,14 @@ class JadwalBimbinganSeeder extends Seeder
 
             // Buat beberapa jadwal (schedules) untuk tiap dosen
             for ($i = 1; $i <= 5; $i++) {
-                Schedule::create([
+                KetersediaanJadwal::create([
                     'dosen_id' => $profile->id,
                     'tanggal' => now()->addDays($i)->toDateString(),
                     'waktu_mulai' => '09:00:00',
                     'waktu_selesai' => '10:00:00',
                     'kuota' => 2, // Kuota awal
                 ]);
-                Schedule::create([
+                KetersediaanJadwal::create([
                     'dosen_id' => $profile->id,
                     'tanggal' => now()->addDays($i)->toDateString(),
                     'waktu_mulai' => '13:00:00',
@@ -115,16 +115,15 @@ class JadwalBimbinganSeeder extends Seeder
         // 3. Data dummy jadwal bimbingan (menggunakan dosen pertama)
         $dosenUtama = $dosenProfiles[0];
         // Ambil beberapa jadwal dosen utama
-        $schedulesUtama = Schedule::where('dosen_id', $dosenUtama->id)->get();
+        $schedulesUtama = KetersediaanJadwal::where('dosen_id', $dosenUtama->id)->get();
 
         if ($schedulesUtama->count() >= 3) {
             $jadwalData = [
                 [
                     'dosen_id' => $dosenUtama->id,
                     'mahasiswa_id' => $mahasiswaProfile->id,
-                    'schedule_id' => $schedulesUtama[0]->id,
-                    'tanggal' => $schedulesUtama[0]->tanggal,
-                    'waktu' => $schedulesUtama[0]->waktu_mulai,
+                    'ketersediaan_jadwal_id' => $schedulesUtama[0]->id,
+                    'judul_ta' => 'Analisis Algoritma X untuk Optimasi Y',
                     'topik_bimbingan' => 'Konsultasi Bab 1 - Pendahuluan & Latar Belakang',
                     'tipe' => 'offline',
                     'status' => 'pending',
@@ -132,9 +131,8 @@ class JadwalBimbinganSeeder extends Seeder
                 [
                     'dosen_id' => $dosenUtama->id,
                     'mahasiswa_id' => $mahasiswaProfile->id,
-                    'schedule_id' => $schedulesUtama[1]->id,
-                    'tanggal' => $schedulesUtama[1]->tanggal,
-                    'waktu' => $schedulesUtama[1]->waktu_mulai,
+                    'ketersediaan_jadwal_id' => $schedulesUtama[1]->id,
+                    'judul_ta' => 'Analisis Algoritma X untuk Optimasi Y',
                     'topik_bimbingan' => 'Review Bab 2 - Tinjauan Pustaka & Landasan Teori',
                     'tipe' => 'online',
                     'status' => 'approved',
@@ -142,9 +140,8 @@ class JadwalBimbinganSeeder extends Seeder
                 [
                     'dosen_id' => $dosenUtama->id,
                     'mahasiswa_id' => $mahasiswaProfile->id,
-                    'schedule_id' => $schedulesUtama[2]->id,
-                    'tanggal' => $schedulesUtama[2]->tanggal,
-                    'waktu' => $schedulesUtama[2]->waktu_mulai,
+                    'ketersediaan_jadwal_id' => $schedulesUtama[2]->id,
+                    'judul_ta' => 'Analisis Algoritma X untuk Optimasi Y',
                     'topik_bimbingan' => 'Diskusi Metodologi Penelitian - Bab 3',
                     'tipe' => 'offline',
                     'status' => 'completed',
@@ -153,9 +150,12 @@ class JadwalBimbinganSeeder extends Seeder
 
             foreach ($jadwalData as $jadwal) {
                 JadwalBimbingan::create($jadwal);
-                // Kurangi kuota schedule
-                $sched = Schedule::find($jadwal['schedule_id']);
-                $sched->decrement('kuota');
+
+                // Jika status bukan pending, kurangi kuota (karena approved/completed)
+                if ($jadwal['status'] !== 'pending') {
+                    $sched = KetersediaanJadwal::find($jadwal['ketersediaan_jadwal_id']);
+                    $sched->decrement('kuota');
+                }
             }
         }
     }

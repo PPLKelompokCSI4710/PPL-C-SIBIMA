@@ -11,16 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('schedules', function (Blueprint $table) {
+        Schema::create('ketersediaan_jadwals', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('dosen_id');
+            $table->foreignId('dosen_id')->constrained('dosen')->cascadeOnDelete();
             $table->date('tanggal');
             $table->time('waktu_mulai');
             $table->time('waktu_selesai');
             $table->integer('kuota')->default(1);
             $table->timestamps();
-
-            $table->foreign('dosen_id')->references('id')->on('dosen')->onDelete('cascade');
         });
     }
 
@@ -29,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('schedules');
+        Schema::dropIfExists('ketersediaan_jadwals');
     }
 };

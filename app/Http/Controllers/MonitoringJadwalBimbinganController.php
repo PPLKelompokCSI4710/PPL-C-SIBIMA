@@ -21,25 +21,28 @@ class MonitoringJadwalBimbinganController extends Controller
         $search = $request->query('search');
 
         // Query jadwal milik mahasiswa ini dengan filter opsional
-        $query = JadwalBimbingan::with(['dosen', 'mahasiswa'])
-            ->where('mahasiswa_id', $mahasiswa?->id);
+        $query = JadwalBimbingan::select('jadwal_bimbingans.*')
+            ->join('ketersediaan_jadwals', 'jadwal_bimbingans.ketersediaan_jadwal_id', '=', 'ketersediaan_jadwals.id')
+            ->with(['dosen', 'mahasiswa', 'ketersediaanJadwal'])
+            ->where('jadwal_bimbingans.mahasiswa_id', $mahasiswa?->id);
 
         // Filter berdasarkan status jika dipilih
         if ($status && $status !== 'all') {
-            $query->where('status', $status);
+            $query->where('jadwal_bimbingans.status', $status);
         }
 
         // Filter berdasarkan kata kunci topik atau nama dosen
         if ($search) {
             $query->where(function ($q) use ($search) {
-                $q->where('topik_bimbingan', 'like', "%{$search}%")
+                $q->where('jadwal_bimbingans.topik_bimbingan', 'like', "%{$search}%")
+                    ->orWhere('jadwal_bimbingans.judul_ta', 'like', "%{$search}%")
                     ->orWhereHas('dosen', function ($q2) use ($search) {
                         $q2->where('nama_lengkap', 'like', "%{$search}%");
                     });
             });
         }
 
-        $jadwalBimbingans = $query->orderBy('tanggal', 'desc')->get();
+        $jadwalBimbingans = $query->orderBy('ketersediaan_jadwals.tanggal', 'desc')->get();
 
         return Inertia::render('MonitoringJadwal/Index', [
             'jadwalBimbingans' => $jadwalBimbingans,
