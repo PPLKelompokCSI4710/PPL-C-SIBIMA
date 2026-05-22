@@ -2,6 +2,11 @@
 
 namespace App\Filament\Resources\JadwalBimbingans\Schemas;
 
+use App\Models\User;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\TimePicker;
 use Filament\Schemas\Schema;
 
 class JadwalBimbinganForm
@@ -10,28 +15,28 @@ class JadwalBimbinganForm
     {
         return $schema
             ->components([
-                \Filament\Forms\Components\Select::make('dosen_id')
+                Select::make('dosen_id')
                     ->label('Dosen')
-                    ->options(\App\Models\User::role('dosen')->pluck('name', 'id'))
+                    ->options(User::role('dosen')->pluck('name', 'id'))
                     ->required(),
-                \Filament\Forms\Components\Select::make('mahasiswa_id')
+                Select::make('mahasiswa_id')
                     ->label('Mahasiswa')
-                    ->options(\App\Models\User::role('mahasiswa')->pluck('name', 'id'))
+                    ->options(User::role('mahasiswa')->pluck('name', 'id'))
                     ->required(),
-                \Filament\Forms\Components\DatePicker::make('tanggal')
+                DatePicker::make('tanggal')
                     ->required(),
-                \Filament\Forms\Components\TimePicker::make('waktu')
+                TimePicker::make('waktu')
                     ->required(),
-                \Filament\Forms\Components\TextInput::make('topik_bimbingan')
+                TextInput::make('topik_bimbingan')
                     ->required()
                     ->maxLength(255),
-                \Filament\Forms\Components\Select::make('tipe')
+                Select::make('tipe')
                     ->options([
                         'online' => 'Online',
                         'offline' => 'Offline',
                     ])
                     ->required(),
-                \Filament\Forms\Components\Select::make('status')
+                Select::make('status')
                     ->options([
                         'menunggu' => 'Menunggu',
                         'disetujui' => 'Disetujui',

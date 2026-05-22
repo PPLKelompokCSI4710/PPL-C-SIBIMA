@@ -1,11 +1,11 @@
 <?php
 
 use App\Http\Controllers\InputJadwalBimbinganController;
-use App\Http\Controllers\MonitoringJadwalBimbinganController;
 use App\Http\Controllers\Mahasiswa\CourseController;
 use App\Http\Controllers\Mahasiswa\DashboardController;
 use App\Http\Controllers\Mahasiswa\ProgressController;
 use App\Http\Controllers\Mahasiswa\StudyPlanController;
+use App\Http\Controllers\MonitoringJadwalBimbinganController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
