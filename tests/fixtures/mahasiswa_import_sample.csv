@@ -1,0 +1,11 @@
+email,nim,nama_lengkap,program_studi,angkatan,semester,fakultas,ipk,sks_lulus,sks_total,status_akademik,no_telepon,tanggal_lahir,alamat
+budi.santoso@example.com,2024001001,Budi Santoso,Teknik Informatika,2024,1,Fakultas Ilmu Komputer,0.00,0,144,aktif,081234567801,2002-01-15,Jl. Kebon Jeruk No. 1 Jakarta
+citra.dewi@example.com,2024001002,Citra Dewi,Sistem Informasi,2024,1,Fakultas Ilmu Komputer,0.00,0,144,aktif,081234567802,2002-03-22,Jl. Merdeka No. 5 Bandung
+ahmad.fauzi@example.com,2023001003,Ahmad Fauzi,Teknik Informatika,2023,3,Fakultas Ilmu Komputer,3.25,72,144,aktif,081234567803,2001-07-10,Jl. Sudirman No. 10 Surabaya
+siti.rahmah@example.com,2023001004,Siti Rahmah,Sistem Informasi,2023,3,Fakultas Ilmu Komputer,3.50,72,144,aktif,081234567804,2001-11-30,Jl. Diponegoro No. 20 Yogyakarta
+eko.prasetyo@example.com,2022001005,Eko Prasetyo,Teknik Informatika,2022,5,Fakultas Ilmu Komputer,3.10,108,144,aktif,081234567805,2000-05-05,Jl. Ahmad Yani No. 15 Semarang
+rina.kusuma@example.com,2022001006,Rina Kusuma,Sistem Informasi,2022,5,Fakultas Ilmu Komputer,3.75,108,144,aktif,081234567806,2000-08-19,Jl. Gatot Subroto No. 3 Medan
+dimas.aryo@example.com,2021001007,Dimas Aryo Wibowo,Teknik Informatika,2021,7,Fakultas Ilmu Komputer,3.60,132,144,aktif,081234567807,1999-12-01,Jl. Veteran No. 7 Makassar
+fitri.lestari@example.com,2021001008,Fitri Lestari,Sistem Informasi,2021,7,Fakultas Ilmu Komputer,2.90,132,144,cuti,081234567808,1999-06-25,Jl. Pahlawan No. 12 Palembang
+hendra.saputra@example.com,2024001009,Hendra Saputra,Teknik Informatika,2024,1,,0.00,0,144,aktif,081234567809,2002-09-08,
+nita.anggraini@example.com,2024001010,Nita Anggraini,Sistem Informasi,2024,1,,,,,aktif,,,

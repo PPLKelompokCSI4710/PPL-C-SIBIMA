@@ -8,26 +8,21 @@ use Tests\DuskTestCase;
 class LoginTest extends DuskTestCase
 {
     /**
-     * TC.Login.001 - Login berhasil
+     * A Dusk test example.
      */
-    public function test_login(): void
+    public function test_user_can_see_login_page()
     {
         $this->browse(function (Browser $browser) {
-
             $browser->visit('/login')
-
-                // pakai selector lebih aman
-                ->type('input[type="email"]', 'mahasiswa@sibima.test')
-                ->type('input[type="password"]', 'password')
-
-                // tombol sesuai web kamu
-                ->press('LOG IN')
-
-                // tunggu redirect
-                ->waitForLocation('/dashboard')
-
-                // validasi sukses login
-                ->assertPathIs('/dashboard');
+                    // Tunggu hingga teks muncul di layar (penting untuk Vue/Inertia)
+                ->waitForText('Masuk ke portal SIBIMA')
+                ->assertSee('Masuk ke portal SIBIMA')
+                ->type('email', 'maya@example.com')
+                ->type('password', 'password')
+                    // Pastikan nama tombol sesuai (Dusk mencari teks di dalam tombol)
+                ->press('Masuk ke Portal')
+                ->waitForLocation('/staff/dashboard')
+                ->assertPathIs('/staff/dashboard');
         });
     }
 }
