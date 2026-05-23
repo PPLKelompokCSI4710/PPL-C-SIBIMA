@@ -1,6 +1,6 @@
 <script setup>
-    import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-    import { Head, router } from '@inertiajs/vue3';
+    import StudentLayout from '@/Layouts/StudentLayout.vue';
+    import { Head, router, Link } from '@inertiajs/vue3';
     import { ref, watch } from 'vue';
 
     const props = defineProps({
@@ -109,13 +109,7 @@
 <template>
     <Head title="Monitoring Jadwal Bimbingan" />
 
-    <AuthenticatedLayout>
-        <template #header>
-            <h2 class="text-xl font-semibold leading-tight text-gray-800">
-                Monitoring Jadwal Bimbingan
-            </h2>
-        </template>
-
+    <StudentLayout>
         <div class="py-12">
             <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
                 <!-- Flash Message -->
@@ -155,24 +149,35 @@
                             Pantau dan kelola jadwal bimbingan akademik Anda.
                         </p>
                     </div>
-                    <div
-                        class="flex items-center space-x-2 rounded-lg border border-gray-200 bg-white px-4 py-2 shadow-sm"
-                    >
-                        <svg
-                            class="h-5 w-5 text-indigo-500"
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke-width="1.5"
-                            stroke="currentColor"
+                    <div class="flex items-center gap-3">
+                        <Link
+                            :href="route('mahasiswa.jadwal-bimbingan.create')"
+                            class="inline-flex items-center justify-center rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 transition-all"
                         >
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"
-                            />
-                        </svg>
-                        <span class="text-sm font-medium text-gray-700">Total: {{ jadwalBimbingans.length }} Jadwal</span>
+                            <svg class="mr-2 h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                            </svg>
+                            Ajukan Jadwal
+                        </Link>
+                        <div
+                            class="flex items-center space-x-2 rounded-lg border border-gray-200 bg-white px-4 py-2 shadow-sm"
+                        >
+                            <svg
+                                class="h-5 w-5 text-indigo-500"
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke-width="1.5"
+                                stroke="currentColor"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"
+                                />
+                            </svg>
+                            <span class="text-sm font-medium text-gray-700">Total: {{ jadwalBimbingans.length }} Jadwal</span>
+                        </div>
                     </div>
                 </div>
 
@@ -475,5 +480,5 @@
                 </div>
             </div>
         </div>
-    </AuthenticatedLayout>
+    </StudentLayout>
 </template>

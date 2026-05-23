@@ -1,6 +1,6 @@
 <script setup>
     import { ref, watch } from 'vue';
-    import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+    import StudentLayout from '@/Layouts/StudentLayout.vue';
     import { Head, useForm } from '@inertiajs/vue3';
     import axios from 'axios';
 
@@ -58,13 +58,7 @@
 <template>
     <Head title="Input Jadwal Bimbingan" />
 
-    <AuthenticatedLayout>
-        <template #header>
-            <h2 class="text-xl font-semibold leading-tight text-gray-800">
-                Input Jadwal Bimbingan
-            </h2>
-        </template>
-
+    <StudentLayout>
         <div class="py-12">
             <div class="mx-auto max-w-3xl sm:px-6 lg:px-8">
                 <!-- Flash Message -->
@@ -270,5 +264,5 @@
                 </div>
             </div>
         </div>
-    </AuthenticatedLayout>
+    </StudentLayout>
 </template>
