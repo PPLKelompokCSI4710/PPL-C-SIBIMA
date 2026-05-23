@@ -59,6 +59,18 @@
                     <TrendingUpIcon class="w-5 h-5" />
                     <span>Progress Studi</span>
                 </Link>
+                <Link
+                    :href="route('mahasiswa.jadwal.index')"
+                    :class="[
+                        route().current('mahasiswa.jadwal.*') || route().current('mahasiswa.jadwal-bimbingan.*')
+                            ? 'bg-blue-50 text-blue-700 font-semibold'
+                            : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900',
+                    ]"
+                    class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors"
+                >
+                    <UsersIcon class="w-5 h-5" />
+                    <span>Jadwal Bimbingan</span>
+                </Link>
             </nav>
             <div class="p-4 border-t border-slate-200">
                 <div class="flex items-center gap-3 p-2 bg-slate-50 rounded-xl">
@@ -224,6 +236,7 @@
         CheckCircle2Icon,
         AlertCircleIcon,
         InfoIcon,
+        UsersIcon,
     } from 'lucide-vue-next';
 
     const showNotifications = ref(false);
@@ -234,6 +247,7 @@
         if (route().current('mahasiswa.study-plans.index')) return 'Study Plans (KRS)';
         if (route().current('mahasiswa.progress.index')) return 'Progress Studi';
         if (route().current('mahasiswa.calendar')) return 'Academic Calendar';
+        if (route().current('mahasiswa.jadwal.*') || route().current('mahasiswa.jadwal-bimbingan.*')) return 'Jadwal Bimbingan';
         return 'SIBIMA';
     });
 
@@ -243,6 +257,7 @@
         if (route().current('mahasiswa.study-plans.index')) return 'KRS Management';
         if (route().current('mahasiswa.progress.index')) return 'Achievement Tracking';
         if (route().current('mahasiswa.calendar')) return 'Event Schedule';
+        if (route().current('mahasiswa.jadwal.*') || route().current('mahasiswa.jadwal-bimbingan.*')) return 'Bimbingan Akademik';
         return 'Portal Mahasiswa';
     });
 
