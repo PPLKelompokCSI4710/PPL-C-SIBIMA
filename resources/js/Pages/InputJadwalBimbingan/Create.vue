@@ -68,7 +68,10 @@
         <div class="py-12">
             <div class="mx-auto max-w-3xl sm:px-6 lg:px-8">
                 <!-- Flash Message -->
-                <div v-if="$page.props.flash?.success" class="mb-4 rounded-md bg-green-50 p-4">
+                <div
+                    v-if="$page.props.flash?.success"
+                    class="mb-4 rounded-md bg-green-50 p-4"
+                >
                     <div class="flex">
                         <div class="flex-shrink-0">
                             <svg
@@ -93,21 +96,28 @@
 
                 <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg">
                     <div class="p-6 text-gray-900">
-                        <form class="space-y-6" @submit.prevent="submit">
+                        <form
+                            class="space-y-6"
+                            @submit.prevent="submit"
+                        >
                             <!-- Dosen Pembimbing -->
                             <div>
                                 <label
                                     for="dosen_id"
                                     class="block text-sm font-medium text-gray-700"
-                                    >Dosen Pembimbing</label
-                                >
+                                >Dosen Pembimbing</label>
                                 <select
                                     id="dosen_id"
                                     v-model="form.dosen_id"
                                     class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                                     required
                                 >
-                                    <option value="" disabled>-- Pilih Dosen Pembimbing --</option>
+                                    <option
+                                        value=""
+                                        disabled
+                                    >
+                                        -- Pilih Dosen Pembimbing --
+                                    </option>
                                     <option
                                         v-for="dosen in dosenList"
                                         :key="dosen.id"
@@ -116,7 +126,10 @@
                                         {{ dosen.nama_lengkap }}
                                     </option>
                                 </select>
-                                <p v-if="form.errors.dosen_id" class="mt-1 text-sm text-red-600">
+                                <p
+                                    v-if="form.errors.dosen_id"
+                                    class="mt-1 text-sm text-red-600"
+                                >
                                     {{ form.errors.dosen_id }}
                                 </p>
                             </div>
@@ -126,8 +139,7 @@
                                 <label
                                     for="ketersediaan_jadwal_id"
                                     class="block text-sm font-medium text-gray-700"
-                                    >Pilih Jadwal</label
-                                >
+                                >Pilih Jadwal</label>
                                 <select
                                     id="ketersediaan_jadwal_id"
                                     v-model="form.ketersediaan_jadwal_id"
@@ -135,11 +147,14 @@
                                     required
                                     :disabled="
                                         !form.dosen_id ||
-                                        isLoadingSchedules ||
-                                        schedules.length === 0
+                                            isLoadingSchedules ||
+                                            schedules.length === 0
                                     "
                                 >
-                                    <option value="" disabled>
+                                    <option
+                                        value=""
+                                        disabled
+                                    >
                                         <template v-if="isLoadingSchedules">
                                             Memuat jadwal...
                                         </template>
@@ -149,7 +164,9 @@
                                         <template v-else-if="schedules.length === 0">
                                             Tidak ada jadwal tersedia
                                         </template>
-                                        <template v-else> -- Pilih Jadwal Tersedia -- </template>
+                                        <template v-else>
+                                            -- Pilih Jadwal Tersedia --
+                                        </template>
                                     </option>
                                     <option
                                         v-for="schedule in schedules"
@@ -176,8 +193,7 @@
                                 <label
                                     for="judul_ta"
                                     class="block text-sm font-medium text-gray-700"
-                                    >Judul Skripsi / Tugas Akhir</label
-                                >
+                                >Judul Skripsi / Tugas Akhir</label>
                                 <input
                                     id="judul_ta"
                                     v-model="form.judul_ta"
@@ -185,8 +201,11 @@
                                     class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                                     placeholder="Masukkan judul skripsi Anda..."
                                     required
-                                />
-                                <p v-if="form.errors.judul_ta" class="mt-1 text-sm text-red-600">
+                                >
+                                <p
+                                    v-if="form.errors.judul_ta"
+                                    class="mt-1 text-sm text-red-600"
+                                >
                                     {{ form.errors.judul_ta }}
                                 </p>
                             </div>
@@ -196,8 +215,7 @@
                                 <label
                                     for="topik_bimbingan"
                                     class="block text-sm font-medium text-gray-700"
-                                    >Topik Bimbingan</label
-                                >
+                                >Topik Bimbingan</label>
                                 <textarea
                                     id="topik_bimbingan"
                                     v-model="form.topik_bimbingan"

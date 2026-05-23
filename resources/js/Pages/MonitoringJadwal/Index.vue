@@ -119,7 +119,10 @@
         <div class="py-12">
             <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
                 <!-- Flash Message -->
-                <div v-if="$page.props.flash?.success" class="mb-4 rounded-md bg-green-50 p-4">
+                <div
+                    v-if="$page.props.flash?.success"
+                    class="mb-4 rounded-md bg-green-50 p-4"
+                >
                     <div class="flex">
                         <div class="flex-shrink-0">
                             <svg
@@ -169,9 +172,7 @@
                                 d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"
                             />
                         </svg>
-                        <span class="text-sm font-medium text-gray-700"
-                            >Total: {{ jadwalBimbingans.length }} Jadwal</span
-                        >
+                        <span class="text-sm font-medium text-gray-700">Total: {{ jadwalBimbingans.length }} Jadwal</span>
                     </div>
                 </div>
 
@@ -205,7 +206,7 @@
                                     type="text"
                                     placeholder="Cari topik bimbingan atau nama dosen..."
                                     class="block w-full rounded-md border-gray-300 pl-9 text-sm shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                />
+                                >
                             </div>
 
                             <!-- Status Filter Dropdown -->
@@ -270,7 +271,10 @@
                         </div>
 
                         <!-- Active Filter Badge -->
-                        <div v-if="hasActiveFilter()" class="mt-2 flex flex-wrap gap-2">
+                        <div
+                            v-if="hasActiveFilter()"
+                            class="mt-2 flex flex-wrap gap-2"
+                        >
                             <span
                                 v-if="selectedStatus !== 'all'"
                                 class="inline-flex items-center gap-1 rounded-full bg-indigo-100 px-2.5 py-0.5 text-xs font-medium text-indigo-800"
@@ -391,7 +395,9 @@
                                                 <div class="text-sm font-medium text-gray-900">
                                                     {{ jadwal.mahasiswa?.nama_lengkap || 'N/A' }}
                                                 </div>
-                                                <div class="text-xs text-green-500">Mahasiswa</div>
+                                                <div class="text-xs text-green-500">
+                                                    Mahasiswa
+                                                </div>
                                             </div>
                                         </div>
                                     </td>
@@ -428,7 +434,10 @@
 
                                 <!-- Empty State -->
                                 <tr v-if="jadwalBimbingans.length === 0">
-                                    <td colspan="5" class="px-6 py-12 text-center">
+                                    <td
+                                        colspan="5"
+                                        class="px-6 py-12 text-center"
+                                    >
                                         <svg
                                             class="mx-auto h-12 w-12 text-gray-300"
                                             xmlns="http://www.w3.org/2000/svg"
@@ -452,7 +461,10 @@
                                         >
                                             Coba ubah atau reset filter pencarian Anda.
                                         </p>
-                                        <p v-else class="mt-1 text-xs text-gray-400">
+                                        <p
+                                            v-else
+                                            class="mt-1 text-xs text-gray-400"
+                                        >
                                             Belum ada jadwal yang diajukan.
                                         </p>
                                     </td>

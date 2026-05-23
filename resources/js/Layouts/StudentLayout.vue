@@ -71,7 +71,9 @@
                         <p class="text-sm font-semibold text-slate-800 truncate">
                             {{ $page.props.auth.user.name }}
                         </p>
-                        <p class="text-xs text-slate-500">Student</p>
+                        <p class="text-xs text-slate-500">
+                            Student
+                        </p>
                     </div>
                 </div>
             </div>
@@ -122,7 +124,9 @@
                                 <div
                                     class="p-4 border-b border-slate-50 bg-slate-50/50 flex justify-between items-center"
                                 >
-                                    <h3 class="font-bold text-slate-800 text-sm">Notifikasi</h3>
+                                    <h3 class="font-bold text-slate-800 text-sm">
+                                        Notifikasi
+                                    </h3>
                                     <button
                                         class="text-xs text-blue-600 font-bold hover:underline"
                                         @click="showNotifications = false"
@@ -141,7 +145,10 @@
                                                 :class="notif.color"
                                                 class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
                                             >
-                                                <component :is="notif.icon" class="w-5 h-5" />
+                                                <component
+                                                    :is="notif.icon"
+                                                    class="w-5 h-5"
+                                                />
                                             </div>
                                             <div>
                                                 <p
