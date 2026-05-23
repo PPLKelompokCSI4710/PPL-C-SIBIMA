@@ -4,17 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-<<<<<<< HEAD
 
-class Dosen extends Model
-{
-    use HasFactory;
-
-    protected $table = 'dosen';
-
-    protected $guarded = [];
-}
-=======
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Dosen extends Model
@@ -60,4 +50,4 @@ class Dosen extends Model
             ->withPivot(['tanggal_penugasan', 'tanggal_berakhir', 'is_active', 'catatan']);
     }
 }
->>>>>>> main
+}
