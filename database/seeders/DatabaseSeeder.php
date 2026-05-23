@@ -14,9 +14,11 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        require_once __DIR__.'/JadwalBimbinganSeeder.php';
         $this->call([
             RolePermissionSeeder::class,
             UserSeeder::class,
+            JadwalBimbinganSeeder::class,
             KalenderTestSeeder::class,
         ]);
     }

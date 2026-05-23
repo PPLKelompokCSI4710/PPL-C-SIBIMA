@@ -2,6 +2,18 @@
 
 namespace App\Models;
 
+<<<<<<< HEAD
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class Mahasiswa extends Model
+{
+    use HasFactory;
+
+    protected $table = 'mahasiswa';
+
+    protected $guarded = [];
+=======
 use App\Enums\AkademikStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -70,4 +82,5 @@ class Mahasiswa extends Model
             }
         });
     }
+>>>>>>> main
 }
