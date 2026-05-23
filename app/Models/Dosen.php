@@ -50,4 +50,3 @@ class Dosen extends Model
             ->withPivot(['tanggal_penugasan', 'tanggal_berakhir', 'is_active', 'catatan']);
     }
 }
-}
