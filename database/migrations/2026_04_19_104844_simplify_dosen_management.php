@@ -11,15 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // 1. Tambahkan kolom ke tabel users
-        Schema::table('users', function (Blueprint $table) {
-            $table->string('program_studi')->nullable()->after('password');
-            $table->string('fakultas')->nullable()->after('program_studi');
-            $table->integer('kuota_pembimbingan')->default(10)->after('fakultas');
-        });
-
-        // 2. Hapus tabel dosen (karena data tidak perlu dipindahkan sesuai instruksi)
-        Schema::dropIfExists('dosen');
+        if (!Schema::hasColumn('users', 'program_studi')) {
+            Schema::table('users', function (Blueprint $table) {
+                $table->string('program_studi')->nullable()->after('password');
+                $table->string('fakultas')->nullable()->after('program_studi');
+                $table->integer('kuota_pembimbingan')->default(10)->after('fakultas');
+            });
+        }
     }
 
     /**
