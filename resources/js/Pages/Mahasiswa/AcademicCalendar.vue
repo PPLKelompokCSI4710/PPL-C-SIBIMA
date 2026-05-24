@@ -2,86 +2,166 @@
     <StudentLayout>
         <Head title="Academic Calendar - SIBIMA" />
 
-        <div class="space-y-8">
-            <!-- Month Grid -->
+        <div class="space-y-6">
+            <!-- Back Button and Page Navigation Header -->
+            <div class="flex items-center justify-between flex-wrap gap-4">
+                <Link
+                    :href="route('mahasiswa.dashboard')"
+                    class="inline-flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-xl text-sm font-semibold text-slate-600 hover:text-blue-600 hover:border-blue-200 shadow-sm transition-all hover:-translate-x-1"
+                >
+                    <ArrowLeftIcon class="w-4 h-4" />
+                    <span>Kembali ke Dashboard</span>
+                </Link>
+                <div class="text-right">
+                    <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">
+                        Tahun Akademik 2025/2026
+                    </p>
+                </div>
+            </div>
+
+            <!-- Month Grid and Interactive Layout -->
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <!-- Calendar View Placeholder -->
+                <!-- Left Section: Interactive Calendar -->
                 <div class="lg:col-span-2 space-y-6">
-                    <div class="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm">
+                    <!-- Calendar Card -->
+                    <div
+                        class="bg-white p-6 md:p-8 rounded-3xl border border-slate-200 shadow-sm transition-all"
+                    >
                         <div class="flex items-center justify-between mb-8">
-                            <h3 class="text-xl font-black text-slate-800">Mei 2026</h3>
-                            <div class="flex gap-2">
-                                <button class="p-2 bg-slate-100 rounded-xl hover:bg-slate-200">
-                                    <ChevronLeftIcon class="w-4 h-4" />
+                            <div>
+                                <h3 class="text-2xl font-black text-slate-800 tracking-tight">
+                                    {{ currentMonthName }} {{ currentYear }}
+                                </h3>
+                                <p class="text-xs text-slate-500 mt-0.5">
+                                    Klik tanggal untuk melihat kegiatan akademik dalam pop-up modal
+                                </p>
+                            </div>
+                            <div class="flex gap-2.5">
+                                <button
+                                    class="p-2 bg-slate-50 border border-slate-200 rounded-xl hover:bg-slate-100 hover:text-blue-600 active:scale-95 transition-all"
+                                    title="Bulan Sebelumnya"
+                                    @click="prevMonth"
+                                >
+                                    <ChevronLeftIcon class="w-5 h-5" />
                                 </button>
-                                <button class="p-2 bg-slate-100 rounded-xl hover:bg-slate-200">
-                                    <ChevronRightIcon class="w-4 h-4" />
+                                <button
+                                    class="p-2 bg-slate-50 border border-slate-200 rounded-xl hover:bg-slate-100 hover:text-blue-600 active:scale-95 transition-all"
+                                    title="Bulan Berikutnya"
+                                    @click="nextMonth"
+                                >
+                                    <ChevronRightIcon class="w-5 h-5" />
                                 </button>
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-7 gap-4 mb-4">
+                        <!-- Days of Week Headers -->
+                        <div class="grid grid-cols-7 gap-2 md:gap-4 mb-4">
                             <div
-                                v-for="day in ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']"
+                                v-for="day in ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab']"
                                 :key="day"
-                                class="text-center text-xs font-bold text-slate-400 uppercase tracking-widest"
+                                class="text-center text-xs font-bold text-slate-400 uppercase tracking-wider py-2"
                             >
                                 {{ day }}
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-7 gap-4">
+                        <!-- Calendar Days Grid -->
+                        <div class="grid grid-cols-7 gap-2 md:gap-4">
                             <div
-                                v-for="n in 31"
-                                :key="n"
+                                v-for="(dayItem, idx) in calendarDays"
+                                :key="idx"
                                 :class="[
-                                    n === 15
-                                        ? 'bg-blue-600 text-white shadow-lg shadow-blue-200'
-                                        : 'bg-slate-50 text-slate-600',
+                                    !dayItem.isCurrentMonth
+                                        ? 'text-slate-300 bg-slate-50/30 cursor-not-allowed pointer-events-none'
+                                        : dayItem.day === selectedDay
+                                          ? 'bg-blue-600 text-white shadow-xl shadow-blue-200 ring-2 ring-blue-500 ring-offset-2 scale-105 z-10 font-bold'
+                                          : 'bg-slate-50/80 text-slate-700 hover:bg-blue-50 hover:text-blue-600 hover:scale-[1.03]',
                                 ]"
-                                class="h-16 rounded-2xl flex flex-col items-center justify-center relative group hover:bg-blue-50 hover:text-blue-600 transition-all cursor-pointer"
+                                class="h-14 md:h-18 rounded-2xl flex flex-col items-center justify-center relative group transition-all duration-250 cursor-pointer select-none"
+                                @click="selectDay(dayItem)"
                             >
-                                <span class="text-sm font-bold">{{ n }}</span>
+                                <span class="text-sm md:text-base font-bold">{{
+                                    dayItem.day
+                                }}</span>
+
+                                <!-- Dot indicator for event -->
                                 <div
-                                    v-if="[3, 10, 15, 24].includes(n)"
-                                    class="w-1.5 h-1.5 rounded-full bg-amber-400 mt-1"
+                                    v-if="
+                                        getDayEvents(dayItem.day, dayItem.isCurrentMonth).length > 0
+                                    "
+                                    :class="
+                                        dayItem.day === selectedDay ? 'bg-white' : 'bg-blue-500'
+                                    "
+                                    class="w-1.5 h-1.5 rounded-full mt-1.5 transition-colors"
                                 />
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Agenda List -->
+                <!-- Right Section: Upcoming Agenda with Custom Scrolling -->
                 <div class="space-y-6">
-                    <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
-                        <BellIcon class="w-5 h-5 text-blue-500" /> Agenda Mendatang
-                    </h3>
+                    <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
+                        <div class="flex items-center justify-between mb-5">
+                            <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                                <BellIcon class="w-5 h-5 text-blue-500" />
+                                <span>Agenda Mendatang</span>
+                            </h3>
+                            <span
+                                class="text-xs font-bold bg-slate-100 text-slate-600 px-2 py-0.5 rounded-md"
+                            >
+                                {{ upcomingEvents.length }} Kegiatan
+                            </span>
+                        </div>
 
-                    <div class="space-y-4">
+                        <!-- Scrollable events list (Scrolling if events > 5) -->
                         <div
-                            v-for="event in events"
-                            :key="event.title"
-                            class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm hover:border-blue-200 transition-colors group"
+                            :class="[
+                                upcomingEvents.length > 5
+                                    ? 'max-h-[460px] overflow-y-auto pr-2 custom-scrollbar'
+                                    : '',
+                            ]"
+                            class="space-y-3.5"
                         >
-                            <div class="flex gap-4">
+                            <div
+                                v-for="(event, idx) in upcomingEvents"
+                                :key="idx"
+                                :class="[
+                                    event.day === selectedDay &&
+                                    event.month === currentDate.getMonth()
+                                        ? 'border-blue-500 bg-blue-50/40 ring-1 ring-blue-100 scale-[0.99]'
+                                        : 'border-slate-200 hover:border-blue-200 hover:bg-slate-50/50',
+                                ]"
+                                class="bg-white p-4 rounded-2xl border transition-all duration-200 cursor-pointer group flex gap-3.5"
+                                @click="goToEventDate(event)"
+                            >
+                                <!-- Event Date Badge -->
                                 <div
                                     :class="event.color"
-                                    class="w-12 h-12 rounded-xl flex flex-col items-center justify-center shrink-0"
+                                    class="w-12 h-12 rounded-xl flex flex-col items-center justify-center shrink-0 border shadow-sm group-hover:scale-105 transition-transform"
                                 >
-                                    <span class="text-xs font-bold uppercase">{{
-                                        event.month
+                                    <span class="text-[9px] font-bold uppercase tracking-wider">{{
+                                        monthShortNames[event.month]
                                     }}</span>
-                                    <span class="text-lg font-black leading-tight">{{
-                                        event.day
+                                    <span class="text-lg font-black leading-none mt-0.5">{{
+                                        event.day < 10 ? '0' + event.day : event.day
                                     }}</span>
                                 </div>
-                                <div>
+                                <div class="overflow-hidden flex-1">
+                                    <div class="flex items-center gap-1.5">
+                                        <span
+                                            class="text-[8px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded"
+                                            :class="event.color"
+                                        >
+                                            {{ event.badge }}
+                                        </span>
+                                    </div>
                                     <h4
-                                        class="font-bold text-slate-800 group-hover:text-blue-600 transition-colors"
+                                        class="font-bold text-slate-800 text-sm mt-1 group-hover:text-blue-600 transition-colors line-clamp-1"
                                     >
                                         {{ event.title }}
                                     </h4>
-                                    <p class="text-xs text-slate-500 mt-1">
+                                    <p class="text-xs text-slate-500 mt-0.5 line-clamp-1">
                                         {{ event.desc }}
                                     </p>
                                 </div>
@@ -91,46 +171,482 @@
                 </div>
             </div>
         </div>
+
+        <!-- Detail Popup Modal -->
+        <Transition
+            enter-active-class="transition ease-out duration-250"
+            enter-from-class="opacity-0 scale-95"
+            enter-to-class="opacity-100 scale-100"
+            leave-active-class="transition ease-in duration-200"
+            leave-from-class="opacity-100 scale-100"
+            leave-to-class="opacity-0 scale-95"
+        >
+            <div
+                v-if="isDetailModalOpen"
+                class="fixed inset-0 z-50 flex items-center justify-center p-4"
+            >
+                <!-- Backdrop -->
+                <div
+                    class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity"
+                    @click="isDetailModalOpen = false"
+                />
+
+                <!-- Modal Content -->
+                <div
+                    class="relative w-full max-w-lg bg-white rounded-3xl shadow-2xl border border-slate-100 overflow-hidden transform transition-all z-10 flex flex-col"
+                >
+                    <!-- Modal Header -->
+                    <div
+                        class="px-6 py-4 bg-slate-50 border-b border-slate-100 flex items-center justify-between"
+                    >
+                        <div class="flex items-center gap-2 text-slate-800">
+                            <CalendarIcon class="w-5 h-5 text-blue-600" />
+                            <h4 class="font-bold text-sm uppercase tracking-wider text-slate-500">
+                                Agenda Kegiatan
+                            </h4>
+                        </div>
+                        <button
+                            class="p-1.5 rounded-full hover:bg-slate-200 text-slate-400 hover:text-slate-600 transition"
+                            @click="isDetailModalOpen = false"
+                        >
+                            <XIcon class="w-5 h-5" />
+                        </button>
+                    </div>
+
+                    <!-- Modal Body -->
+                    <div class="p-6 overflow-y-auto max-h-[70vh] space-y-4">
+                        <!-- Selected Date Banner -->
+                        <div
+                            class="flex items-center justify-between pb-2 border-b border-slate-100"
+                        >
+                            <span class="text-sm font-bold text-slate-800">
+                                {{ popupDayLabel }}
+                            </span>
+                            <span
+                                class="text-xs font-semibold bg-blue-50 text-blue-700 px-3 py-1 rounded-full border border-blue-100"
+                            >
+                                {{
+                                    formatDateString(
+                                        selectedDay,
+                                        currentDate.getMonth(),
+                                        currentDate.getFullYear(),
+                                    )
+                                }}
+                            </span>
+                        </div>
+
+                        <!-- Events List -->
+                        <div v-if="selectedDateEvents.length > 0" class="space-y-4 pt-2">
+                            <div
+                                v-for="(event, eIdx) in selectedDateEvents"
+                                :key="eIdx"
+                                class="p-4 bg-slate-50/80 rounded-2xl border border-slate-100 flex flex-col gap-3.5"
+                            >
+                                <div class="space-y-1.5">
+                                    <div class="flex items-center gap-2 flex-wrap">
+                                        <span
+                                            class="px-2 py-0.5 text-[9px] font-black tracking-wider uppercase rounded"
+                                            :class="event.color"
+                                        >
+                                            {{ event.badge }}
+                                        </span>
+                                        <h5
+                                            class="text-base font-black text-slate-800 leading-snug"
+                                        >
+                                            {{ event.title }}
+                                        </h5>
+                                    </div>
+                                    <p class="text-sm text-slate-600 font-medium leading-relaxed">
+                                        {{ event.desc }}
+                                    </p>
+                                </div>
+
+                                <!-- Time, Location & Google Sync Button -->
+                                <div
+                                    class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-3 border-t border-slate-200/60 text-xs text-slate-500"
+                                >
+                                    <div class="space-y-1.5">
+                                        <div class="flex items-center gap-2">
+                                            <ClockIcon class="w-4 h-4 text-blue-500 shrink-0" />
+                                            <span class="font-semibold">{{ event.time }}</span>
+                                        </div>
+                                        <div class="flex items-center gap-2">
+                                            <MapPinIcon class="w-4 h-4 text-emerald-500 shrink-0" />
+                                            <span
+                                                class="font-semibold truncate max-w-[200px]"
+                                                :title="event.location"
+                                                >{{ event.location }}</span
+                                            >
+                                        </div>
+                                    </div>
+
+                                    <!-- Google Calendar Button -->
+                                    <a
+                                        :href="getGoogleCalendarUrl(event)"
+                                        target="_blank"
+                                        class="inline-flex items-center gap-2 px-3.5 py-2 bg-[#1a73e8] hover:bg-[#1557b0] text-white font-bold rounded-xl shadow-sm hover:shadow-md transition-all duration-200 active:scale-95 text-center justify-center shrink-0"
+                                    >
+                                        <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                                            <path
+                                                d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"
+                                            />
+                                        </svg>
+                                        <span>Google Calendar</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Empty State -->
+                        <div
+                            v-else
+                            class="py-10 text-center flex flex-col items-center justify-center text-slate-400"
+                        >
+                            <CalendarIcon class="w-16 h-16 text-slate-200 mb-3 stroke-[1.2]" />
+                            <p class="text-base font-black text-slate-600">
+                                Tidak ada kegiatan terjadwal
+                            </p>
+                            <p
+                                class="text-xs text-slate-400 mt-1 max-w-[250px] mx-auto leading-relaxed"
+                            >
+                                Hari ini bebas dari kegiatan akademik. Silakan cek tanggal lainnya.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Modal Footer -->
+                    <div class="px-6 py-4 bg-slate-50 border-t border-slate-100 flex justify-end">
+                        <button
+                            class="px-5 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-600 hover:bg-slate-50 transition active:scale-95"
+                            @click="isDetailModalOpen = false"
+                        >
+                            Tutup
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </Transition>
     </StudentLayout>
 </template>
 
 <script setup>
-    import { Head } from '@inertiajs/vue3';
+    import { ref, computed } from 'vue';
+    import { Head, Link } from '@inertiajs/vue3';
     import StudentLayout from '@/Layouts/StudentLayout.vue';
-    import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-vue-next';
+    import {
+        ChevronLeftIcon,
+        ChevronRightIcon,
+        BellIcon,
+        ArrowLeftIcon,
+        MapPinIcon,
+        ClockIcon,
+        CalendarIcon,
+        XIcon,
+    } from 'lucide-vue-next';
 
     defineProps({
         auth: { type: Object, default: () => ({}) },
     });
 
-    const events = [
-        {
-            day: '03',
-            month: 'Mei',
-            title: 'Batas Akhir Revisi KRS',
-            desc: 'Pastikan seluruh mata kuliah sudah disetujui Dosen PA.',
-            color: 'bg-blue-100 text-blue-700',
-        },
-        {
-            day: '10',
-            month: 'Mei',
-            title: 'Awal Perkuliahan',
-            desc: 'Kuliah perdana semester genap dimulai pukul 08:00.',
-            color: 'bg-emerald-100 text-emerald-700',
-        },
-        {
-            day: '15',
-            month: 'Mei',
-            title: 'Dies Natalis Univ',
-            desc: 'Libur Akademik dalam rangka perayaan HUT Universitas.',
-            color: 'bg-purple-100 text-purple-700',
-        },
-        {
-            day: '24',
-            month: 'Mei',
-            title: 'Input Nilai Tugas 1',
-            desc: 'Batas akhir pengumpulan tugas mandiri pertama.',
-            color: 'bg-amber-100 text-amber-700',
-        },
+    // Calendar States
+    const currentDate = ref(new Date(2026, 4, 1)); // Default starts on May 2026
+    const selectedDay = ref(15); // Default active date (selected date: 15)
+    const isDetailModalOpen = ref(false); // Modal visibility state
+
+    const monthNames = [
+        'Januari',
+        'Februari',
+        'Maret',
+        'April',
+        'Mei',
+        'Juni',
+        'Juli',
+        'Agustus',
+        'September',
+        'Oktober',
+        'November',
+        'Desember',
     ];
+
+    const monthShortNames = [
+        'Jan',
+        'Feb',
+        'Mar',
+        'Apr',
+        'Mei',
+        'Jun',
+        'Jul',
+        'Agt',
+        'Sep',
+        'Okt',
+        'Nov',
+        'Des',
+    ];
+
+    const currentMonthName = computed(() => monthNames[currentDate.value.getMonth()]);
+    const currentYear = computed(() => currentDate.value.getFullYear());
+
+    // Navigation Months
+    const prevMonth = () => {
+        currentDate.value = new Date(
+            currentDate.value.getFullYear(),
+            currentDate.value.getMonth() - 1,
+            1,
+        );
+        selectedDay.value = 1;
+    };
+
+    const nextMonth = () => {
+        currentDate.value = new Date(
+            currentDate.value.getFullYear(),
+            currentDate.value.getMonth() + 1,
+            1,
+        );
+        selectedDay.value = 1;
+    };
+
+    // Full List of Academic Calendar Events (total 7 events for testing scrollbar and clicks)
+    const events = ref([
+        {
+            day: 3,
+            month: 4, // Mei (0-indexed)
+            year: 2026,
+            title: 'Batas Akhir Revisi KRS',
+            desc: 'Batas akhir untuk melakukan revisi rencana studi. Pastikan KRS sudah disetujui Dosen Pembimbing Akademik.',
+            time: '23:59 WIB',
+            location: 'Portal Online SIBIMA',
+            color: 'bg-blue-50 text-blue-700 border-blue-200',
+            badge: 'KRS',
+        },
+        {
+            day: 10,
+            month: 4,
+            year: 2026,
+            title: 'Awal Perkuliahan Genap',
+            desc: 'Hari pertama perkuliahan Semester Genap dimulai. Mahasiswa wajib hadir di kelas masing-masing.',
+            time: '08:00 - 16:00 WIB',
+            location: 'Gedung A, B & C Ruang Teori',
+            color: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+            badge: 'Kuliah',
+        },
+        {
+            day: 12,
+            month: 4,
+            year: 2026,
+            title: 'Kelas Metodologi Penelitian',
+            desc: 'Pertemuan perdana asistensi proposal tugas akhir/skripsi dan pembagian kelompok dosen pembimbing.',
+            time: '10:00 - 12:00 WIB',
+            location: 'Gedung C R.302 Fasilkom',
+            color: 'bg-indigo-50 text-indigo-700 border-indigo-200',
+            badge: 'Asistensi',
+        },
+        {
+            day: 15,
+            month: 4,
+            year: 2026,
+            title: 'Dies Natalis Universitas',
+            desc: 'Hari libur akademik memperingati hari jadi Universitas SIBIMA yang ke-45. Kegiatan perkuliahan ditiadakan.',
+            time: 'Seharian penuh',
+            location: 'Kampus Pusat SIBIMA',
+            color: 'bg-purple-50 text-purple-700 border-purple-200',
+            badge: 'Libur',
+        },
+        {
+            day: 20,
+            month: 4,
+            year: 2026,
+            title: 'Bimbingan Akademik Tengah Semester',
+            desc: 'Konsultasi wajib perkembangan kemajuan studi dan evaluasi nilai tengah semester bersama Dosen Wali.',
+            time: '13:00 - 15:00 WIB',
+            location: 'Ruang Rapat Gedung D R.104',
+            color: 'bg-teal-50 text-teal-700 border-teal-200',
+            badge: 'Bimbingan',
+        },
+        {
+            day: 24,
+            month: 4,
+            year: 2026,
+            title: 'Pengumpulan Tugas Mandiri 1',
+            desc: 'Batas akhir pengunggahan tugas mandiri pertama untuk mata kuliah keahlian di sistem e-learning.',
+            time: '17:00 WIB',
+            location: 'E-Learning Center SIBIMA',
+            color: 'bg-amber-50 text-amber-700 border-amber-200',
+            badge: 'Tugas',
+        },
+        {
+            day: 28,
+            month: 4,
+            year: 2026,
+            title: 'Webinar Publikasi Karya Ilmiah',
+            desc: 'Seminar nasional penulisan karya tulis ilmiah untuk persiapan kelulusan mahasiswa tingkat akhir.',
+            time: '09:00 - 12:00 WIB',
+            location: 'Zoom Webinar Online',
+            color: 'bg-rose-50 text-rose-700 border-rose-200',
+            badge: 'Seminar',
+        },
+    ]);
+
+    // Format Full Date String Indonesian Style
+    const formatDateString = (day, month, year) => {
+        return `${day} ${monthNames[month]} ${year}`;
+    };
+
+    // Filter events for the currently selected date
+    const selectedDateEvents = computed(() => {
+        return events.value.filter(
+            (e) =>
+                e.day === selectedDay.value &&
+                e.month === currentDate.value.getMonth() &&
+                e.year === currentDate.value.getFullYear(),
+        );
+    });
+
+    // Returns the day-of-week label for the popup header
+    const popupDayLabel = computed(() => {
+        if (!selectedDay.value) return '';
+        const date = new Date(
+            currentDate.value.getFullYear(),
+            currentDate.value.getMonth(),
+            selectedDay.value,
+        );
+        return date.toLocaleDateString('id-ID', { weekday: 'long' }).toUpperCase();
+    });
+
+    // Dynamic generation of calendar grid days
+    const calendarDays = computed(() => {
+        const year = currentDate.value.getFullYear();
+        const month = currentDate.value.getMonth();
+
+        // 1st Day of month starting weekday index (0 = Sun, 1 = Mon, etc.)
+        const firstDayIndex = new Date(year, month, 1).getDay();
+
+        // Days in current month
+        const totalDays = new Date(year, month + 1, 0).getDate();
+
+        // Days in previous month
+        const prevMonthTotalDays = new Date(year, month, 0).getDate();
+
+        const days = [];
+
+        // Add previous month's ending trailing days
+        for (let i = firstDayIndex - 1; i >= 0; i--) {
+            days.push({
+                day: prevMonthTotalDays - i,
+                isCurrentMonth: false,
+                dateObject: new Date(year, month - 1, prevMonthTotalDays - i),
+            });
+        }
+
+        // Add current month's days
+        for (let i = 1; i <= totalDays; i++) {
+            days.push({
+                day: i,
+                isCurrentMonth: true,
+                dateObject: new Date(year, month, i),
+            });
+        }
+
+        // Add next month's starting leading days to fit complete grid (6 rows = 42 slots)
+        const remainingSlots = 42 - days.length;
+        for (let i = 1; i <= remainingSlots; i++) {
+            days.push({
+                day: i,
+                isCurrentMonth: false,
+                dateObject: new Date(year, month + 1, i),
+            });
+        }
+
+        return days;
+    });
+
+    // Filter day events helper
+    const getDayEvents = (day, isCurrentMonth) => {
+        if (!isCurrentMonth) return [];
+        return events.value.filter(
+            (e) =>
+                e.day === day &&
+                e.month === currentDate.value.getMonth() &&
+                e.year === currentDate.value.getFullYear(),
+        );
+    };
+
+    // User Selects a day on the calendar, opens popup detail modal
+    const selectDay = (dayItem) => {
+        if (dayItem.isCurrentMonth) {
+            selectedDay.value = dayItem.day;
+            isDetailModalOpen.value = true;
+        } else {
+            // Smoothly navigate month if clicking next/prev month days
+            currentDate.value = new Date(
+                dayItem.dateObject.getFullYear(),
+                dayItem.dateObject.getMonth(),
+                1,
+            );
+            selectedDay.value = dayItem.day;
+            isDetailModalOpen.value = true;
+        }
+    };
+
+    // User Clicks on an upcoming agenda card, jumps to that date and opens modal
+    const goToEventDate = (event) => {
+        currentDate.value = new Date(event.year, event.month, 1);
+        selectedDay.value = event.day;
+        isDetailModalOpen.value = true;
+    };
+
+    // Google Calendar Sync URL Generator
+    const getGoogleCalendarUrl = (event) => {
+        const title = encodeURIComponent(event.title);
+        const details = encodeURIComponent(event.desc || '');
+        const location = encodeURIComponent(event.location || 'SIBIMA - Universitas');
+
+        const pad = (num) => String(num).padStart(2, '0');
+        const yStr = String(event.year);
+        const mStr = pad(event.month + 1);
+        const dStr = pad(event.day);
+        let startStr = `${yStr}${mStr}${dStr}`;
+        let endStr = startStr;
+
+        if (event.time) {
+            const timeMatch = event.time.match(/(\d{2})[.:](\d{2})/);
+            if (timeMatch) {
+                const startHour = timeMatch[1];
+                const startMin = timeMatch[2];
+                startStr += `T${startHour}${startMin}00`;
+
+                // default end hour is start hour + 1
+                const endHour = pad(Number(startHour) + 1);
+                endStr += `T${endHour}${startMin}00`;
+            }
+        }
+
+        return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&details=${details}&location=${location}&dates=${startStr}/${endStr}`;
+    };
+
+    // Sorted list of upcoming events (in chronological order)
+    const upcomingEvents = computed(() => {
+        return [...events.value].sort((a, b) => {
+            const dateA = new Date(a.year, a.month, a.day);
+            const dateB = new Date(b.year, b.month, b.day);
+            return dateA - dateB;
+        });
+    });
 </script>
+
+<style>
+    /* Styling Scrollbar kustom yang elegan */
+    .custom-scrollbar::-webkit-scrollbar {
+        width: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+        background: #f1f5f9;
+        border-radius: 8px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 8px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8;
+    }
+</style>
