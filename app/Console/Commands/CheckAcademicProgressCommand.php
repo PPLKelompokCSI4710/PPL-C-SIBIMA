@@ -51,7 +51,7 @@ class CheckAcademicProgressCommand extends Command
 
             $daysSinceLast = max(0, $daysSinceLast);
 
-            $cooldownDays = ($mahasiswa->progress_reminder_frequency ?? 'biweekly') === 'weekly' ? 7 : 14;
+            $cooldownDays = (int) ($mahasiswa->progress_reminder_frequency_days ?? 14);
             $lastSentAt = $mahasiswa->last_progress_reminder_sent_at;
             $eligibleByCooldown = ! $lastSentAt || $lastSentAt->copy()->addDays($cooldownDays)->isPast();
 
@@ -82,7 +82,20 @@ class CheckAcademicProgressCommand extends Command
 
                 $this->info("Reminder sent to Mahasiswa NIM {$mahasiswa->nim} and CC'd Dosen.");
 
-                if ($nextConsecutive >= $escalationThreshold) {
+                $mahasiswa->refresh();
+            }
+
+            // Check if we should escalate to admin
+            if ($mahasiswa->consecutive_progress_reminders >= $escalationThreshold) {
+                $escalationDelayDays = (int) (AppSetting::get('escalation_delay_days', 3) ?? 3);
+                $lastSent = $mahasiswa->last_progress_reminder_sent_at;
+
+                // If delay is 0, escalate immediately.
+                // Otherwise, check if enough days have passed since the last reminder was sent.
+                $eligibleForEscalation = ($escalationDelayDays === 0) ||
+                    ($lastSent && $lastSent->copy()->startOfDay()->addDays($escalationDelayDays)->isPast());
+
+                if ($eligibleForEscalation) {
                     $existingActive = Eskalasi::where('mahasiswa_id', $mahasiswa->id)
                         ->where('status', 'active')
                         ->exists();
@@ -92,6 +105,13 @@ class CheckAcademicProgressCommand extends Command
                             'mahasiswa_id' => $mahasiswa->id,
                             'status' => 'active',
                         ]);
+
+                        $progressSummary = [
+                            'sks_lulus' => $mahasiswa->sks_lulus,
+                            'sks_total' => $mahasiswa->sks_total,
+                            'ipk' => $mahasiswa->ipk,
+                            'semester' => $mahasiswa->semester,
+                        ];
 
                         $admins = User::role('admin')->get();
                         $sesiSelesai = $mahasiswa->bimbingans->count();

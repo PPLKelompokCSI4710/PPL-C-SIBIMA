@@ -28,6 +28,7 @@ class Pbi34EskalasiTest extends DuskTestCase
 
         AppSetting::set('progress_reminder_inactive_days', 1);
         AppSetting::set('escalation_reminder_threshold', 3);
+        AppSetting::set('escalation_delay_days', 0);
 
         $adminUser = User::factory()->create();
         $adminUser->assignRole('admin');

@@ -9,6 +9,7 @@
     const form = useForm({
         progress_reminder_inactive_days: props.settings.progress_reminder_inactive_days,
         escalation_reminder_threshold: props.settings.escalation_reminder_threshold,
+        escalation_delay_days: props.settings.escalation_delay_days,
     });
 
     const submit = () => {
@@ -92,6 +93,32 @@
                                 class="text-brand-accent text-sm mt-2"
                             >
                                 {{ form.errors.escalation_reminder_threshold }}
+                            </div>
+                        </div>
+
+                        <div
+                            class="bg-brand-bg p-6 rounded-2xl border border-brand-text-secondary/10"
+                        >
+                            <label class="block text-sm font-bold text-brand-text-primary mb-3">
+                                Ambang Penundaan Eskalasi ke Admin (Hari setelah reminder terakhir)
+                            </label>
+                            <p class="text-brand-text-secondary text-sm mb-3">
+                                Berikan penundaan selama N hari setelah reminder progres dikirim ke mahasiswa
+                                sebelum sistem secara resmi mengirim email eskalasi ke admin.
+                                Setel ke 0 untuk eskalasi langsung/tanpa penundaan.
+                            </p>
+                            <input
+                                v-model="form.escalation_delay_days"
+                                type="number"
+                                min="0"
+                                max="90"
+                                class="w-full bg-brand-white border border-brand-text-secondary/30 text-brand-text-primary text-base rounded-lg focus:ring-brand-primary focus:border-brand-primary block p-3"
+                            />
+                            <div
+                                v-if="form.errors.escalation_delay_days"
+                                class="text-brand-accent text-sm mt-2"
+                            >
+                                {{ form.errors.escalation_delay_days }}
                             </div>
                         </div>
 

@@ -17,6 +17,7 @@ class ProgressReminderController extends Controller
 
         $inactiveThresholdDays = (int) (AppSetting::get('progress_reminder_inactive_days', 14) ?? 14);
         $frequency = $mahasiswa?->progress_reminder_frequency ?? 'biweekly';
+        $frequencyDays = $mahasiswa?->progress_reminder_frequency_days ?? 14;
         $isEnabled = $mahasiswa ? (bool) $mahasiswa->progress_reminder_enabled : true;
 
         $daysSinceLast = 0;
@@ -38,6 +39,7 @@ class ProgressReminderController extends Controller
             'reminderSettings' => [
                 'inactive_threshold_days' => $inactiveThresholdDays,
                 'frequency' => $frequency,
+                'frequency_days' => $frequencyDays,
                 'enabled' => (bool) $isEnabled,
             ],
         ]);
@@ -46,16 +48,28 @@ class ProgressReminderController extends Controller
     public function updateFrequency(Request $request)
     {
         $request->validate([
-            'frequency' => 'required|in:weekly,biweekly',
+            'frequency' => 'required|in:2_days,3_days,weekly,biweekly,custom',
+            'custom_days' => 'required_if:frequency,custom|nullable|integer|min:1|max:365',
             'enabled' => 'required|boolean',
         ]);
 
         $mahasiswa = Mahasiswa::where('user_id', auth()->id())->first();
         if ($mahasiswa) {
-            $days = $request->frequency === 'weekly' ? 7 : 14;
+            $days = 14;
+            if ($request->frequency === '2_days') {
+                $days = 2;
+            } elseif ($request->frequency === '3_days') {
+                $days = 3;
+            } elseif ($request->frequency === 'weekly') {
+                $days = 7;
+            } elseif ($request->frequency === 'biweekly') {
+                $days = 14;
+            } elseif ($request->frequency === 'custom') {
+                $days = (int) $request->custom_days;
+            }
+
             $mahasiswa->update([
                 'progress_reminder_frequency' => $request->frequency,
-                // keep legacy column in sync
                 'progress_reminder_frequency_days' => $days,
                 'progress_reminder_enabled' => $request->enabled,
             ]);
