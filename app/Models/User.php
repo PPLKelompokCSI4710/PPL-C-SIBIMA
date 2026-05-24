@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -17,6 +19,11 @@ class User extends Authenticatable
     /** @use HasFactory<UserFactory> */
     use HasFactory, HasRoles, Notifiable;
 
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
     protected function casts(): array
     {
         return [
@@ -25,20 +32,6 @@ class User extends Authenticatable
         ];
     }
 
-    public function progress()
-    {
-        return $this->hasOne(StudentProgress::class);
-    }
-
-    public function mahasiswa()
-    {
-        return $this->hasOne(Mahasiswa::class);
-    }
-
-    public function dosen()
-    {
-        return $this->hasOne(Dosen::class);
-    }
     // =========================================================================
     // RELATIONSHIPS
     // =========================================================================

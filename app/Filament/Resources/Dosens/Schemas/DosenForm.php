@@ -22,7 +22,11 @@ class DosenForm
                         TextInput::make('name')
                             ->label('Nama Lengkap')
                             ->required()
-                            ->maxLength(255),
+                            ->maxLength(255)
+                            ->regex('/^[a-zA-Z\s]+$/')
+                            ->validationMessages([
+                                'regex' => 'Nama lengkap hanya boleh berisi huruf dan spasi.',
+                            ]),
 
                         TextInput::make('email')
                             ->label('Alamat Email')
@@ -47,7 +51,11 @@ class DosenForm
                         TextInput::make('fakultas')
                             ->label('Fakultas')
                             ->required()
-                            ->maxLength(255),
+                            ->maxLength(255)
+                            ->regex('/^[a-zA-Z\s]+$/')
+                            ->validationMessages([
+                                'regex' => 'Fakultas hanya boleh berisi huruf dan spasi.',
+                            ]),
 
                         TextInput::make('kuota_pembimbingan')
                             ->label('Kapasitas Bimbingan')
