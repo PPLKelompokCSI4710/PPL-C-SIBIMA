@@ -237,12 +237,15 @@
             class="fixed inset-0 z-40"
             @click="showNotifications = false"
         />
+        <!-- SIBIMA AI Assistant Floating Widget -->
+        <AiAssistantWidget />
     </div>
 </template>
 
 <script setup>
     import { ref, computed } from 'vue';
     import { Link } from '@inertiajs/vue3';
+    import AiAssistantWidget from '@/Components/AiAssistantWidget.vue';
     import {
         GraduationCapIcon,
         LayoutDashboardIcon,
