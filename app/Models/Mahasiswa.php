@@ -66,4 +66,19 @@ class Mahasiswa extends Model
     {
         return $this->belongsToMany(Dosen::class, 'dosen_mahasiswa')->withPivot(['tanggal_penugasan', 'tanggal_berakhir', 'is_active', 'catatan']);
     }
+
+    // =========================================================================
+    // LIFECYCLE HOOKS
+    // =========================================================================
+
+    protected static function booted(): void
+    {
+        // Ketika mahasiswa dihapus (soft-delete), hapus juga akun User-nya
+        // agar email tidak menghalangi import ulang di masa mendatang.
+        static::deleting(function (Mahasiswa $mahasiswa) {
+            if ($mahasiswa->user) {
+                $mahasiswa->user->delete();
+            }
+        });
+    }
 }

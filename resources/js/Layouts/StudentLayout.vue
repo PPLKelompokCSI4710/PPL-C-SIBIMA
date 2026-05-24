@@ -60,6 +60,19 @@
                     <span>Progress Studi</span>
                 </Link>
                 <Link
+                    :href="route('mahasiswa.jadwal.index')"
+                    :class="[
+                        route().current('mahasiswa.jadwal.*') ||
+                        route().current('mahasiswa.jadwal-bimbingan.*')
+                            ? 'bg-blue-50 text-blue-700 font-semibold'
+                            : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900',
+                    ]"
+                    class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors"
+                >
+                    <UsersIcon class="w-5 h-5" />
+                    <span>Jadwal Bimbingan</span>
+                </Link>
+                <Link
                     :href="route('mahasiswa.bimbingan.reminder')"
                     :class="[
                         route().current('mahasiswa.bimbingan.reminder')
@@ -241,6 +254,7 @@
         CheckCircle2Icon,
         AlertCircleIcon,
         InfoIcon,
+        UsersIcon,
     } from 'lucide-vue-next';
 
     const showNotifications = ref(false);
@@ -251,8 +265,14 @@
         if (route().current('mahasiswa.study-plans.index')) return 'Study Plans (KRS)';
         if (route().current('mahasiswa.progress.index')) return 'Progress Studi';
         if (route().current('mahasiswa.calendar')) return 'Academic Calendar';
+        if (
+            route().current('mahasiswa.jadwal.*') ||
+            route().current('mahasiswa.jadwal-bimbingan.*')
+        )
+            return 'Jadwal Bimbingan';
         if (route().current('mahasiswa.bimbingan.reminder')) return 'Reminder Jadwal Bimbingan';
-        if (route().current('mahasiswa.bimbingan.progress_reminder')) return 'Monitoring Progres Akademik';
+        if (route().current('mahasiswa.bimbingan.progress_reminder'))
+            return 'Monitoring Progres Akademik';
         return 'SIBIMA';
     });
 
@@ -262,8 +282,14 @@
         if (route().current('mahasiswa.study-plans.index')) return 'KRS Management';
         if (route().current('mahasiswa.progress.index')) return 'Achievement Tracking';
         if (route().current('mahasiswa.calendar')) return 'Event Schedule';
+        if (
+            route().current('mahasiswa.jadwal.*') ||
+            route().current('mahasiswa.jadwal-bimbingan.*')
+        )
+            return 'Bimbingan Akademik';
         if (route().current('mahasiswa.bimbingan.reminder')) return 'Informasi Reminder Jadwal';
-        if (route().current('mahasiswa.bimbingan.progress_reminder')) return 'Frekuensi Notifikasi Progres';
+        if (route().current('mahasiswa.bimbingan.progress_reminder'))
+            return 'Frekuensi Notifikasi Progres';
         return 'Portal Mahasiswa';
     });
 
