@@ -48,7 +48,10 @@ class CatatanKonsultasiController extends Controller
             'catatan' => $request->catatan,
         ]);
 
-        return redirect()->back()->with('success', 'Catatan konsultasi berhasil disimpan.');
+        // Ubah status jadwal menjadi selesai setelah catatan disimpan
+        $jadwal->update(['status' => 'completed']);
+
+        return redirect()->back()->with('success', 'Catatan konsultasi berhasil disimpan, bimbingan telah selesai.');
     }
 
     public function destroy($id)

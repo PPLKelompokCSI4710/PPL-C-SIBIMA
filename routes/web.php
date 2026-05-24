@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Models\Dosen;
+use App\Models\JadwalBimbingan;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -15,7 +17,27 @@ Route::get('/', function () {
 });
 
 Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
+    $user = auth()->user();
+    $stats = null;
+
+    if ($user->hasRole('dosen')) {
+        $dosen = Dosen::where('user_id', $user->id)->first();
+        if ($dosen) {
+            $jadwals = JadwalBimbingan::where('dosen_id', $dosen->id)->get();
+            $stats = [
+                'total' => $jadwals->count(),
+                'pending' => $jadwals->where('status', 'pending')->count(),
+                'approved' => $jadwals->where('status', 'approved')->count(),
+                'completed' => $jadwals->where('status', 'completed')->count(),
+                'rejected' => $jadwals->where('status', 'rejected')->count(),
+                'canceled' => $jadwals->where('status', 'canceled')->count(),
+            ];
+        }
+    }
+
+    return Inertia::render('Dashboard', [
+        'stats' => $stats,
+    ]);
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {

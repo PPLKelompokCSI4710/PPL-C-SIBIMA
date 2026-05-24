@@ -20,25 +20,32 @@ class MonitoringJadwalBimbinganController extends Controller
         ]);
     }
 
-    // Membatalkan jadwal (Oleh Mahasiswa)
     public function cancel($id)
     {
         $jadwal = JadwalBimbingan::findOrFail($id);
+
+        // Jika jadwal sebelumnya sudah disetujui, kembalikan kuota ketersediaan
+        if ($jadwal->status === 'approved' && $jadwal->ketersediaanJadwal) {
+            $jadwal->ketersediaanJadwal->increment('kuota');
+        }
+
         $jadwal->update(['status' => 'canceled']);
 
         return redirect()->back()->with('success', 'Jadwal bimbingan berhasil dibatalkan.');
     }
 
-    // Menyetujui jadwal (Khusus Dosen)
     public function approve($id)
     {
         $jadwal = JadwalBimbingan::findOrFail($id);
-        $jadwal->update(['status' => 'approved']);
 
-        // Kurangi kuota ketersediaan jadwal jika ada relasi
         if ($jadwal->ketersediaanJadwal) {
+            if ($jadwal->ketersediaanJadwal->kuota <= 0) {
+                return redirect()->back()->withErrors(['error' => 'Gagal disetujui: Kuota jadwal ini sudah penuh.']);
+            }
             $jadwal->ketersediaanJadwal->decrement('kuota');
         }
+
+        $jadwal->update(['status' => 'approved']);
 
         return redirect()->back()->with('success', 'Jadwal bimbingan berhasil disetujui.');
     }

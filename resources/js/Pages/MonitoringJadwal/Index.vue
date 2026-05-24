@@ -1,13 +1,46 @@
 <script setup>
     import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
     import { Head, usePage, router } from '@inertiajs/vue3';
-    import { ref } from 'vue';
+    import { ref, computed } from 'vue';
 
-    defineProps({
+    const props = defineProps({
         jadwalBimbingans: {
             type: Array,
             default: () => [],
         },
+    });
+
+    // === Filter & Search ===
+    const searchQuery = ref('');
+    const activeFilter = ref('all');
+
+    const filterTabs = [
+        { key: 'all', label: 'Semua' },
+        { key: 'pending', label: 'Menunggu' },
+        { key: 'approved', label: 'Disetujui' },
+        { key: 'completed', label: 'Selesai' },
+        { key: 'rejected', label: 'Ditolak' },
+        { key: 'canceled', label: 'Dibatalkan' },
+    ];
+
+    const filteredJadwal = computed(() => {
+        let list = props.jadwalBimbingans;
+
+        if (activeFilter.value !== 'all') {
+            list = list.filter((j) => j.status === activeFilter.value);
+        }
+
+        if (searchQuery.value.trim()) {
+            const q = searchQuery.value.toLowerCase();
+            list = list.filter(
+                (j) =>
+                    j.topik_bimbingan?.toLowerCase().includes(q) ||
+                    j.mahasiswa?.nama_lengkap?.toLowerCase().includes(q) ||
+                    j.dosen?.nama_lengkap?.toLowerCase().includes(q),
+            );
+        }
+
+        return list;
     });
 
     const page = usePage();
@@ -76,6 +109,7 @@
                     color: 'text-amber-700',
                     bg: 'bg-amber-100',
                     border: 'border-amber-200',
+                    borderLeft: 'border-l-amber-400',
                     label: 'Menunggu Konfirmasi',
                 };
             case 'approved':
@@ -83,6 +117,7 @@
                     color: 'text-emerald-700',
                     bg: 'bg-emerald-100',
                     border: 'border-emerald-200',
+                    borderLeft: 'border-l-emerald-400',
                     label: 'Disetujui',
                 };
             case 'completed':
@@ -90,6 +125,7 @@
                     color: 'text-blue-700',
                     bg: 'bg-blue-100',
                     border: 'border-blue-200',
+                    borderLeft: 'border-l-blue-400',
                     label: 'Selesai',
                 };
             case 'canceled':
@@ -97,6 +133,7 @@
                     color: 'text-slate-600',
                     bg: 'bg-slate-100',
                     border: 'border-slate-200',
+                    borderLeft: 'border-l-slate-400',
                     label: 'Dibatalkan',
                 };
             case 'rejected':
@@ -104,6 +141,7 @@
                     color: 'text-rose-700',
                     bg: 'bg-rose-100',
                     border: 'border-rose-200',
+                    borderLeft: 'border-l-rose-400',
                     label: 'Ditolak',
                 };
             default:
@@ -111,6 +149,7 @@
                     color: 'text-slate-600',
                     bg: 'bg-slate-100',
                     border: 'border-slate-200',
+                    borderLeft: 'border-l-slate-300',
                     label: status,
                 };
         }
@@ -122,9 +161,8 @@
 
     <AuthenticatedLayout>
         <template #header>
-            <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <div>
-                    <!-- Heading -->
                     <h2 class="text-3xl font-extrabold tracking-tight text-primary-dark">
                         Monitoring Jadwal Bimbingan
                     </h2>
@@ -132,12 +170,35 @@
                         Pantau dan kelola jadwal bimbingan akademik dengan mudah.
                     </p>
                 </div>
-                <div class="mt-4 md:mt-0 flex items-center">
+                <div class="flex items-center gap-3">
+                    <!-- Search Box -->
+                    <div class="relative">
+                        <svg
+                            class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                            />
+                        </svg>
+                        <input
+                            v-model="searchQuery"
+                            type="text"
+                            placeholder="Cari topik atau mahasiswa..."
+                            class="pl-9 pr-4 py-2 rounded-xl bg-white border border-slate-200 text-sm text-slate-700 placeholder-slate-300 focus:outline-none focus:ring-2 focus:ring-primary/30 w-56 shadow-sm"
+                        />
+                    </div>
+                    <!-- Total Badge -->
                     <div
                         class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white border border-neutral-medium text-primary shadow-sm"
                     >
                         <svg
-                            class="w-5 h-5 text-secondary"
+                            class="w-4 h-4 text-secondary"
                             fill="none"
                             stroke="currentColor"
                             viewBox="0 0 24 24"
@@ -150,7 +211,7 @@
                             />
                         </svg>
                         <span class="font-bold text-sm"
-                            >Total: {{ jadwalBimbingans.length }} Jadwal</span
+                            >{{ filteredJadwal.length }} / {{ jadwalBimbingans.length }}</span
                         >
                     </div>
                 </div>
@@ -171,6 +232,38 @@
             />
 
             <div class="max-w-6xl mx-auto sm:px-6 lg:px-8 relative z-10">
+                <!-- Filter Tabs -->
+                <div class="mb-4 flex gap-2 flex-wrap">
+                    <button
+                        v-for="tab in filterTabs"
+                        :key="tab.key"
+                        :class="[
+                            'px-4 py-1.5 rounded-full text-xs font-bold transition-all border flex items-center gap-2',
+                            activeFilter === tab.key
+                                ? 'bg-primary text-white border-primary shadow-sm'
+                                : 'bg-white text-slate-500 border-slate-200 hover:border-primary hover:text-primary',
+                        ]"
+                        @click="activeFilter = tab.key"
+                    >
+                        {{ tab.label }}
+                        <span
+                            :class="[
+                                'px-1.5 py-0.5 rounded-md text-[10px]',
+                                activeFilter === tab.key
+                                    ? 'bg-white/20 text-white'
+                                    : 'bg-slate-100 text-slate-500',
+                            ]"
+                        >
+                            {{
+                                tab.key === 'all'
+                                    ? props.jadwalBimbingans.length
+                                    : props.jadwalBimbingans.filter((j) => j.status === tab.key)
+                                          .length
+                            }}
+                        </span>
+                    </button>
+                </div>
+
                 <!-- Notifikasi -->
                 <transition name="slide-fade">
                     <div
@@ -242,9 +335,12 @@
                             </thead>
                             <tbody class="divide-y divide-slate-100/50 bg-transparent">
                                 <tr
-                                    v-for="jadwal in jadwalBimbingans"
+                                    v-for="jadwal in filteredJadwal"
                                     :key="jadwal.id"
-                                    class="hover:bg-blue-50/30 transition-all duration-200 group"
+                                    :class="[
+                                        'hover:bg-blue-50/30 transition-all duration-200 group border-l-4',
+                                        statusConfig(jadwal.status).borderLeft,
+                                    ]"
                                 >
                                     <!-- Kolom Topik & Waktu -->
                                     <td class="whitespace-normal py-3 pl-4 pr-3">
@@ -357,25 +453,22 @@
                                             <!-- Aksi Khusus Dosen -->
                                             <template v-if="basePath === '/dosen'">
                                                 <template v-if="jadwal.status === 'pending'">
-                                                    <!-- Primary Button -->
                                                     <button
-                                                        class="inline-flex items-center text-[10px] font-bold text-white bg-primary hover:bg-primary-dark px-4 py-2 rounded-lg transition-colors"
+                                                        class="inline-flex items-center text-[10px] font-bold text-white bg-primary hover:bg-primary-dark px-3 py-1.5 rounded-lg transition-colors"
                                                         @click="handleAction(jadwal.id, 'approve')"
                                                     >
                                                         Setujui
                                                     </button>
                                                     <button
-                                                        class="inline-flex items-center text-[10px] font-bold text-neutral-dark bg-white border border-neutral-medium hover:bg-neutral-light px-4 py-2 rounded-lg transition-colors"
+                                                        class="inline-flex items-center text-[10px] font-bold text-neutral-dark bg-white border border-neutral-medium hover:bg-neutral-light px-3 py-1.5 rounded-lg transition-colors"
                                                         @click="handleAction(jadwal.id, 'reject')"
                                                     >
                                                         Tolak
                                                     </button>
                                                 </template>
                                                 <template v-else-if="jadwal.status === 'approved'">
-                                                    <!-- Tombol Tambah Catatan / Lihat Catatan -->
                                                     <button
-                                                        v-if="!jadwal.catatan_konsultasi"
-                                                        class="inline-flex items-center gap-1 text-[10px] font-bold text-white bg-indigo-500 hover:bg-indigo-600 px-4 py-2 rounded-lg transition-colors"
+                                                        class="inline-flex items-center gap-1 text-[10px] font-bold text-white bg-indigo-500 hover:bg-indigo-600 px-3 py-1.5 rounded-lg transition-colors"
                                                         @click="openCatatanModal(jadwal, false)"
                                                     >
                                                         <svg
@@ -391,11 +484,19 @@
                                                                 d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
                                                             />
                                                         </svg>
-                                                        Tambah Catatan
+                                                        Selesaikan & Catat
                                                     </button>
                                                     <button
-                                                        v-else
-                                                        class="inline-flex items-center gap-1 text-[10px] font-bold text-indigo-600 bg-indigo-50 border border-indigo-200 hover:bg-indigo-100 px-4 py-2 rounded-lg transition-colors"
+                                                        class="inline-flex items-center text-[10px] font-bold text-slate-600 bg-white border border-slate-200 hover:bg-rose-50 hover:text-rose-600 hover:border-rose-200 px-3 py-1.5 rounded-lg transition-colors"
+                                                        @click="handleAction(jadwal.id, 'cancel')"
+                                                    >
+                                                        Batalkan
+                                                    </button>
+                                                </template>
+                                                <template v-else-if="jadwal.status === 'completed'">
+                                                    <button
+                                                        v-if="jadwal.catatan_konsultasi"
+                                                        class="inline-flex items-center gap-1 text-[10px] font-bold text-indigo-600 bg-indigo-50 border border-indigo-200 hover:bg-indigo-100 px-3 py-1.5 rounded-lg transition-colors"
                                                         @click="openCatatanModal(jadwal, true)"
                                                     >
                                                         <svg
@@ -429,12 +530,53 @@
                                                 </template>
                                             </template>
 
-                                            <!-- Tampilan Mahasiswa (Tanpa Aksi) -->
+                                            <!-- Tampilan Mahasiswa -->
                                             <template v-else>
-                                                <span
-                                                    class="inline-flex items-center text-indigo-500 font-bold text-[10px] bg-indigo-50 px-3 py-1.5 rounded-md border border-indigo-100"
+                                                <button
+                                                    v-if="
+                                                        ['pending', 'approved'].includes(
+                                                            jadwal.status,
+                                                        )
+                                                    "
+                                                    class="inline-flex items-center text-[10px] font-bold text-slate-600 bg-white border border-slate-200 hover:bg-rose-50 hover:text-rose-600 hover:border-rose-200 px-3 py-1.5 rounded-lg transition-colors"
+                                                    @click="handleAction(jadwal.id, 'cancel')"
                                                 >
-                                                    Lihat Saja
+                                                    Batalkan
+                                                </button>
+                                                <button
+                                                    v-else-if="
+                                                        jadwal.status === 'completed' &&
+                                                        jadwal.catatan_konsultasi
+                                                    "
+                                                    class="inline-flex items-center gap-1 text-[10px] font-bold text-indigo-600 bg-indigo-50 border border-indigo-200 hover:bg-indigo-100 px-3 py-1.5 rounded-lg transition-colors"
+                                                    @click="openCatatanModal(jadwal, true)"
+                                                >
+                                                    <svg
+                                                        class="w-3 h-3"
+                                                        fill="none"
+                                                        stroke="currentColor"
+                                                        viewBox="0 0 24 24"
+                                                    >
+                                                        <path
+                                                            stroke-linecap="round"
+                                                            stroke-linejoin="round"
+                                                            stroke-width="2"
+                                                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                                                        />
+                                                        <path
+                                                            stroke-linecap="round"
+                                                            stroke-linejoin="round"
+                                                            stroke-width="2"
+                                                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                                                        />
+                                                    </svg>
+                                                    Lihat Catatan
+                                                </button>
+                                                <span
+                                                    v-else
+                                                    class="inline-flex items-center text-slate-400 font-bold text-[10px] bg-slate-50 px-3 py-1.5 rounded-md border border-slate-200"
+                                                >
+                                                    Terkunci
                                                 </span>
                                             </template>
                                         </div>
@@ -442,7 +584,7 @@
                                 </tr>
 
                                 <!-- Empty State -->
-                                <tr v-if="jadwalBimbingans.length === 0">
+                                <tr v-if="filteredJadwal.length === 0">
                                     <td colspan="5" class="px-6 py-24 text-center">
                                         <div
                                             class="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-blue-50"
