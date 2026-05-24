@@ -29,14 +29,30 @@ class AdminPanelProvider extends PanelProvider
             ->path('admin')
             ->brandName('SIBIMA')
             ->login()
+
+            // ─── SIBIMA Brand Identity ────────────────────────────────────
+            ->brandName('SIBIMA')
+            ->brandLogo(asset('images/logo-sibima.svg'))
+            ->brandLogoHeight('2.5rem')
+            ->favicon(asset('images/logo-sibima.svg'))
+
+            // ─── SIBIMA Color Scheme ──────────────────────────────────────
             ->colors([
-                'primary' => '#1F4C7A', // Deep Blue
-                'secondary' => '#2FA7A0', // Teal
-                'warning' => '#F39C12', // Orange
-                'success' => '#6DBE45', // Leaf Green
-                'info' => '#2FA7A0', // Teal
-                'gray' => Color::Slate,
+                'primary' => Color::hex('#1F4C7A'),   // Deep Blue — Navbar, header, primary button
+                'gray' => Color::hex('#1B3F66'),    // Navy Blue — Hover state, footer, sidebar
+                'info' => Color::hex('#2FA7A0'),    // Teal      — Links, icons, accent UI
+                'success' => Color::hex('#6DBE45'),    // Leaf Green — Success state, progress
+                'warning' => Color::hex('#F39C12'),    // Orange    — CTA button, alerts
+                'danger' => Color::hex('#E74C3C'),    // Red       — Danger / destructive actions
             ])
+
+            // ─── Typography & UI Preferences ─────────────────────────────
+            ->font('Inter')
+            ->darkMode()
+            ->databaseNotifications()
+            ->sidebarCollapsibleOnDesktop()
+
+            // ─── Resource & Page Discovery ────────────────────────────────
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages')
             ->pages([
@@ -47,6 +63,8 @@ class AdminPanelProvider extends PanelProvider
                 AccountWidget::class,
                 FilamentInfoWidget::class,
             ])
+
+            // ─── Middleware ──────────────────────────────────────────────
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,

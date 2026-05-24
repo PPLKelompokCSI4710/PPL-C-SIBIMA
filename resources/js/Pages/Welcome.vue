@@ -1,6 +1,7 @@
 <script setup>
     import { Head, Link } from '@inertiajs/vue3';
-    import { GraduationCapIcon, LayoutDashboardIcon } from 'lucide-vue-next';
+    import { LayoutDashboardIcon } from 'lucide-vue-next';
+    import AiAssistantWidget from '@/Components/AiAssistantWidget.vue';
 
     defineProps({
         canLogin: {
@@ -42,12 +43,7 @@
             <div class="navbar-inner">
                 <!-- Logo -->
                 <Link href="/" class="navbar-brand">
-                    <div
-                        class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-600/20"
-                    >
-                        <GraduationCapIcon class="w-6 h-6" />
-                    </div>
-                    <span class="navbar-wordmark text-slate-800 ml-2">SIBIMA</span>
+                    <img src="/images/logo-sibima.svg" alt="SIBIMA Logo" class="navbar-logo" />
                 </Link>
 
                 <!-- Auth Links -->
@@ -340,7 +336,6 @@
             <div class="site-footer-inner">
                 <div class="footer-brand">
                     <img src="/images/logo-sibima.svg" alt="SIBIMA Logo" class="footer-logo" />
-                    <span class="footer-wordmark">SIBIMA</span>
                 </div>
                 <p class="footer-copy">
                     &copy; 2026 SIBIMA — Telkom University. All rights reserved.
@@ -350,6 +345,9 @@
                 </p>
             </div>
         </footer>
+
+        <!-- SIBIMA AI Assistant Floating Widget -->
+        <AiAssistantWidget />
     </div>
 </template>
 
@@ -357,7 +355,7 @@
     /* ─────────────────────────────────────────────────────────
    DESIGN TOKENS
 ───────────────────────────────────────────────────────── */
-    :root {
+    .sibima-root {
         --color-primary: #4f46e5; /* indigo-600 */
         --color-primary-dark: #3730a3; /* indigo-800 */
         --color-primary-light: #e0e7ff; /* indigo-100 */
