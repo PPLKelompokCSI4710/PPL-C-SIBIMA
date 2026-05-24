@@ -52,6 +52,15 @@ class Mahasiswa extends Model
         return $this->belongsTo(User::class);
     }
 
+    /**
+     * Mendapatkan Dosen Pembimbing utama mahasiswa ini.
+     * (Inverse of One-to-Many — satu mahasiswa memiliki satu dosen pembimbing)
+     */
+    public function dosen(): BelongsTo
+    {
+        return $this->belongsTo(Dosen::class);
+    }
+
     public function studyPlans(): HasMany
     {
         return $this->hasMany(StudyPlan::class);
