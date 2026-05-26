@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\BimbinganRelation\Tables;
 
 use App\Models\Dosen;
+use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\EditAction;
 use Filament\Support\Enums\FontWeight;
@@ -83,6 +84,17 @@ class BimbinganRelationTable
             ->recordActions([
                 EditAction::make()
                     ->label('Tetapkan'),
+
+                Action::make('putus_relasi')
+                    ->label('Hapus Relasi')
+                    ->color('danger')
+                    ->icon('heroicon-o-x-circle')
+                    ->requiresConfirmation()
+                    ->modalHeading('Hapus Relasi Dosen Pembimbing')
+                    ->modalDescription('Aksi ini hanya akan mengosongkan dosen pembimbing pada mahasiswa ini. Data mahasiswa tidak akan dihapus.')
+                    ->modalSubmitActionLabel('Ya, Hapus Relasi')
+                    ->action(fn ($record) => $record->update(['dosen_id' => null]))
+                    ->visible(fn ($record): bool => $record->dosen_id !== null),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([]),

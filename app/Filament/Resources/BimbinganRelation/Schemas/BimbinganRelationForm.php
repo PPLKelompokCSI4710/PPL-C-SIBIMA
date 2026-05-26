@@ -20,6 +20,7 @@ class BimbinganRelationForm
                     ->description('Informasi mahasiswa yang akan ditetapkan dosen pembimbingnya.')
                     ->icon('heroicon-o-academic-cap')
                     ->columns(2)
+                    ->disabledOn('edit')
                     ->schema([
                         TextInput::make('nim')
                             ->label('NIM')
