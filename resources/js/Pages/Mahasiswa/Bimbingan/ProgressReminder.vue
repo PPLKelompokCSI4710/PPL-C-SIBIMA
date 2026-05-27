@@ -1,71 +1,74 @@
 <script setup>
-import StudentLayout from '@/Layouts/StudentLayout.vue';
-import { Head, Link, useForm } from '@inertiajs/vue3';
-import { ref } from 'vue';
+    import StudentLayout from '@/Layouts/StudentLayout.vue';
+    import { Head, Link, useForm } from '@inertiajs/vue3';
+    import { ref } from 'vue';
 
-const props = defineProps({
-    progressData: {
-        type: Object,
-        default: () => ({
-            daysSinceLastBimbingan: 0,
-            status: 'Good',
-            lastBimbinganDate: '-',
-        }),
-    },
-    reminderSettings: {
-        type: Object,
-        default: () => ({
-            inactive_threshold_days: 14,
-            frequency: 'biweekly',
-            frequency_days: 14,
-            enabled: true,
-        }),
-    },
-});
-
-const isEditing = ref(false);
-
-const form = useForm({
-    frequency: props.reminderSettings.frequency,
-    custom_days: props.reminderSettings.frequency === 'custom' ? props.reminderSettings.frequency_days : 14,
-    enabled: props.reminderSettings.enabled,
-});
-
-const submitSettings = () => {
-    form.post(route('mahasiswa.bimbingan.progress_reminder.update'), {
-        preserveScroll: true,
-        onSuccess: () => {
-            isEditing.value = false;
+    const props = defineProps({
+        progressData: {
+            type: Object,
+            default: () => ({
+                daysSinceLastBimbingan: 0,
+                status: 'Good',
+                lastBimbinganDate: '-',
+            }),
+        },
+        reminderSettings: {
+            type: Object,
+            default: () => ({
+                inactive_threshold_days: 14,
+                frequency: 'biweekly',
+                frequency_days: 14,
+                enabled: true,
+            }),
         },
     });
-};
 
-const getStatusDetails = () => {
-    if (props.progressData.status === 'Warning') {
-        return {
-            color: 'text-brand-accent',
-            bg: 'bg-brand-accent/10',
-            border: 'border-brand-accent/20',
-            gradient: 'bg-brand-accent',
-            iconColor: 'bg-brand-accent/10 text-brand-accent',
-            title: 'Perhatian!',
-            message: `Sudah ${props.progressData.daysSinceLastBimbingan} Hari Anda Belum Bimbingan`,
-            subText: 'Dosen pembimbing akan menerima notifikasi tembusan.',
-        };
-    }
-    return {
-        color: 'text-brand-success',
-        bg: 'bg-brand-success/10',
-        border: 'border-brand-success/20',
-        gradient: 'bg-brand-success',
-        iconColor: 'bg-brand-success/10 text-brand-success',
-        title: 'Progres Sangat Baik!',
-        message: 'Bimbingan Anda Berjalan Rutin',
-        subText: 'Pertahankan kedisiplinan ini untuk lulus tepat waktu.',
+    const isEditing = ref(false);
+
+    const form = useForm({
+        frequency: props.reminderSettings.frequency,
+        custom_days:
+            props.reminderSettings.frequency === 'custom'
+                ? props.reminderSettings.frequency_days
+                : 14,
+        enabled: props.reminderSettings.enabled,
+    });
+
+    const submitSettings = () => {
+        form.post(route('mahasiswa.bimbingan.progress_reminder.update'), {
+            preserveScroll: true,
+            onSuccess: () => {
+                isEditing.value = false;
+            },
+        });
     };
-};
 
-const statusObj = getStatusDetails();
+    const getStatusDetails = () => {
+        if (props.progressData.status === 'Warning') {
+            return {
+                color: 'text-brand-accent',
+                bg: 'bg-brand-accent/10',
+                border: 'border-brand-accent/20',
+                gradient: 'bg-brand-accent',
+                iconColor: 'bg-brand-accent/10 text-brand-accent',
+                title: 'Perhatian!',
+                message: `Sudah ${props.progressData.daysSinceLastBimbingan} Hari Anda Belum Bimbingan`,
+                subText: 'Dosen pembimbing akan menerima notifikasi tembusan.',
+            };
+        }
+        return {
+            color: 'text-brand-success',
+            bg: 'bg-brand-success/10',
+            border: 'border-brand-success/20',
+            gradient: 'bg-brand-success',
+            iconColor: 'bg-brand-success/10 text-brand-success',
+            title: 'Progres Sangat Baik!',
+            message: 'Bimbingan Anda Berjalan Rutin',
+            subText: 'Pertahankan kedisiplinan ini untuk lulus tepat waktu.',
+        };
+    };
+
+    const statusObj = getStatusDetails();
 </script>
 
 <template>
@@ -152,7 +155,7 @@ const statusObj = getStatusDetails();
                                 class="mt-6 flex gap-4"
                             >
                                 <Link
-                                    :href="route('mahasiswa.bimbingan.reminder')"
+                                    :href="route('mahasiswa.jadwal-bimbingan.create')"
                                     class="inline-block px-6 py-3 bg-brand-accent hover:bg-brand-accent-light text-white rounded-xl font-bold font-medium shadow-md transition-all duration-300 hover:-translate-y-1 hover:text-white"
                                 >
                                     Ajukan Jadwal Bimbingan Sekarang
@@ -231,7 +234,9 @@ const statusObj = getStatusDetails();
                                 </select>
 
                                 <div v-if="form.frequency === 'custom'" class="mt-4">
-                                    <label class="block text-sm font-bold text-brand-text-primary mb-2">
+                                    <label
+                                        class="block text-sm font-bold text-brand-text-primary mb-2"
+                                    >
                                         Jumlah Hari Kustom
                                     </label>
                                     <input
@@ -253,9 +258,25 @@ const statusObj = getStatusDetails();
                                 <p class="text-xs text-brand-text-secondary mt-2">
                                     Reminder dikirim berkala setiap
                                     <strong>
-                                        {{ form.frequency === 'custom' ? form.custom_days : (form.frequency === '2_days' ? 2 : (form.frequency === '3_days' ? 3 : (form.frequency === 'weekly' ? 7 : 14))) }} hari
-                                    </strong>, tetapi hanya jika Anda melewati ambang tidak bimbingan selama
-                                    <strong>{{ props.reminderSettings.inactive_threshold_days }} hari</strong>.
+                                        {{
+                                            form.frequency === 'custom'
+                                                ? form.custom_days
+                                                : form.frequency === '2_days'
+                                                  ? 2
+                                                  : form.frequency === '3_days'
+                                                    ? 3
+                                                    : form.frequency === 'weekly'
+                                                      ? 7
+                                                      : 14
+                                        }}
+                                        hari </strong
+                                    >, tetapi hanya jika Anda melewati ambang tidak bimbingan selama
+                                    <strong
+                                        >{{
+                                            props.reminderSettings.inactive_threshold_days
+                                        }}
+                                        hari</strong
+                                    >.
                                 </p>
                                 <div
                                     v-if="form.errors.frequency"

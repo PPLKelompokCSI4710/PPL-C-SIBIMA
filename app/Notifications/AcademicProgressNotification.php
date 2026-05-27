@@ -2,6 +2,7 @@
 
 namespace App\Notifications;
 
+use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
 class AcademicProgressNotification extends Notification
@@ -32,7 +33,51 @@ class AcademicProgressNotification extends Notification
      */
     public function via(object $notifiable): array
     {
-        return ['database'];
+        return ['database', 'mail'];
+    }
+
+    /**
+     * Get the mail representation of the notification.
+     */
+    public function toMail(object $notifiable): MailMessage
+    {
+        $sksLulus = $this->progressSummary['sks_lulus'] ?? '-';
+        $sksTotal = $this->progressSummary['sks_total'] ?? '-';
+        $ipk = $this->progressSummary['ipk'] ?? '-';
+        $semester = $this->progressSummary['semester'] ?? '-';
+
+        if ($this->isDosenCc) {
+            $subject = "📢 CC Reminder: Progres Akademik Mahasiswa {$this->mahasiswaName}";
+
+            return (new MailMessage)
+                ->subject($subject)
+                ->greeting('Yth. Bapak/Ibu Dosen Pembimbing,')
+                ->line("Pemberitahuan ini dikirimkan sebagai salinan (CC) karena mahasiswa bimbingan Anda, **{$this->mahasiswaName}**, tercatat belum melakukan bimbingan akademik selama **{$this->daysSinceLastBimbingan} hari**.")
+                ->line('Berikut adalah ringkasan progres akademik mahasiswa yang bersangkutan:')
+                ->line("• **Nama Mahasiswa:** {$this->mahasiswaName}")
+                ->line("• **Semester:** {$semester}")
+                ->line("• **IPK Saat Ini:** {$ipk}")
+                ->line("• **SKS Lulus / Total:** {$sksLulus} / {$sksTotal} SKS")
+                ->line('Kami menyarankan Bapak/Ibu untuk menghubungi mahasiswa bersangkutan guna memantau kendala atau hambatan yang mungkin sedang dihadapi dalam pengerjaan tugas akhir.')
+                ->action('Buka Dashboard Dosen SIBIMA', url('/'))
+                ->line('Terima kasih atas dedikasi Bapak/Ibu dalam membimbing mahasiswa.')
+                ->salutation("Salam hormat,\nTim SIBIMA");
+        }
+
+        $subject = '📈 Pantau Progres Akademikmu: Waktunya Bimbingan!';
+
+        return (new MailMessage)
+            ->subject($subject)
+            ->greeting('Halo, rekan mahasiswa!')
+            ->line("Sudah **{$this->daysSinceLastBimbingan} hari** berlalu sejak sesi bimbingan terakhir Anda. Konsistensi bimbingan sangat krusial dalam menyukseskan perjalanan akademik Anda.")
+            ->line('Berikut adalah ringkasan progres akademik Anda saat ini:')
+            ->line("• **Semester:** {$semester}")
+            ->line("• **IPK Saat Ini:** {$ipk}")
+            ->line("• **SKS Lulus / Total:** {$sksLulus} / {$sksTotal} SKS")
+            ->line('Ayo, selangkah lebih dekat dengan kelulusanmu! Jangan tunda lagi, segera jadwalkan sesi bimbingan baru dengan dosen pembimbing Anda untuk membahas kemajuan studi Anda.')
+            ->action('Booking Bimbingan Baru', url('/'))
+            ->line('Terima kasih, tetap semangat untuk meraih impian akademikmu!')
+            ->salutation("Salam hangat,\nTim SIBIMA");
     }
 
     /**
