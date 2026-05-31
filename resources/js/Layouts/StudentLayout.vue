@@ -76,6 +76,15 @@
                     :href="route('mahasiswa.calendar')"
                     :class="[
                         route().current('mahasiswa.calendar')
+                            ? 'bg-blue-50 text-blue-700 font-semibold'
+                            : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900',
+                    ]"
+                    class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors"
+                >
+                    <CalendarDaysIcon class="w-5 h-5" />
+                    <span>Kalender Akademik</span>
+                </Link>
+                <Link
                     :href="route('mahasiswa.bimbingan.reminder')"
                     :class="[
                         route().current('mahasiswa.bimbingan.reminder')
@@ -84,8 +93,6 @@
                     ]"
                     class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors"
                 >
-                    <CalendarDaysIcon class="w-5 h-5" />
-                    <span>Kalender Akademik</span>
                     <BellIcon class="w-5 h-5" />
                     <span>Reminder Jadwal</span>
                 </Link>
