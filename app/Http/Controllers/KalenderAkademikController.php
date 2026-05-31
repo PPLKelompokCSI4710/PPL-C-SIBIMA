@@ -2,9 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Dosen;
+use App\Models\JadwalBimbingan;
 use App\Models\JadwalRequest;
 use App\Models\KalenderAkademik;
+use App\Models\Mahasiswa;
 use App\Models\User;
+use App\Services\GoogleCalendarService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -139,9 +143,51 @@ class KalenderAkademikController extends Controller
                 ->orWhere('user_id', $dosenId);
         })->get();
 
-        $requests = JadwalRequest::with(['user'])
-            ->where('dosen_id', $dosenId)
-            ->get();
+        $dosenModel = Dosen::where('user_id', $dosenId)->first();
+
+        $bimbinganRequests = JadwalBimbingan::with(['mahasiswa.user', 'ketersediaanJadwal'])
+            ->where('dosen_id', $dosenModel?->id)
+            ->where('status', 'pending')
+            ->get()
+            ->map(function ($b) {
+                return [
+                    'id' => $b->id,
+                    'is_real_bimbingan' => true,
+                    'judul' => 'Bimbingan: '.($b->judul_ta ?? 'Tugas Akhir'),
+                    'deskripsi' => $b->topik_bimbingan,
+                    'tanggal' => $b->ketersediaanJadwal->tanggal ?? '',
+                    'jam' => ($b->ketersediaanJadwal->waktu_mulai ? substr($b->ketersediaanJadwal->waktu_mulai, 0, 5) : '').' - '.($b->ketersediaanJadwal->waktu_selesai ? substr($b->ketersediaanJadwal->waktu_selesai, 0, 5) : ''),
+                    'status' => 'pending_dosen',
+                    'user' => [
+                        'name' => $b->mahasiswa->nama_lengkap ?? 'Mahasiswa',
+                        'email' => $b->mahasiswa->user->email ?? '',
+                    ],
+                ];
+            });
+
+        // Fallback to JadwalRequest if no real bimbingan requests exist (for demo purposes)
+        if ($bimbinganRequests->isEmpty()) {
+            $requests = JadwalRequest::with(['user'])
+                ->where('dosen_id', $dosenId)
+                ->get()
+                ->map(function ($r) {
+                    return [
+                        'id' => $r->id,
+                        'is_real_bimbingan' => false,
+                        'judul' => $r->judul,
+                        'deskripsi' => $r->deskripsi,
+                        'tanggal' => $r->tanggal,
+                        'jam' => $r->jam,
+                        'status' => $r->status,
+                        'user' => [
+                            'name' => $r->user->name ?? 'Mahasiswa',
+                            'email' => $r->user->email ?? '',
+                        ],
+                    ];
+                });
+        } else {
+            $requests = $bimbinganRequests;
+        }
 
         // Cari user yang memiliki role 'dosen'. Jika ID yang diminta bukan dosen, ambil dosen pertama yang tersedia.
         $currentDosen = User::role('dosen')->find($dosenId)
@@ -165,7 +211,7 @@ class KalenderAkademikController extends Controller
             'deskripsi' => 'nullable|string',
         ]);
 
-        KalenderAkademik::create([
+        $kalenderItem = KalenderAkademik::create([
             'user_id' => $request->dosen_id ?? Auth::id() ?? 1,
             'nama_kegiatan' => $request->nama_kegiatan,
             'tipe_kegiatan' => $request->tipe_kegiatan,
@@ -176,6 +222,13 @@ class KalenderAkademikController extends Controller
             'status' => 'Active',
         ]);
 
+        // Attempt Google Calendar Sync for Dosen
+        $user = Auth::user();
+        if ($user && $user->google_access_token) {
+            $googleService = new GoogleCalendarService;
+            $googleService->syncEvent($user, $kalenderItem);
+        }
+
         return redirect()->back()->with('success', 'Jadwal berhasil ditambahkan.');
     }
 
@@ -183,40 +236,123 @@ class KalenderAkademikController extends Controller
     {
         $studentId = Auth::id() ?? 1;
 
-        // Ambil semua ID Dosen yang pernah di-request oleh mahasiswa ini
+        // Ambil semua ID Dosen
         $dosenIds = JadwalRequest::where('user_id', $studentId)
             ->pluck('dosen_id')
             ->unique()
             ->toArray();
 
-        // Jika belum ada request, coba ambil dari parameter URL
         if (empty($dosenIds) && request('dosen_id')) {
             $dosenIds[] = request('dosen_id');
         }
 
-        $kalender = KalenderAkademik::where(function ($query) use ($dosenIds) {
-            $query->whereNull('user_id') // Kalender Akademik Umum (Pusat)
-                ->when(! empty($dosenIds), function ($q) use ($dosenIds) {
-                    $q->orWhereIn('user_id', $dosenIds); // Kalender Pribadi Dosen-dosen terkait
-                });
-        })->where('status', 'Active')->get();
+        // Get global academic calendar events (where user_id is null)
+        $kalenderGlobal = KalenderAkademik::whereNull('user_id')
+            ->where('status', 'Active')
+            ->get();
 
-        // Ensure we load the 'dosen' relationship properly
-        $requests = JadwalRequest::with(['dosen'])->where('user_id', $studentId)->get();
+        // Get student's own approved bimbingan events
+        $mahasiswa = Mahasiswa::where('user_id', $studentId)->first();
+        $myBimbingans = JadwalBimbingan::with(['dosen', 'ketersediaanJadwal'])
+            ->where('mahasiswa_id', $mahasiswa?->id)
+            ->where('status', 'approved')
+            ->get()
+            ->map(function ($b) {
+                return (object) [
+                    'id' => 'bimbingan-'.$b->id,
+                    'user_id' => $b->mahasiswa->user_id ?? null,
+                    'nama_kegiatan' => 'Bimbingan: '.($b->dosen->nama_lengkap ?? 'Dosen'),
+                    'tipe_kegiatan' => 'bimbingan',
+                    'tanggal_mulai' => $b->ketersediaanJadwal->tanggal ?? '',
+                    'tanggal_selesai' => $b->ketersediaanJadwal->tanggal ?? '',
+                    'jam_mulai' => $b->ketersediaanJadwal->waktu_mulai ?? '',
+                    'deskripsi' => $b->topik_bimbingan.' (Lokasi: '.($b->lokasi ?? '-').', Tipe: '.($b->tipe ?? 'offline').')',
+                    'status' => 'Active',
+                ];
+            });
 
-        foreach ($requests as $req) {
-            // Priority: Actual relationship name -> then mock name
-            $req->dosen_name = ($req->dosen && $req->dosen->name !== 'Administrator')
-                ? $req->dosen->name
-                : 'Dr. Ir. H. Rahmat Hidayat, M.T.';
-        }
+        $kalender = $kalenderGlobal->concat($myBimbingans);
 
-        $dosens = User::role('dosen')->get();
+        // Fetch bimbingan requests (pending, approved, rejected, completed)
+        $requests = JadwalBimbingan::with(['dosen', 'ketersediaanJadwal'])
+            ->where('mahasiswa_id', $mahasiswa?->id)
+            ->get()
+            ->map(function ($b) {
+                return [
+                    'id' => $b->id,
+                    'judul' => 'Bimbingan: '.($b->judul_ta ?? 'Tugas Akhir'),
+                    'deskripsi' => $b->topik_bimbingan,
+                    'tanggal' => $b->ketersediaanJadwal->tanggal ?? '',
+                    'jam' => ($b->ketersediaanJadwal->waktu_mulai ? substr($b->ketersediaanJadwal->waktu_mulai, 0, 5) : '').' - '.($b->ketersediaanJadwal->waktu_selesai ? substr($b->ketersediaanJadwal->waktu_selesai, 0, 5) : ''),
+                    'status' => $b->status,
+                    'tipe' => $b->tipe,
+                    'lokasi' => $b->lokasi,
+                    'dosen_name' => $b->dosen->nama_lengkap ?? 'Dosen',
+                ];
+            });
 
-        return Inertia::render('Mahasiswa/KalenderAkademik/Index', [
+        $dosenList = Dosen::all();
+
+        return Inertia::render('Mahasiswa/AcademicCalendar', [
             'kalender' => $kalender,
             'requests' => $requests,
-            'dosens' => $dosens,
+            'dosenList' => $dosenList,
         ]);
+    }
+
+    public function approveBimbingan(Request $request, $id)
+    {
+        $request->validate([
+            'tipe' => 'required|in:online,offline',
+            'lokasi' => 'required|string|max:255',
+        ]);
+
+        $bimbingan = JadwalBimbingan::with(['mahasiswa.user', 'dosen.user', 'ketersediaanJadwal'])->findOrFail($id);
+        $bimbingan->update([
+            'status' => 'approved',
+            'tipe' => $request->tipe,
+            'lokasi' => $request->lokasi,
+        ]);
+
+        // Decrement quota
+        if ($bimbingan->ketersediaanJadwal) {
+            $bimbingan->ketersediaanJadwal->decrement('kuota');
+        }
+
+        // Add to Kalender Akademik so both see it
+        $kalenderItem = KalenderAkademik::create([
+            'user_id' => $bimbingan->dosen->user_id ?? Auth::id() ?? 1,
+            'nama_kegiatan' => 'Bimbingan: '.($bimbingan->mahasiswa->nama_lengkap ?? 'Mahasiswa'),
+            'tipe_kegiatan' => 'bimbingan',
+            'tanggal_mulai' => $bimbingan->ketersediaanJadwal->tanggal ?? date('Y-m-d'),
+            'tanggal_selesai' => $bimbingan->ketersediaanJadwal->tanggal ?? date('Y-m-d'),
+            'jam_mulai' => $bimbingan->ketersediaanJadwal->waktu_mulai ?? '08:00:00',
+            'deskripsi' => $bimbingan->topik_bimbingan.' (Lokasi: '.$request->lokasi.', Tipe: '.$request->tipe.')',
+            'status' => 'Active',
+        ]);
+
+        // Google Calendar Sync for Dosen
+        if ($bimbingan->dosen && $bimbingan->dosen->user && $bimbingan->dosen->user->google_access_token) {
+            $googleService = new GoogleCalendarService;
+            $googleService->syncEvent($bimbingan->dosen->user, $kalenderItem);
+        }
+
+        // Google Calendar Sync for Mahasiswa
+        if ($bimbingan->mahasiswa && $bimbingan->mahasiswa->user && $bimbingan->mahasiswa->user->google_access_token) {
+            $googleService = new GoogleCalendarService;
+            $googleService->syncEvent($bimbingan->mahasiswa->user, $kalenderItem);
+        }
+
+        return redirect()->back()->with('success', 'Request bimbingan berhasil disetujui.');
+    }
+
+    public function rejectBimbingan(Request $request, $id)
+    {
+        $bimbingan = JadwalBimbingan::findOrFail($id);
+        $bimbingan->update([
+            'status' => 'rejected',
+        ]);
+
+        return redirect()->back()->with('success', 'Request bimbingan berhasil ditolak.');
     }
 }

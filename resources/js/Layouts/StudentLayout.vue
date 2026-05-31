@@ -73,6 +73,9 @@
                     <span>Jadwal Bimbingan</span>
                 </Link>
                 <Link
+                    :href="route('mahasiswa.calendar')"
+                    :class="[
+                        route().current('mahasiswa.calendar')
                     :href="route('mahasiswa.bimbingan.reminder')"
                     :class="[
                         route().current('mahasiswa.bimbingan.reminder')
@@ -81,6 +84,8 @@
                     ]"
                     class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors"
                 >
+                    <CalendarDaysIcon class="w-5 h-5" />
+                    <span>Kalender Akademik</span>
                     <BellIcon class="w-5 h-5" />
                     <span>Reminder Jadwal</span>
                 </Link>
