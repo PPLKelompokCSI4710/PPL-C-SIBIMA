@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\InputJadwalBimbinganController;
+use App\Http\Controllers\KalenderAkademikController;
 use App\Http\Controllers\Mahasiswa\CourseController;
 use App\Http\Controllers\Mahasiswa\DashboardController;
 use App\Http\Controllers\Mahasiswa\ProgressController;
@@ -30,7 +31,7 @@ Route::middleware(['auth', 'role:mahasiswa'])->prefix('mahasiswa')->name('mahasi
     })->name('bimbingan.reminder');
 
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    Route::get('/calendar', [DashboardController::class, 'calendar'])->name('calendar');
+    Route::get('/calendar', [KalenderAkademikController::class, 'mahasiswaIndex'])->name('calendar');
 
     // Study Plan routes
     Route::get('/study-plans', [StudyPlanController::class, 'index'])->name('study-plans.index');

@@ -62,7 +62,8 @@
                 <Link
                     :href="route('mahasiswa.jadwal.index')"
                     :class="[
-                        route().current('mahasiswa.jadwal.*') || route().current('mahasiswa.jadwal-bimbingan.*')
+                        route().current('mahasiswa.jadwal.*') ||
+                        route().current('mahasiswa.jadwal-bimbingan.*')
                             ? 'bg-blue-50 text-blue-700 font-semibold'
                             : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900',
                     ]"
@@ -70,6 +71,18 @@
                 >
                     <UsersIcon class="w-5 h-5" />
                     <span>Jadwal Bimbingan</span>
+                </Link>
+                <Link
+                    :href="route('mahasiswa.calendar')"
+                    :class="[
+                        route().current('mahasiswa.calendar')
+                            ? 'bg-blue-50 text-blue-700 font-semibold'
+                            : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900',
+                    ]"
+                    class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors"
+                >
+                    <CalendarDaysIcon class="w-5 h-5" />
+                    <span>Kalender Akademik</span>
                 </Link>
             </nav>
             <div class="p-4 border-t border-slate-200">
@@ -83,9 +96,7 @@
                         <p class="text-sm font-semibold text-slate-800 truncate">
                             {{ $page.props.auth.user.name }}
                         </p>
-                        <p class="text-xs text-slate-500">
-                            Student
-                        </p>
+                        <p class="text-xs text-slate-500">Student</p>
                     </div>
                 </div>
             </div>
@@ -136,9 +147,7 @@
                                 <div
                                     class="p-4 border-b border-slate-50 bg-slate-50/50 flex justify-between items-center"
                                 >
-                                    <h3 class="font-bold text-slate-800 text-sm">
-                                        Notifikasi
-                                    </h3>
+                                    <h3 class="font-bold text-slate-800 text-sm">Notifikasi</h3>
                                     <button
                                         class="text-xs text-blue-600 font-bold hover:underline"
                                         @click="showNotifications = false"
@@ -157,10 +166,7 @@
                                                 :class="notif.color"
                                                 class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
                                             >
-                                                <component
-                                                    :is="notif.icon"
-                                                    class="w-5 h-5"
-                                                />
+                                                <component :is="notif.icon" class="w-5 h-5" />
                                             </div>
                                             <div>
                                                 <p
@@ -247,7 +253,11 @@
         if (route().current('mahasiswa.study-plans.index')) return 'Study Plans (KRS)';
         if (route().current('mahasiswa.progress.index')) return 'Progress Studi';
         if (route().current('mahasiswa.calendar')) return 'Academic Calendar';
-        if (route().current('mahasiswa.jadwal.*') || route().current('mahasiswa.jadwal-bimbingan.*')) return 'Jadwal Bimbingan';
+        if (
+            route().current('mahasiswa.jadwal.*') ||
+            route().current('mahasiswa.jadwal-bimbingan.*')
+        )
+            return 'Jadwal Bimbingan';
         return 'SIBIMA';
     });
 
@@ -257,7 +267,11 @@
         if (route().current('mahasiswa.study-plans.index')) return 'KRS Management';
         if (route().current('mahasiswa.progress.index')) return 'Achievement Tracking';
         if (route().current('mahasiswa.calendar')) return 'Event Schedule';
-        if (route().current('mahasiswa.jadwal.*') || route().current('mahasiswa.jadwal-bimbingan.*')) return 'Bimbingan Akademik';
+        if (
+            route().current('mahasiswa.jadwal.*') ||
+            route().current('mahasiswa.jadwal-bimbingan.*')
+        )
+            return 'Bimbingan Akademik';
         return 'Portal Mahasiswa';
     });
 

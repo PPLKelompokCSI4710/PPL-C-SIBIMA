@@ -18,6 +18,7 @@ class JadwalBimbingan extends Model
         'judul_ta',
         'topik_bimbingan',
         'tipe',
+        'lokasi',
         'status',
     ];
 

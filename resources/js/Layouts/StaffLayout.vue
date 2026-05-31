@@ -82,6 +82,20 @@
                         <TrendingUpIcon class="w-5 h-5" />
                         <span>Progres Mahasiswa</span>
                     </Link>
+
+                    <!-- Dosen & Admin: Kalender Akademik -->
+                    <Link
+                        :href="route('staff.calendar')"
+                        :class="[
+                            route().current('staff.calendar')
+                                ? 'bg-indigo-50 text-indigo-700 font-semibold'
+                                : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900',
+                        ]"
+                        class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors"
+                    >
+                        <CalendarDaysIcon class="w-5 h-5" />
+                        <span>Kalender Akademik</span>
+                    </Link>
                 </nav>
             </div>
 
@@ -149,6 +163,7 @@
         TrendingUpIcon,
         LogOutIcon,
         BellIcon,
+        CalendarDaysIcon,
     } from 'lucide-vue-next';
 
     const page = usePage();
@@ -160,6 +175,7 @@
         if (route().current('staff.courses.index')) return 'Manajemen Kursus';
         if (route().current('staff.study-plans.index')) return 'Persetujuan KRS';
         if (route().current('staff.progress.index')) return 'Progres Mahasiswa';
+        if (route().current('staff.calendar')) return 'Kalender Akademik';
         return 'Staff Portal';
     });
 </script>

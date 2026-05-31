@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\GoogleCalendarAuthController;
 use App\Http\Controllers\JadwalRequestController;
 use App\Http\Controllers\KalenderAkademikController;
 use App\Http\Controllers\ProfileController;
@@ -38,6 +39,10 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/settings/reminders', [ReminderSettingsController::class, 'edit'])->name('reminders.edit');
     Route::post('/settings/reminders', [ReminderSettingsController::class, 'update'])->name('reminders.update');
+
+    // Google Calendar Connection Routes
+    Route::get('/google/connect', [GoogleCalendarAuthController::class, 'redirectToGoogle'])->name('google.connect');
+    Route::get('/google/callback', [GoogleCalendarAuthController::class, 'handleGoogleCallback'])->name('google.callback');
 });
 
 require __DIR__.'/auth.php';

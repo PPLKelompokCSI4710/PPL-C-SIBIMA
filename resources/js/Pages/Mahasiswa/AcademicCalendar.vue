@@ -27,7 +27,7 @@
                     <div
                         class="bg-white p-6 md:p-8 rounded-3xl border border-slate-200 shadow-sm transition-all"
                     >
-                        <div class="flex items-center justify-between mb-8">
+                        <div class="flex items-center justify-between mb-8 flex-wrap gap-4">
                             <div>
                                 <h3 class="text-2xl font-black text-slate-800 tracking-tight">
                                     {{ currentMonthName }} {{ currentYear }}
@@ -36,6 +36,33 @@
                                     Klik tanggal untuk melihat kegiatan akademik dalam pop-up modal
                                 </p>
                             </div>
+
+                            <!-- Google Calendar Connect Section -->
+                            <div class="flex items-center gap-3">
+                                <a
+                                    v-if="!isGoogleConnected"
+                                    :href="route('google.connect')"
+                                    class="inline-flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-xl text-xs font-bold text-slate-600 hover:text-blue-600 hover:border-blue-200 shadow-sm transition-all"
+                                >
+                                    <svg
+                                        class="w-4 h-4 fill-current text-blue-500"
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <path
+                                            d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"
+                                        />
+                                    </svg>
+                                    <span>Hubungkan Google Calendar</span>
+                                </a>
+                                <div
+                                    v-else
+                                    class="inline-flex items-center gap-2 px-4 py-2 bg-emerald-50 border border-emerald-200 rounded-xl text-xs font-bold text-emerald-700 shadow-sm animate-pulse"
+                                >
+                                    <span class="w-2 h-2 rounded-full bg-emerald-500" />
+                                    <span>Terhubung ke Google Calendar</span>
+                                </div>
+                            </div>
+
                             <div class="flex gap-2.5">
                                 <button
                                     class="p-2 bg-slate-50 border border-slate-200 rounded-xl hover:bg-slate-100 hover:text-blue-600 active:scale-95 transition-all"
@@ -235,82 +262,254 @@
                             </span>
                         </div>
 
-                        <!-- Events List -->
-                        <div v-if="selectedDateEvents.length > 0" class="space-y-4 pt-2">
-                            <div
-                                v-for="(event, eIdx) in selectedDateEvents"
-                                :key="eIdx"
-                                class="p-4 bg-slate-50/80 rounded-2xl border border-slate-100 flex flex-col gap-3.5"
-                            >
-                                <div class="space-y-1.5">
-                                    <div class="flex items-center gap-2 flex-wrap">
-                                        <span
-                                            class="px-2 py-0.5 text-[9px] font-black tracking-wider uppercase rounded"
-                                            :class="event.color"
-                                        >
-                                            {{ event.badge }}
-                                        </span>
-                                        <h5
-                                            class="text-base font-black text-slate-800 leading-snug"
-                                        >
-                                            {{ event.title }}
-                                        </h5>
-                                    </div>
-                                    <p class="text-sm text-slate-600 font-medium leading-relaxed">
-                                        {{ event.desc }}
-                                    </p>
-                                </div>
-
-                                <!-- Time, Location & Google Sync Button -->
+                        <!-- Switch between Events List and Booking Form -->
+                        <div v-if="!showBookingForm" class="space-y-4">
+                            <!-- Events List -->
+                            <div v-if="selectedDateEvents.length > 0" class="space-y-4 pt-2">
                                 <div
-                                    class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-3 border-t border-slate-200/60 text-xs text-slate-500"
+                                    v-for="(event, eIdx) in selectedDateEvents"
+                                    :key="eIdx"
+                                    class="p-4 bg-slate-50/80 rounded-2xl border border-slate-100 flex flex-col gap-3.5"
                                 >
                                     <div class="space-y-1.5">
-                                        <div class="flex items-center gap-2">
-                                            <ClockIcon class="w-4 h-4 text-blue-500 shrink-0" />
-                                            <span class="font-semibold">{{ event.time }}</span>
-                                        </div>
-                                        <div class="flex items-center gap-2">
-                                            <MapPinIcon class="w-4 h-4 text-emerald-500 shrink-0" />
+                                        <div class="flex items-center gap-2 flex-wrap">
                                             <span
-                                                class="font-semibold truncate max-w-[200px]"
-                                                :title="event.location"
-                                                >{{ event.location }}</span
+                                                class="px-2 py-0.5 text-[9px] font-black tracking-wider uppercase rounded"
+                                                :class="event.color"
                                             >
+                                                {{ event.badge }}
+                                            </span>
+                                            <h5
+                                                class="text-base font-black text-slate-800 leading-snug"
+                                            >
+                                                {{ event.title }}
+                                            </h5>
                                         </div>
+                                        <p
+                                            class="text-sm text-slate-600 font-medium leading-relaxed"
+                                        >
+                                            {{ event.desc }}
+                                        </p>
                                     </div>
 
-                                    <!-- Google Calendar Button -->
-                                    <a
-                                        :href="getGoogleCalendarUrl(event)"
-                                        target="_blank"
-                                        class="inline-flex items-center gap-2 px-3.5 py-2 bg-[#1a73e8] hover:bg-[#1557b0] text-white font-bold rounded-xl shadow-sm hover:shadow-md transition-all duration-200 active:scale-95 text-center justify-center shrink-0"
+                                    <!-- Time, Location & Google Sync Button -->
+                                    <div
+                                        class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-3 border-t border-slate-200/60 text-xs text-slate-500"
                                     >
-                                        <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
-                                            <path
-                                                d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"
-                                            />
-                                        </svg>
-                                        <span>Google Calendar</span>
-                                    </a>
+                                        <div class="space-y-1.5">
+                                            <div class="flex items-center gap-2">
+                                                <ClockIcon class="w-4 h-4 text-blue-500 shrink-0" />
+                                                <span class="font-semibold">{{ event.time }}</span>
+                                            </div>
+                                            <div class="flex items-center gap-2">
+                                                <MapPinIcon
+                                                    class="w-4 h-4 text-emerald-500 shrink-0"
+                                                />
+                                                <span
+                                                    class="font-semibold truncate max-w-[200px]"
+                                                    :title="event.location"
+                                                    >{{ event.location }}</span
+                                                >
+                                            </div>
+                                        </div>
+
+                                        <!-- Google Calendar Button -->
+                                        <a
+                                            :href="getGoogleCalendarUrl(event)"
+                                            target="_blank"
+                                            class="inline-flex items-center gap-2 px-3.5 py-2 bg-[#1a73e8] hover:bg-[#1557b0] text-white font-bold rounded-xl shadow-sm hover:shadow-md transition-all duration-200 active:scale-95 text-center justify-center shrink-0"
+                                        >
+                                            <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                                                <path
+                                                    d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"
+                                                />
+                                            </svg>
+                                            <span>Google Calendar</span>
+                                        </a>
+                                    </div>
                                 </div>
+                            </div>
+
+                            <!-- Empty State -->
+                            <div
+                                v-else
+                                class="py-10 text-center flex flex-col items-center justify-center text-slate-400"
+                            >
+                                <CalendarIcon class="w-16 h-16 text-slate-200 mb-3 stroke-[1.2]" />
+                                <p class="text-base font-black text-slate-600">
+                                    Tidak ada kegiatan terjadwal
+                                </p>
+                                <p
+                                    class="text-xs text-slate-400 mt-1 max-w-[250px] mx-auto leading-relaxed"
+                                >
+                                    Hari ini bebas dari kegiatan akademik. Silakan cek tanggal
+                                    lainnya.
+                                </p>
+                            </div>
+
+                            <!-- Request Advisement Direct Link -->
+                            <div class="pt-4 border-t border-slate-250 flex flex-col gap-3">
+                                <button
+                                    class="w-full inline-flex items-center justify-center gap-2 px-5 py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-2xl shadow-sm hover:shadow-md transition-all duration-200 active:scale-95 text-sm"
+                                    @click="initBookingForm"
+                                >
+                                    <svg
+                                        class="w-4.5 h-4.5"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                        stroke-width="2"
+                                    >
+                                        <path
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            d="M12 4.5v15m7.5-7.5h-15"
+                                        />
+                                    </svg>
+                                    <span>Ajukan Bimbingan Baru</span>
+                                </button>
                             </div>
                         </div>
 
-                        <!-- Empty State -->
-                        <div
-                            v-else
-                            class="py-10 text-center flex flex-col items-center justify-center text-slate-400"
-                        >
-                            <CalendarIcon class="w-16 h-16 text-slate-200 mb-3 stroke-[1.2]" />
-                            <p class="text-base font-black text-slate-600">
-                                Tidak ada kegiatan terjadwal
-                            </p>
-                            <p
-                                class="text-xs text-slate-400 mt-1 max-w-[250px] mx-auto leading-relaxed"
-                            >
-                                Hari ini bebas dari kegiatan akademik. Silakan cek tanggal lainnya.
-                            </p>
+                        <!-- Advisement Booking Form -->
+                        <div v-else class="space-y-4 pt-2">
+                            <div class="flex items-center justify-between">
+                                <h5
+                                    class="text-sm font-bold text-slate-800 uppercase tracking-wider"
+                                >
+                                    Form Pengajuan Bimbingan
+                                </h5>
+                                <button
+                                    class="text-xs text-blue-600 hover:text-blue-800 font-bold"
+                                    @click="showBookingForm = false"
+                                >
+                                    ← Kembali
+                                </button>
+                            </div>
+
+                            <form class="space-y-4" @submit.prevent="submitBimbinganBooking">
+                                <!-- Dosen Selection -->
+                                <div>
+                                    <label
+                                        class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2"
+                                        >Dosen Pembimbing</label
+                                    >
+                                    <select
+                                        v-model="bookingForm.dosen_id"
+                                        class="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                                        required
+                                    >
+                                        <option value="" disabled>Pilih Dosen Pembimbing</option>
+                                        <option v-for="d in dosenList" :key="d.id" :value="d.id">
+                                            {{ d.nama_lengkap }}
+                                        </option>
+                                    </select>
+                                </div>
+
+                                <!-- Time Slot Selection -->
+                                <div>
+                                    <label
+                                        class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2"
+                                        >Pilih Slot Waktu</label
+                                    >
+                                    <select
+                                        v-model="bookingForm.ketersediaan_jadwal_id"
+                                        class="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-100 disabled:bg-slate-50"
+                                        :disabled="
+                                            !bookingForm.dosen_id ||
+                                            isLoadingSchedules ||
+                                            availableSchedules.length === 0
+                                        "
+                                        required
+                                    >
+                                        <option value="" disabled>
+                                            <template v-if="isLoadingSchedules">
+                                                Memuat jadwal...
+                                            </template>
+                                            <template v-else-if="!bookingForm.dosen_id">
+                                                Pilih dosen terlebih dahulu
+                                            </template>
+                                            <template v-else-if="availableSchedules.length === 0">
+                                                Tidak ada jadwal tersedia di tanggal ini
+                                            </template>
+                                            <template v-else> Pilih Slot Tersedia </template>
+                                        </option>
+                                        <option
+                                            v-for="s in availableSchedules"
+                                            :key="s.id"
+                                            :value="s.id"
+                                            :disabled="s.has_clash || s.kuota <= 0"
+                                        >
+                                            {{ s.waktu_mulai.substring(0, 5) }} -
+                                            {{ s.waktu_selesai.substring(0, 5) }}
+                                            {{
+                                                s.has_clash
+                                                    ? ' (Dosen Sedang Ada Kegiatan)'
+                                                    : ` (Sisa Kuota: ${s.kuota})`
+                                            }}
+                                        </option>
+                                    </select>
+                                </div>
+
+                                <!-- Warning Clash Pop-up Alert -->
+                                <div
+                                    v-if="selectedSlotHasClash"
+                                    class="p-4 bg-amber-50 border border-amber-200 rounded-2xl text-xs text-amber-800 font-medium"
+                                >
+                                    ⚠️ Maaf dosen sedang ada kegiatan, mohon pilih jadwal lain.
+                                </div>
+
+                                <!-- Judul TA -->
+                                <div>
+                                    <label
+                                        class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2"
+                                        >Judul Tugas Akhir / Skripsi</label
+                                    >
+                                    <input
+                                        v-model="bookingForm.judul_ta"
+                                        type="text"
+                                        placeholder="Masukkan judul skripsi..."
+                                        class="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                                        required
+                                    />
+                                </div>
+
+                                <!-- Topik Bimbingan -->
+                                <div>
+                                    <label
+                                        class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2"
+                                        >Topik Bahasan</label
+                                    >
+                                    <textarea
+                                        v-model="bookingForm.topik_bimbingan"
+                                        rows="3"
+                                        placeholder="Tuliskan topik yang ingin dikonsultasikan..."
+                                        class="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                                        required
+                                    />
+                                </div>
+
+                                <div class="flex justify-end gap-3 pt-2">
+                                    <button
+                                        type="button"
+                                        class="px-5 py-2.5 bg-slate-100 text-slate-600 font-bold rounded-xl text-sm hover:bg-slate-200 transition active:scale-95"
+                                        @click="showBookingForm = false"
+                                    >
+                                        Batal
+                                    </button>
+                                    <button
+                                        type="submit"
+                                        class="px-5 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-xl text-sm transition active:scale-95 disabled:opacity-50"
+                                        :disabled="selectedSlotHasClash || bookingForm.processing"
+                                    >
+                                        {{
+                                            bookingForm.processing
+                                                ? 'Mengirim...'
+                                                : 'Kirim Pengajuan'
+                                        }}
+                                    </button>
+                                </div>
+                            </form>
                         </div>
                     </div>
 
@@ -318,7 +517,10 @@
                     <div class="px-6 py-4 bg-slate-50 border-t border-slate-100 flex justify-end">
                         <button
                             class="px-5 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-600 hover:bg-slate-50 transition active:scale-95"
-                            @click="isDetailModalOpen = false"
+                            @click="
+                                isDetailModalOpen = false;
+                                showBookingForm = false;
+                            "
                         >
                             Tutup
                         </button>
@@ -344,14 +546,87 @@
         XIcon,
     } from 'lucide-vue-next';
 
-    defineProps({
+    import { usePage, useForm } from '@inertiajs/vue3';
+    import axios from 'axios';
+    import { watch } from 'vue';
+
+    const props = defineProps({
         auth: { type: Object, default: () => ({}) },
+        kalender: { type: Array, default: () => [] },
+        requests: { type: Array, default: () => [] },
+        dosenList: { type: Array, default: () => [] },
     });
 
     // Calendar States
     const currentDate = ref(new Date(2026, 4, 1)); // Default starts on May 2026
     const selectedDay = ref(15); // Default active date (selected date: 15)
     const isDetailModalOpen = ref(false); // Modal visibility state
+
+    const page = usePage();
+    const isGoogleConnected = computed(() => !!page.props.auth.user?.google_access_token);
+
+    // Advisement Booking form inside calendar popup
+    const showBookingForm = ref(false);
+    const bookingForm = useForm({
+        dosen_id: '',
+        ketersediaan_jadwal_id: '',
+        judul_ta: '',
+        topik_bimbingan: '',
+    });
+
+    const schedulesList = ref([]);
+    const isLoadingSchedules = ref(false);
+
+    watch(
+        () => bookingForm.dosen_id,
+        async (newDosenId) => {
+            bookingForm.ketersediaan_jadwal_id = '';
+            schedulesList.value = [];
+            if (!newDosenId) return;
+
+            isLoadingSchedules.value = true;
+            try {
+                const response = await axios.get(
+                    route('mahasiswa.jadwal-bimbingan.schedules', newDosenId),
+                );
+                schedulesList.value = response.data;
+            } catch (error) {
+                console.error('Failed to load schedules', error);
+            } finally {
+                isLoadingSchedules.value = false;
+            }
+        },
+    );
+
+    // Filter available schedules to matches selected calendar date
+    const availableSchedules = computed(() => {
+        if (!selectedDay.value || schedulesList.value.length === 0) return [];
+        const pad = (n) => String(n).padStart(2, '0');
+        const selectedDateStr = `${currentDate.value.getFullYear()}-${pad(currentDate.value.getMonth() + 1)}-${pad(selectedDay.value)}`;
+        return schedulesList.value.filter((s) => s.tanggal === selectedDateStr);
+    });
+
+    const selectedSlotHasClash = computed(() => {
+        const selectedSlot = availableSchedules.value.find(
+            (s) => s.id === bookingForm.ketersediaan_jadwal_id,
+        );
+        return selectedSlot ? !!selectedSlot.has_clash : false;
+    });
+
+    const initBookingForm = () => {
+        showBookingForm.value = true;
+        bookingForm.reset();
+    };
+
+    const submitBimbinganBooking = () => {
+        bookingForm.post(route('mahasiswa.jadwal-bimbingan.store'), {
+            onSuccess: () => {
+                showBookingForm.value = false;
+                isDetailModalOpen.value = false;
+                bookingForm.reset();
+            },
+        });
+    };
 
     const monthNames = [
         'Januari',
@@ -405,86 +680,118 @@
         selectedDay.value = 1;
     };
 
-    // Full List of Academic Calendar Events (total 7 events for testing scrollbar and clicks)
-    const events = ref([
-        {
-            day: 3,
-            month: 4, // Mei (0-indexed)
-            year: 2026,
-            title: 'Batas Akhir Revisi KRS',
-            desc: 'Batas akhir untuk melakukan revisi rencana studi. Pastikan KRS sudah disetujui Dosen Pembimbing Akademik.',
-            time: '23:59 WIB',
-            location: 'Portal Online SIBIMA',
-            color: 'bg-blue-50 text-blue-700 border-blue-200',
-            badge: 'KRS',
-        },
-        {
-            day: 10,
-            month: 4,
-            year: 2026,
-            title: 'Awal Perkuliahan Genap',
-            desc: 'Hari pertama perkuliahan Semester Genap dimulai. Mahasiswa wajib hadir di kelas masing-masing.',
-            time: '08:00 - 16:00 WIB',
-            location: 'Gedung A, B & C Ruang Teori',
-            color: 'bg-emerald-50 text-emerald-700 border-emerald-200',
-            badge: 'Kuliah',
-        },
-        {
-            day: 12,
-            month: 4,
-            year: 2026,
-            title: 'Kelas Metodologi Penelitian',
-            desc: 'Pertemuan perdana asistensi proposal tugas akhir/skripsi dan pembagian kelompok dosen pembimbing.',
-            time: '10:00 - 12:00 WIB',
-            location: 'Gedung C R.302 Fasilkom',
-            color: 'bg-indigo-50 text-indigo-700 border-indigo-200',
-            badge: 'Asistensi',
-        },
-        {
-            day: 15,
-            month: 4,
-            year: 2026,
-            title: 'Dies Natalis Universitas',
-            desc: 'Hari libur akademik memperingati hari jadi Universitas SIBIMA yang ke-45. Kegiatan perkuliahan ditiadakan.',
-            time: 'Seharian penuh',
-            location: 'Kampus Pusat SIBIMA',
-            color: 'bg-purple-50 text-purple-700 border-purple-200',
-            badge: 'Libur',
-        },
-        {
-            day: 20,
-            month: 4,
-            year: 2026,
-            title: 'Bimbingan Akademik Tengah Semester',
-            desc: 'Konsultasi wajib perkembangan kemajuan studi dan evaluasi nilai tengah semester bersama Dosen Wali.',
-            time: '13:00 - 15:00 WIB',
-            location: 'Ruang Rapat Gedung D R.104',
-            color: 'bg-teal-50 text-teal-700 border-teal-200',
-            badge: 'Bimbingan',
-        },
-        {
-            day: 24,
-            month: 4,
-            year: 2026,
-            title: 'Pengumpulan Tugas Mandiri 1',
-            desc: 'Batas akhir pengunggahan tugas mandiri pertama untuk mata kuliah keahlian di sistem e-learning.',
-            time: '17:00 WIB',
-            location: 'E-Learning Center SIBIMA',
-            color: 'bg-amber-50 text-amber-700 border-amber-200',
-            badge: 'Tugas',
-        },
-        {
-            day: 28,
-            month: 4,
-            year: 2026,
-            title: 'Webinar Publikasi Karya Ilmiah',
-            desc: 'Seminar nasional penulisan karya tulis ilmiah untuk persiapan kelulusan mahasiswa tingkat akhir.',
-            time: '09:00 - 12:00 WIB',
-            location: 'Zoom Webinar Online',
-            color: 'bg-rose-50 text-rose-700 border-rose-200',
-            badge: 'Seminar',
-        },
-    ]);
+    // Full List of Academic Calendar Events (load from DB kalender, falling back to mock if empty)
+    const events = computed(() => {
+        if (props.kalender && props.kalender.length > 0) {
+            return props.kalender.map((k) => {
+                const date = new Date(k.tanggal_mulai);
+                const type = (k.tipe_kegiatan || 'kegiatan').toLowerCase();
+                let color = 'bg-blue-50 text-blue-700 border-blue-200';
+                if (type === 'kuliah') color = 'bg-emerald-50 text-emerald-700 border-emerald-200';
+                if (type === 'rapat') color = 'bg-amber-50 text-amber-700 border-amber-200';
+                if (type === 'bimbingan') color = 'bg-purple-50 text-purple-700 border-purple-200';
+                if (type === 'asistensi') color = 'bg-indigo-50 text-indigo-700 border-indigo-200';
+                if (type === 'libur') color = 'bg-rose-50 text-rose-700 border-rose-200';
+
+                return {
+                    id: k.id,
+                    day: date.getDate(),
+                    month: date.getMonth(),
+                    year: date.getFullYear(),
+                    title: k.nama_kegiatan,
+                    desc: k.deskripsi || '',
+                    time: k.jam_mulai ? k.jam_mulai.substring(0, 5) + ' WIB' : 'Seharian penuh',
+                    location:
+                        k.deskripsi && k.deskripsi.includes('(Lokasi: ')
+                            ? k.deskripsi.split('(Lokasi: ')[1].replace(')', '')
+                            : 'Portal SIBIMA',
+                    color: color,
+                    badge: k.tipe_kegiatan ? k.tipe_kegiatan.toUpperCase() : 'KEGIATAN',
+                };
+            });
+        }
+
+        // Fallback to original mock events if no database events exist
+        return [
+            {
+                day: 3,
+                month: 4, // Mei (0-indexed)
+                year: 2026,
+                title: 'Batas Akhir Revisi KRS',
+                desc: 'Batas akhir untuk melakukan revisi rencana studi. Pastikan KRS sudah disetujui Dosen Pembimbing Akademik.',
+                time: '23:59 WIB',
+                location: 'Portal Online SIBIMA',
+                color: 'bg-blue-50 text-blue-700 border-blue-200',
+                badge: 'KRS',
+            },
+            {
+                day: 10,
+                month: 4,
+                year: 2026,
+                title: 'Awal Perkuliahan Genap',
+                desc: 'Hari pertama perkuliahan Semester Genap dimulai. Mahasiswa wajib hadir di kelas masing-masing.',
+                time: '08:00 - 16:00 WIB',
+                location: 'Gedung A, B & C Ruang Teori',
+                color: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+                badge: 'KULIAH',
+            },
+            {
+                day: 12,
+                month: 4,
+                year: 2026,
+                title: 'Kelas Metodologi Penelitian',
+                desc: 'Pertemuan perdana asistensi proposal tugas akhir/skripsi dan pembagian kelompok dosen pembimbing.',
+                time: '10:00 - 12:00 WIB',
+                location: 'Gedung C R.302 Fasilkom',
+                color: 'bg-indigo-50 text-indigo-700 border-indigo-200',
+                badge: 'ASISTENSI',
+            },
+            {
+                day: 15,
+                month: 4,
+                year: 2026,
+                title: 'Dies Natalis Universitas',
+                desc: 'Hari libur akademik memperingati hari jadi Universitas SIBIMA yang ke-45. Kegiatan perkuliahan ditiadakan.',
+                time: 'Seharian penuh',
+                location: 'Kampus Pusat SIBIMA',
+                color: 'bg-purple-50 text-purple-700 border-purple-200',
+                badge: 'LIBUR',
+            },
+            {
+                day: 20,
+                month: 4,
+                year: 2026,
+                title: 'Bimbingan Akademik Tengah Semester',
+                desc: 'Konsultasi wajib perkembangan kemajuan studi dan evaluasi nilai tengah semester bersama Dosen Wali.',
+                time: '13:00 - 15:00 WIB',
+                location: 'Ruang Rapat Gedung D R.104',
+                color: 'bg-teal-50 text-teal-700 border-teal-200',
+                badge: 'BIMBINGAN',
+            },
+            {
+                day: 24,
+                month: 4,
+                year: 2026,
+                title: 'Pengumpulan Tugas Mandiri 1',
+                desc: 'Batas akhir pengunggahan tugas mandiri pertama untuk mata kuliah keahlian di sistem e-learning.',
+                time: '17:00 WIB',
+                location: 'E-Learning Center SIBIMA',
+                color: 'bg-amber-50 text-amber-700 border-amber-200',
+                badge: 'TUGAS',
+            },
+            {
+                day: 28,
+                month: 4,
+                year: 2026,
+                title: 'Webinar Publikasi Karya Ilmiah',
+                desc: 'Seminar nasional penulisan karya tulis ilmiah untuk persiapan kelulusan mahasiswa tingkat akhir.',
+                time: '09:00 - 12:00 WIB',
+                location: 'Zoom Webinar Online',
+                color: 'bg-rose-50 text-rose-700 border-rose-200',
+                badge: 'SEMINAR',
+            },
+        ];
+    });
 
     // Format Full Date String Indonesian Style
     const formatDateString = (day, month, year) => {
