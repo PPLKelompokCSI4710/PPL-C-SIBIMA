@@ -76,6 +76,9 @@
                     :href="route('mahasiswa.calendar')"
                     :class="[
                         route().current('mahasiswa.calendar')
+                    :href="route('mahasiswa.bimbingan.reminder')"
+                    :class="[
+                        route().current('mahasiswa.bimbingan.reminder')
                             ? 'bg-blue-50 text-blue-700 font-semibold'
                             : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900',
                     ]"
@@ -83,6 +86,20 @@
                 >
                     <CalendarDaysIcon class="w-5 h-5" />
                     <span>Kalender Akademik</span>
+                    <BellIcon class="w-5 h-5" />
+                    <span>Reminder Jadwal</span>
+                </Link>
+                <Link
+                    :href="route('mahasiswa.bimbingan.progress_reminder')"
+                    :class="[
+                        route().current('mahasiswa.bimbingan.progress_reminder')
+                            ? 'bg-blue-50 text-blue-700 font-semibold'
+                            : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900',
+                    ]"
+                    class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors"
+                >
+                    <TrendingUpIcon class="w-5 h-5" />
+                    <span>Reminder Progres</span>
                 </Link>
             </nav>
             <div class="p-4 border-t border-slate-200">
@@ -225,12 +242,15 @@
             class="fixed inset-0 z-40"
             @click="showNotifications = false"
         />
+        <!-- SIBIMA AI Assistant Floating Widget -->
+        <AiAssistantWidget />
     </div>
 </template>
 
 <script setup>
     import { ref, computed } from 'vue';
     import { Link } from '@inertiajs/vue3';
+    import AiAssistantWidget from '@/Components/AiAssistantWidget.vue';
     import {
         GraduationCapIcon,
         LayoutDashboardIcon,
@@ -258,6 +278,9 @@
             route().current('mahasiswa.jadwal-bimbingan.*')
         )
             return 'Jadwal Bimbingan';
+        if (route().current('mahasiswa.bimbingan.reminder')) return 'Reminder Jadwal Bimbingan';
+        if (route().current('mahasiswa.bimbingan.progress_reminder'))
+            return 'Monitoring Progres Akademik';
         return 'SIBIMA';
     });
 
@@ -272,6 +295,9 @@
             route().current('mahasiswa.jadwal-bimbingan.*')
         )
             return 'Bimbingan Akademik';
+        if (route().current('mahasiswa.bimbingan.reminder')) return 'Informasi Reminder Jadwal';
+        if (route().current('mahasiswa.bimbingan.progress_reminder'))
+            return 'Frekuensi Notifikasi Progres';
         return 'Portal Mahasiswa';
     });
 

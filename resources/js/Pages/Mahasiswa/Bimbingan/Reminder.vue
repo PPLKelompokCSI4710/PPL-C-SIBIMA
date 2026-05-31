@@ -1,74 +1,33 @@
 <script setup>
-    import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+    import StudentLayout from '@/Layouts/StudentLayout.vue';
     import { Head } from '@inertiajs/vue3';
     import { ref, onMounted } from 'vue';
 
-    // Mock data (Normally passed via props from controller)
+    // Data passed from BimbinganReminderController
     const props = defineProps({
         upcomingBimbingan: {
             type: Object,
-            default: () => ({
-                dosen: 'Dr. Budi Santoso, M.Kom',
-                topic: 'Review Draft Bab 3 & Analisis Data',
-                date: '2026-04-25',
-                dateFormatted: '25 April 2026',
-                timeFormatted: '10:00 - 11:30 WIB',
-                location: 'Ruang Rapat Gedung Kuliah Utama (Lantai 2)',
-                status: 'Upcoming',
-                preparationNotes: [
-                    'Cetak draft Bab 3 sebanyak 1 rangkap',
-                    'Siapkan dataset yang akan dianalisis',
-                    'Isi logbook progres sebelumnya',
-                ],
-                type: 'Offline',
-            }),
+            default: () => null,
         },
     });
 
     // Calculate countdown
     const daysLeft = ref(0);
     onMounted(() => {
-        const target = new Date(props.upcomingBimbingan.date);
-        const today = new Date();
-        const diffTime = Math.abs(target - today);
-        daysLeft.value = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        if (props.upcomingBimbingan && props.upcomingBimbingan.date) {
+            const target = new Date(props.upcomingBimbingan.date);
+            const today = new Date();
+            const diffTime = Math.abs(target - today);
+            daysLeft.value = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        }
     });
 </script>
 
 <template>
     <Head title="Reminder Bimbingan" />
 
-    <AuthenticatedLayout>
-        <template #header>
-            <div class="flex items-center justify-between">
-                <h2
-                    class="text-2xl font-black leading-tight tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-blue-700 to-indigo-600 drop-shadow-sm"
-                >
-                    Reminder Bimbingan
-                </h2>
-                <span
-                    class="inline-flex items-center px-4 py-1.5 rounded-full text-sm font-semibold bg-blue-100 text-blue-800 ring-1 ring-blue-400"
-                >
-                    <svg
-                        class="w-4 h-4 mr-2"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                        xmlns="http://www.w3.org/2000/svg"
-                    >
-                        <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                        />
-                    </svg>
-                    Jadwal Terdekat
-                </span>
-            </div>
-        </template>
-
-        <div class="py-12 min-h-screen bg-brand-bg relative overflow-hidden">
+    <StudentLayout>
+        <div class="py-6 bg-brand-bg relative overflow-hidden">
             <!-- Decorative background elements -->
             <div
                 class="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 rounded-full bg-blue-400/20 blur-3xl mix-blend-multiply"
@@ -76,6 +35,17 @@
             <div
                 class="absolute bottom-0 left-0 -ml-20 -mb-20 w-80 h-80 rounded-full bg-indigo-400/20 blur-3xl mix-blend-multiply"
             />
+
+            <!-- Header Title -->
+            <div class="mx-auto max-w-5xl sm:px-6 lg:px-8 relative z-10 mb-8">
+                <h1 class="text-3xl font-black text-brand-primary-dark tracking-tight">
+                    Reminder Bimbingan
+                </h1>
+                <p class="text-brand-text-secondary text-sm mt-1">
+                    Detail jadwal bimbingan Anda yang akan datang beserta preferensi pengingat
+                    otomatis.
+                </p>
+            </div>
 
             <div class="mx-auto max-w-5xl sm:px-6 lg:px-8 relative z-10">
                 <div
@@ -93,6 +63,7 @@
 
                 <!-- Main Card -->
                 <div
+                    v-if="props.upcomingBimbingan"
                     class="bg-white/80 backdrop-blur-xl shadow-2xl rounded-3xl border border-white/60 overflow-hidden transition-all duration-500 hover:shadow-blue-500/10"
                 >
                     <div class="grid grid-cols-1 md:grid-cols-3">
@@ -349,5 +320,5 @@
                 </div>
             </div>
         </div>
-    </AuthenticatedLayout>
+    </StudentLayout>
 </template>

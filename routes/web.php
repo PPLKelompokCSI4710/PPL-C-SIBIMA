@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\GoogleCalendarAuthController;
+use App\Http\Controllers\AiChatController;
 use App\Http\Controllers\JadwalRequestController;
 use App\Http\Controllers\KalenderAkademikController;
 use App\Http\Controllers\ProfileController;
@@ -17,6 +18,8 @@ Route::get('/', function () {
         'phpVersion' => PHP_VERSION,
     ]);
 });
+
+Route::post('/api/ai-chat', [AiChatController::class, 'generate'])->name('api.ai-chat');
 
 Route::get('/dashboard', function () {
     $user = auth()->user();
