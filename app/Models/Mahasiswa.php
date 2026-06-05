@@ -13,6 +13,24 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Mahasiswa extends Model
 {
+    use SoftDeletes;
+
+    /**
+     * The table associated with the model.
+     * Eksplisit karena nama tabel tidak mengikuti konvensi plural Laravel.
+     */
+    protected $table = 'mahasiswa';
+
+    /**
+     * Menggunakan $guarded = [] agar semua kolom dapat di-mass assign.
+     * Form Filament sendiri sudah bertindak sebagai whitelist implisit.
+     */
+    protected $guarded = [];
+
+    /**
+     * The attributes that should be cast.
+     */
+
     use HasFactory, SoftDeletes;
 
     protected $table = 'mahasiswa';
@@ -25,7 +43,6 @@ class Mahasiswa extends Model
         'progress_reminder_frequency', 'progress_reminder_enabled', 'last_progress_reminder_sent_at',
         'consecutive_progress_reminders',
     ];
-
     protected function casts(): array
     {
         return [
