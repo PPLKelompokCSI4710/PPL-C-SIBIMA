@@ -32,6 +32,14 @@ class User extends Authenticatable
         ];
     }
 
+    public function progress()
+    {
+        return $this->hasOne(StudentProgress::class);
+    }
+
+    // Catatan: relasi dosen() dihapus karena tabel dosen telah di-drop
+    // oleh migration simplify_dosen_management. Data dosen kini disimpan
+    // langsung di tabel users (kolom program_studi, fakultas, kuota_pembimbingan).
     // =========================================================================
     // RELATIONSHIPS
     // =========================================================================

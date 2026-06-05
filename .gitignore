@@ -5,6 +5,10 @@
 .env.production
 .phpactor.json
 .phpunit.result.cache
+public/js/
+public/build/
+node_modules/
+vendor/
 /.fleet
 /.idea
 /.nova
