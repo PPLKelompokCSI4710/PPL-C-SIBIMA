@@ -9,6 +9,7 @@ use App\Http\Controllers\Mahasiswa\ProgressController;
 use App\Http\Controllers\Mahasiswa\ProgressReminderController;
 use App\Http\Controllers\Mahasiswa\StudyPlanController;
 use App\Http\Controllers\MonitoringJadwalBimbinganController;
+use App\Http\Controllers\Mahasiswa\ExportBimbinganController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -30,6 +31,7 @@ Route::middleware(['auth', 'role:mahasiswa'])->prefix('mahasiswa')->name('mahasi
     Route::get('/jadwal-bimbingan/schedules/{dosenId}', [InputJadwalBimbinganController::class, 'getSchedules'])->name('jadwal-bimbingan.schedules');
     Route::post('/jadwal-bimbingan', [InputJadwalBimbinganController::class, 'store'])->name('jadwal-bimbingan.store');
     Route::get('/jadwal-bimbingan', [MonitoringJadwalBimbinganController::class, 'index'])->name('jadwal.index');
+    Route::get('/jadwal-bimbingan/export-pdf', [ExportBimbinganController::class, 'exportPdf'])->name('jadwal.exportPdf');
     Route::patch('/jadwal-bimbingan/{id}/cancel', [MonitoringJadwalBimbinganController::class, 'cancel'])->name('jadwal.cancel');
     Route::delete('/jadwal-bimbingan/{id}', [MonitoringJadwalBimbinganController::class, 'destroy'])->name('jadwal.destroy');
 

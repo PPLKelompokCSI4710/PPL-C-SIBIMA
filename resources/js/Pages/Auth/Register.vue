@@ -5,10 +5,12 @@ import InputLabel from '@/Components/InputLabel.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import TextInput from '@/Components/TextInput.vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
+import { UserIcon, MailIcon, LockIcon, ShieldCheckIcon } from 'lucide-vue-next';
 
 const form = useForm({
     name: '',
     email: '',
+    role: 'mahasiswa',
     password: '',
     password_confirmation: '',
 });
@@ -16,19 +18,6 @@ const form = useForm({
 const submit = () => {
     form.post(route('register'), {
         onFinish: () => form.reset('password', 'password_confirmation'),
-    import GuestLayout from '@/Layouts/GuestLayout.vue';
-    import InputError from '@/Components/InputError.vue';
-    import PrimaryButton from '@/Components/PrimaryButton.vue';
-    import TextInput from '@/Components/TextInput.vue';
-    import { Head, Link, useForm } from '@inertiajs/vue3';
-    import { UserIcon, MailIcon, LockIcon, ShieldCheckIcon } from 'lucide-vue-next';
-
-    const form = useForm({
-        name: '',
-        email: '',
-        role: 'mahasiswa',
-        password: '',
-        password_confirmation: '',
     });
 };
 </script>
@@ -37,15 +26,6 @@ const submit = () => {
     <GuestLayout>
         <Head title="Daftar Akun Baru - SIBIMA" />
 
-                <TextInput
-                    id="name"
-                    type="text"
-                    class="mt-1 block w-full"
-                    v-model="form.name"
-                    required
-                    autofocus
-                    autocomplete="name"
-                />
         <div class="mb-8">
             <h1 class="text-3xl font-black text-slate-800 tracking-tight">Buat Akun</h1>
             <p class="text-slate-500 mt-2 font-medium">
@@ -54,14 +34,11 @@ const submit = () => {
         </div>
 
         <form class="space-y-5" @submit.prevent="submit">
+            <!-- Name -->
             <div>
-                <label for="name" class="block text-sm font-bold text-slate-700 mb-2"
-                    >Nama Lengkap</label
-                >
+                <InputLabel for="name" value="Nama Lengkap" />
                 <div class="relative group">
-                    <div
-                        class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400 group-focus-within:text-blue-600 transition-colors"
-                    >
+                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400 group-focus-within:text-blue-600 transition-colors">
                         <UserIcon class="w-5 h-5" />
                     </div>
                     <TextInput
@@ -78,63 +55,11 @@ const submit = () => {
                 <InputError class="mt-2" :message="form.errors.name" />
             </div>
 
+            <!-- Email -->
             <div class="mt-4">
                 <InputLabel for="email" value="Email" />
-
-                <TextInput
-                    id="email"
-                    type="email"
-                    class="mt-1 block w-full"
-                    v-model="form.email"
-                    required
-                    autocomplete="username"
-                />
-
-                <InputError class="mt-2" :message="form.errors.email" />
-            </div>
-
-            <div class="mt-4">
-                <InputLabel for="password" value="Password" />
-
-                <TextInput
-                    id="password"
-                    type="password"
-                    class="mt-1 block w-full"
-                    v-model="form.password"
-                    required
-                    autocomplete="new-password"
-                />
-
-                <InputError class="mt-2" :message="form.errors.password" />
-            </div>
-
-            <div class="mt-4">
-                <InputLabel
-                    for="password_confirmation"
-                    value="Confirm Password"
-                />
-
-                <TextInput
-                    id="password_confirmation"
-                    type="password"
-                    class="mt-1 block w-full"
-                    v-model="form.password_confirmation"
-                    required
-                    autocomplete="new-password"
-                />
-
-                <InputError
-                    class="mt-2"
-                    :message="form.errors.password_confirmation"
-                />
-            <div>
-                <label for="email" class="block text-sm font-bold text-slate-700 mb-2"
-                    >Alamat Email</label
-                >
                 <div class="relative group">
-                    <div
-                        class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400 group-focus-within:text-blue-600 transition-colors"
-                    >
+                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400 group-focus-within:text-blue-600 transition-colors">
                         <MailIcon class="w-5 h-5" />
                     </div>
                     <TextInput
@@ -150,8 +75,9 @@ const submit = () => {
                 <InputError class="mt-2" :message="form.errors.email" />
             </div>
 
-            <div>
-                <label class="block text-sm font-bold text-slate-700 mb-3">Mendaftar Sebagai</label>
+            <!-- Role Selection -->
+            <div class="mt-4">
+                <InputLabel value="Mendaftar Sebagai" />
                 <div class="grid grid-cols-3 gap-3">
                     <label class="relative cursor-pointer group">
                         <input
@@ -161,14 +87,8 @@ const submit = () => {
                             class="sr-only peer"
                             name="role"
                         />
-                        <div
-                            class="p-3 text-center border-2 border-slate-200 rounded-xl peer-checked:border-blue-600 peer-checked:bg-blue-50/50 hover:bg-slate-50 transition-all"
-                        >
-                            <p
-                                class="text-xs font-black text-slate-400 peer-checked:text-blue-600 uppercase tracking-wider"
-                            >
-                                Mahasiswa
-                            </p>
+                        <div class="p-3 text-center border-2 border-slate-200 rounded-xl peer-checked:border-blue-600 peer-checked:bg-blue-50/50 hover:bg-slate-50 transition-all">
+                            <p class="text-xs font-black text-slate-400 peer-checked:text-blue-600 uppercase tracking-wider">Mahasiswa</p>
                         </div>
                     </label>
                     <label class="relative cursor-pointer group">
@@ -179,14 +99,8 @@ const submit = () => {
                             class="sr-only peer"
                             name="role"
                         />
-                        <div
-                            class="p-3 text-center border-2 border-slate-200 rounded-xl peer-checked:border-blue-600 peer-checked:bg-blue-50/50 hover:bg-slate-50 transition-all"
-                        >
-                            <p
-                                class="text-xs font-black text-slate-400 peer-checked:text-blue-600 uppercase tracking-wider"
-                            >
-                                Dosen
-                            </p>
+                        <div class="p-3 text-center border-2 border-slate-200 rounded-xl peer-checked:border-blue-600 peer-checked:bg-blue-50/50 hover:bg-slate-50 transition-all">
+                            <p class="text-xs font-black text-slate-400 peer-checked:text-blue-600 uppercase tracking-wider">Dosen</p>
                         </div>
                     </label>
                     <label class="relative cursor-pointer group">
@@ -197,29 +111,20 @@ const submit = () => {
                             class="sr-only peer"
                             name="role"
                         />
-                        <div
-                            class="p-3 text-center border-2 border-slate-200 rounded-xl peer-checked:border-blue-600 peer-checked:bg-blue-50/50 hover:bg-slate-50 transition-all"
-                        >
-                            <p
-                                class="text-xs font-black text-slate-400 peer-checked:text-blue-600 uppercase tracking-wider"
-                            >
-                                Admin
-                            </p>
+                        <div class="p-3 text-center border-2 border-slate-200 rounded-xl peer-checked:border-blue-600 peer-checked:bg-blue-50/50 hover:!bg-slate-50 transition-all">
+                            <p class="text-xs font-black text-slate-400 peer-checked:text-blue-600 uppercase tracking-wider">Admin</p>
                         </div>
                     </label>
                 </div>
                 <InputError class="mt-2" :message="form.errors.role" />
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Password -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                 <div>
-                    <label for="password" class="block text-sm font-bold text-slate-700 mb-2"
-                        >Kata Sandi</label
-                    >
+                    <InputLabel for="password" value="Kata Sandi" />
                     <div class="relative group">
-                        <div
-                            class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400 group-focus-within:text-blue-600 transition-colors"
-                        >
+                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400 group-focus-within:text-blue-600 transition-colors">
                             <LockIcon class="w-5 h-5" />
                         </div>
                         <TextInput
@@ -232,18 +137,13 @@ const submit = () => {
                             autocomplete="new-password"
                         />
                     </div>
+                    <InputError class="mt-2" :message="form.errors.password" />
                 </div>
 
                 <div>
-                    <label
-                        for="password_confirmation"
-                        class="block text-sm font-bold text-slate-700 mb-2"
-                        >Konfirmasi</label
-                    >
+                    <InputLabel for="password_confirmation" value="Konfirmasi Kata Sandi" />
                     <div class="relative group">
-                        <div
-                            class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400 group-focus-within:text-blue-600 transition-colors"
-                        >
+                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400 group-focus-within:text-blue-600 transition-colors">
                             <ShieldCheckIcon class="w-5 h-5" />
                         </div>
                         <TextInput
@@ -256,10 +156,11 @@ const submit = () => {
                             autocomplete="new-password"
                         />
                     </div>
+                    <InputError class="mt-2" :message="form.errors.password_confirmation" />
                 </div>
             </div>
-            <InputError class="mt-1" :message="form.errors.password" />
 
+            <!-- Submit -->
             <div class="pt-4">
                 <PrimaryButton
                     class="w-full !py-4 !rounded-xl !bg-blue-600 hover:!bg-blue-700 !text-white !font-black !text-base shadow-xl shadow-blue-600/20 transition-all hover:scale-[1.02] active:scale-[0.98] flex justify-center items-center gap-2"
@@ -268,9 +169,7 @@ const submit = () => {
                 >
                     <span v-if="!form.processing">Daftar Akun Baru</span>
                     <span v-else class="flex items-center gap-2">
-                        <div
-                            class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"
-                        />
+                        <div class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
                         Mendaftarkan...
                     </span>
                 </PrimaryButton>
@@ -279,10 +178,7 @@ const submit = () => {
             <div class="text-center pt-4">
                 <p class="text-sm text-slate-500 font-medium">
                     Sudah punya akun?
-                    <Link
-                        :href="route('login')"
-                        class="text-blue-600 font-bold hover:underline underline-offset-4"
-                    >
+                    <Link :href="route('login')" class="text-blue-600 font-bold hover:underline underline-offset-4">
                         Masuk ke Portal
                     </Link>
                 </p>
