@@ -15,6 +15,7 @@ class Dosen extends Model
     protected $fillable = [
         'user_id',
         'nidn',
+        'kode_dosen',
         'nama_lengkap',
         'program_studi',
         'fakultas',
