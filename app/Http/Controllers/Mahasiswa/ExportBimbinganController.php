@@ -49,7 +49,7 @@ class ExportBimbinganController extends Controller
         // 4. Prepare data for the Blade view
         $data = [
             'mahasiswa' => $mahasiswa,
-            'bimbingan' => $bimbingan,
+            'jadwalBimbingans' => $bimbingan,
             'filters'   => [
                 'status' => $status ?? 'all',
                 'search' => $search ?? '',
