@@ -1,4 +1,10 @@
 {
-  "buildCommand": "composer install && npm run build",
-  "installCommand": "composer install --no-dev && npm install"
+  "buildCommand": "composer install --no-dev && npm install && npm run build",
+  "installCommand": "composer install && npm install",
+  "framework": "laravel",
+  "functions": {
+    "api/**/*.php": {
+      "runtime": "php-8.3"
+    }
+  }
 }
