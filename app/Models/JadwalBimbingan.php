@@ -36,4 +36,9 @@ class JadwalBimbingan extends Model
     {
         return $this->belongsTo(KetersediaanJadwal::class, 'ketersediaan_jadwal_id');
     }
+
+    public function catatanKonsultasi()
+    {
+        return $this->hasOne(CatatanKonsultasi::class, 'jadwal_bimbingan_id');
+    }
 }

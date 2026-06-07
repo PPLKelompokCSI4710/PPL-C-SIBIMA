@@ -96,6 +96,53 @@
                         <CalendarDaysIcon class="w-5 h-5" />
                         <span>Kalender Akademik</span>
                     </Link>
+
+                    <!-- Dosen: Ketersediaan Jadwal -->
+                    <Link
+                        v-if="!isAdmin"
+                        :href="route('dosen.ketersediaan-jadwal.index')"
+                        :class="[
+                            route().current('dosen.ketersediaan-jadwal.*')
+                                ? 'bg-indigo-50 text-indigo-700 font-semibold'
+                                : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900',
+                        ]"
+                        class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors"
+                    >
+                        <CalendarDaysIcon class="w-5 h-5" />
+                        <span>Ketersediaan Jadwal</span>
+                    </Link>
+
+                    <!-- Dosen: Monitoring Jadwal -->
+                    <Link
+                        v-if="!isAdmin"
+                        :href="route('dosen.monitoring-jadwal.index')"
+                        :class="[
+                            route().current('dosen.monitoring-jadwal.*')
+                                ? 'bg-indigo-50 text-indigo-700 font-semibold'
+                                : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900',
+                        ]"
+                        class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors"
+                    >
+                        <ClipboardCheckIcon class="w-5 h-5" />
+                        <span>Monitoring Jadwal</span>
+                    </Link>
+
+                    <!-- Dosen: Riwayat Bimbingan -->
+                    <Link
+                        v-if="!isAdmin"
+                        :href="route('dosen.riwayat-bimbingan.index')"
+                        :class="[
+                            route().current('dosen.riwayat-bimbingan.*')
+                                ? 'bg-indigo-50 text-indigo-700 font-semibold'
+                                : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900',
+                        ]"
+                        class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors"
+                    >
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span>Riwayat Bimbingan</span>
+                    </Link>
                 </nav>
             </div>
 
@@ -176,6 +223,8 @@
         if (route().current('staff.study-plans.index')) return 'Persetujuan KRS';
         if (route().current('staff.progress.index')) return 'Progres Mahasiswa';
         if (route().current('staff.calendar')) return 'Kalender Akademik';
+        if (route().current('dosen.ketersediaan-jadwal.*')) return 'Ketersediaan Jadwal';
+        if (route().current('dosen.monitoring-jadwal.*')) return 'Monitoring Jadwal';
         return 'Staff Portal';
     });
 </script>
