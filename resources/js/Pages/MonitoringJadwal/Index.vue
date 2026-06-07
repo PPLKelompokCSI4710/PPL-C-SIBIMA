@@ -16,7 +16,18 @@
 
     // Reactive filter state diambil dari props (server)
     const selectedStatus = ref(props.filters.status);
-    const searchQuery = ref(props.filters.search);
+const searchQuery = ref(props.filters.search);
+// New export format selector
+const exportFormat = ref('pdf');
+const exportBimbingan = () => {
+    const url = route('mahasiswa.jadwal.exportPdf', {
+        status: selectedStatus.value !== 'all' ? selectedStatus.value : undefined,
+        search: searchQuery.value || undefined,
+        format: exportFormat.value,
+    });
+    window.open(url, '_blank');
+};
+
 
     // Daftar opsi status filter
     const statusOptions = [
@@ -155,33 +166,20 @@
         </svg>
         Ajukan Jadwal
     </Link>
-    <a :href="route('mahasiswa.jadwal.exportPdf', { status: selectedStatus !== 'all' ? selectedStatus : undefined, search: searchQuery || undefined })" class="inline-flex items-center space-x-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
-        <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
-        </svg>
-        <span>Export PDF</span>
-    </a>
+    <select v-model="exportFormat" class="ml-2 rounded-md border-gray-300 text-sm shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+        <option value="pdf">PDF</option>
+        <option value="excel">Excel</option>
+    </select>
+    <button @click="exportBimbingan" class="ml-2 inline-flex items-center rounded-md bg-green-600 px-4 py-2 text-sm font-semibold text-white hover:bg-green-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-600 transition-all">
+        Export
+    </button>
 </div>
-                        <div
-                            class="flex items-center space-x-2 rounded-lg border border-gray-200 bg-white px-4 py-2 shadow-sm"
-                        >
-                            <svg
-                                class="h-5 w-5 text-indigo-500"
-                                xmlns="http://www.w3.org/2000/svg"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke-width="1.5"
-                                stroke="currentColor"
-                            >
-                                <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"
-                                />
-                            </svg>
-                            <span class="text-sm font-medium text-gray-700"
-                                >Total: {{ jadwalBimbingans.length }} Jadwal</span
-                            >
+<div class="flex items-center gap-2">
+    <svg class="h-4 w-4 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
+    </svg>
+    <span class="text-sm font-medium text-gray-700">Total: {{ jadwalBimbingans.length }} Jadwal</span>
+</div>
                         </div>
                     </div>
 
@@ -472,6 +470,6 @@
                     </div>
                 </div>
             </div>
-        </div>
+        
     </StudentLayout>
 </template>
