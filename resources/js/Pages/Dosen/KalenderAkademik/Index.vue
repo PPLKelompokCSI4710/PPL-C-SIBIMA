@@ -21,9 +21,10 @@
     }
 
     // ── Calendar state & Logic ──────────────────────────────────────────────────
-    const currentMonth = ref(4); // Mei (0-indexed)
-    const currentYear = ref(2026);
-    const selectedDay = ref(null);
+    const today = new Date();
+    const currentMonth = ref(today.getMonth());
+    const currentYear = ref(today.getFullYear());
+    const selectedDay = ref(today.getDate());
 
     const monthLabel = computed(() => {
         const date = new Date(currentYear.value, currentMonth.value);
@@ -42,8 +43,7 @@
         for (let i = 1; i <= daysInMonth; i++) {
             const hasKalenderEvent = props.kalender.some((k) => {
                 if (!k.tanggal_mulai) return false;
-                // k.tanggal_mulai is "YYYY-MM-DD"
-                const [y, m, d] = k.tanggal_mulai.split('-').map(Number);
+                const [y, m, d] = k.tanggal_mulai.substring(0, 10).split('-').map(Number);
                 return d === i && m - 1 === currentMonth.value && y === currentYear.value;
             });
 
@@ -89,12 +89,12 @@
         const fromDB = props.kalender
             .filter((k) => {
                 if (!k.tanggal_mulai) return false;
-                const [y, m] = k.tanggal_mulai.split('-').map(Number);
+                const [y, m] = k.tanggal_mulai.substring(0, 10).split('-').map(Number);
                 return m - 1 === currentMonth.value && y === currentYear.value;
             })
             .map((k) => ({
                 id: 'db-' + k.id,
-                day: new Date(k.tanggal_mulai).getDate(),
+                day: parseInt(k.tanggal_mulai.substring(8, 10), 10),
                 title: k.nama_kegiatan,
                 type: k.tipe_kegiatan ?? 'Kegiatan',
                 time: k.jam_mulai ?? '-',
@@ -107,14 +107,18 @@
     const activeFilter = ref('semua');
     const filterOptions = [
         { value: 'semua', label: 'Semua' },
-        { value: 'kuliah', label: 'Kuliah' },
         { value: 'bimbingan', label: 'Bimbingan' },
-        { value: 'rapat', label: 'Rapat' },
-        { value: 'ujian', label: 'Ujian' },
+        { value: 'lainnya', label: 'Lainnya' },
     ];
 
     const filteredEvents = computed(() => {
         if (activeFilter.value === 'semua') return allEvents.value;
+        if (activeFilter.value === 'lainnya') {
+            return allEvents.value.filter((e) => {
+                const t = (e.type || '').toLowerCase();
+                return t === 'kuliah' || t === 'rapat';
+            });
+        }
         return allEvents.value.filter((e) => (e.type || '').toLowerCase() === activeFilter.value);
     });
 
@@ -129,8 +133,8 @@
         const location = encodeURIComponent('SIBIMA - Universitas');
 
         // Format dates: YYYYMMDDTHHmmSSZ
-        let startStr = k.tanggal_mulai.replace(/-/g, '');
-        let endStr = (k.tanggal_selesai || k.tanggal_mulai).replace(/-/g, '');
+        let startStr = k.tanggal_mulai.substring(0, 10).replace(/-/g, '');
+        let endStr = (k.tanggal_selesai ? k.tanggal_selesai.substring(0, 10) : k.tanggal_mulai.substring(0, 10)).replace(/-/g, '');
 
         if (k.jam_mulai) {
             const time = k.jam_mulai.replace(/[:.]/g, '').padEnd(4, '0') + '00';
@@ -386,26 +390,6 @@
                     </div>
                 </div>
                 <div class="flex items-center gap-3">
-                    <!-- Google Calendar Connect Section -->
-                    <a
-                        v-if="!isGoogleConnected"
-                        :href="route('google.connect')"
-                        class="inline-flex items-center gap-2 px-4 py-3 bg-white border border-slate-200 rounded-full text-xs font-bold text-slate-600 hover:text-blue-600 hover:border-blue-200 shadow-sm transition-all"
-                    >
-                        <svg class="w-4 h-4 fill-current text-blue-500" viewBox="0 0 24 24">
-                            <path
-                                d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"
-                            />
-                        </svg>
-                        <span>Hubungkan Google Calendar</span>
-                    </a>
-                    <div
-                        v-else
-                        class="inline-flex items-center gap-2 px-4 py-3 bg-emerald-50 border border-emerald-200 rounded-full text-xs font-bold text-emerald-700 shadow-sm"
-                    >
-                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                        <span>Terhubung ke Google Calendar</span>
-                    </div>
 
                     <button
                         class="inline-flex items-center gap-2 rounded-full bg-[#1F4C7A] px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-900/20 transition hover:bg-[#163a5e]"
@@ -491,44 +475,28 @@
             </div>
             <!-- end header card -->
 
-            <!-- Stats -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div class="rounded-[32px] bg-white p-6 shadow-xl shadow-slate-900/5">
-                    <p class="text-sm text-slate-500 mb-1">Minggu ini</p>
-                    <p class="text-3xl font-bold text-slate-900">8</p>
-                    <p class="text-xs text-slate-500 mt-1">jadwal aktif</p>
-                </div>
-                <div class="rounded-[32px] bg-white p-6 shadow-xl shadow-slate-900/5">
-                    <p class="text-sm text-slate-500 mb-1">SKS diambil</p>
-                    <p class="text-3xl font-bold text-slate-900">12</p>
-                    <p class="text-xs text-slate-500 mt-1">dari 16 maks</p>
-                </div>
-                <div class="rounded-[32px] bg-white p-6 shadow-xl shadow-slate-900/5">
-                    <p class="text-sm text-slate-500 mb-1">Bimbingan</p>
-                    <p class="text-3xl font-bold text-slate-900">
-                        {{ pendingCount }}
-                    </p>
-                    <p class="text-xs text-slate-500 mt-1">permintaan baru</p>
-                </div>
-            </div>
 
             <!-- Lower Grid -->
-            <div class="grid lg:grid-cols-[1fr_1.5fr] gap-6">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 <!-- Calendar -->
-                <div class="rounded-[32px] bg-white p-6 shadow-xl shadow-slate-900/5 h-max">
-                    <div class="flex justify-between items-center mb-6">
-                        <h2 class="text-slate-900 font-bold text-lg capitalize">
-                            {{ monthLabel }}
-                        </h2>
-                        <div class="flex gap-2">
+                <div class="lg:col-span-2 rounded-[32px] bg-white p-6 shadow-xl shadow-slate-900/5 h-max">
+                    <div class="flex justify-between items-center mb-8 flex-wrap gap-4">
+                        <div>
+                            <h3 class="text-2xl font-black text-slate-800 tracking-tight">
+                                {{ monthLabel }}
+                            </h3>
+                        </div>
+                        <div class="flex gap-2.5">
                             <button
-                                class="w-8 h-8 flex justify-center items-center rounded-xl bg-slate-50 border border-slate-200 text-slate-500 hover:bg-slate-100 transition"
+                                class="p-2 bg-slate-50 border border-slate-200 rounded-xl hover:bg-slate-100 hover:text-blue-600 active:scale-95 transition-all flex items-center justify-center"
+                                title="Bulan Sebelumnya"
                                 @click="prevMonth"
                             >
                                 &lt;
                             </button>
                             <button
-                                class="w-8 h-8 flex justify-center items-center rounded-xl bg-slate-50 border border-slate-200 text-slate-500 hover:bg-slate-100 transition"
+                                class="p-2 bg-slate-50 border border-slate-200 rounded-xl hover:bg-slate-100 hover:text-blue-600 active:scale-95 transition-all flex items-center justify-center"
+                                title="Bulan Berikutnya"
                                 @click="nextMonth"
                             >
                                 &gt;
@@ -536,40 +504,34 @@
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-7 text-center gap-y-3">
+                    <div class="grid grid-cols-7 gap-2 md:gap-4 mb-4">
                         <div
                             v-for="d in ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab']"
                             :key="d"
-                            class="text-slate-400 text-xs font-semibold pb-2"
+                            class="text-center text-xs font-bold text-slate-400 uppercase tracking-wider py-2"
                         >
                             {{ d }}
                         </div>
+                    </div>
 
+                    <div class="grid grid-cols-7 gap-2 md:gap-4">
                         <template v-for="(day, idx) in monthDays" :key="idx">
-                            <div v-if="day.empty" class="text-transparent p-2">0</div>
+                            <div v-if="day.empty" class="h-14 md:h-18 text-transparent p-2"></div>
                             <div
                                 v-else
-                                class="relative flex flex-col items-center justify-center w-10 h-10 mx-auto cursor-pointer transition-all rounded-xl select-none"
-                                :class="{
-                                    'bg-[#1F4C7A] text-white shadow-md': day.isSelected,
-                                    'bg-[#E9F0F8] text-[#1F4C7A] font-bold':
-                                        day.isToday && !day.isSelected,
-                                    'text-slate-700 hover:bg-slate-100':
-                                        !day.isSelected && !day.isToday,
-                                }"
+                                :class="[
+                                    day.isSelected
+                                        ? 'bg-blue-600 text-white shadow-xl shadow-blue-200 ring-2 ring-blue-500 ring-offset-2 scale-105 z-10 font-bold'
+                                        : 'bg-slate-50/80 text-slate-700 hover:bg-blue-50 hover:text-blue-600 hover:scale-[1.03]'
+                                ]"
+                                class="h-14 md:h-18 rounded-2xl flex flex-col items-center justify-center relative group transition-all duration-250 cursor-pointer select-none"
                                 @click="clickDay(day)"
                             >
-                                <span
-                                    class="text-sm"
-                                    :class="{
-                                        'font-semibold': day.isSelected || day.isToday,
-                                    }"
-                                    >{{ day.num }}</span
-                                >
-                                <span
+                                <span class="text-sm md:text-base font-bold">{{ day.num }}</span>
+                                <div
                                     v-if="day.hasDot"
-                                    class="absolute bottom-1 w-1 h-1 rounded-full"
-                                    :class="day.isSelected ? 'bg-white' : 'bg-emerald-500'"
+                                    :class="day.isSelected ? 'bg-white' : 'bg-blue-500'"
+                                    class="w-1.5 h-1.5 rounded-full mt-1.5 transition-colors"
                                 />
                             </div>
                         </template>
@@ -579,24 +541,28 @@
                         class="flex gap-4 mt-6 pt-4 border-t border-slate-100 text-xs text-slate-500"
                     >
                         <div class="flex items-center gap-1.5">
-                            <span class="w-2.5 h-2.5 rounded-full bg-[#E9F0F8]" />Hari ini
+                            <span class="w-2.5 h-2.5 rounded-full bg-slate-50/80 ring-1 ring-slate-200" />Biasa
                         </div>
                         <div class="flex items-center gap-1.5">
-                            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500" />Ada jadwal
+                            <span class="w-2.5 h-2.5 rounded-full bg-blue-500" />Ada jadwal
                         </div>
                         <div class="flex items-center gap-1.5">
-                            <span class="w-2.5 h-2.5 rounded-full bg-[#1F4C7A]" />Dipilih
+                            <span class="w-2.5 h-2.5 rounded-full bg-blue-600" />Dipilih
                         </div>
                     </div>
                 </div>
 
                 <!-- Requests & Agenda -->
-                <div class="rounded-[32px] bg-white p-6 shadow-xl shadow-slate-900/5">
-                    <!-- Pending Requests -->
-                    <h3 class="text-lg font-bold text-slate-900 mb-4">
-                        Permintaan Jadwal Bimbingan
-                    </h3>
-                    <div
+                <div class="space-y-6 h-full">
+                    <!-- Pending Requests and Agenda Wrapper -->
+                    <div class="bg-white p-6 md:p-8 rounded-3xl border border-slate-200 shadow-sm flex flex-col h-full max-h-[800px]">
+                        
+                        <!-- Pending Requests -->
+                        <h3 class="text-xl font-bold text-slate-900 mb-4 flex items-center gap-2">
+                            <span class="w-2 h-6 bg-amber-500 rounded-full"></span>
+                            Permintaan Bimbingan
+                        </h3>
+                        <div
                         v-if="requests.filter((r) => r.status === 'pending_dosen').length === 0"
                         class="text-slate-500 text-sm mb-6"
                     >
@@ -645,8 +611,11 @@
                     </div>
 
                     <!-- Agenda -->
-                    <div class="flex justify-between items-center mb-4">
-                        <h3 class="text-lg font-bold text-slate-900">Jadwal Akan Datang</h3>
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+                            <span class="w-2 h-6 bg-blue-500 rounded-full"></span>
+                            Jadwal Akan Datang
+                        </h3>
                     </div>
                     <!-- Agenda filter -->
                     <div class="flex flex-wrap gap-2 mb-4">
@@ -710,6 +679,8 @@
                             </div>
                         </div>
                     </div>
+                </div>
+                <!-- End of wrapper added earlier -->
                 </div>
             </div>
         </div>
@@ -833,9 +804,6 @@
                     >
                         <div>
                             <h2 class="text-xl font-semibold text-slate-900">Tambah Jadwal</h2>
-                            <p class="text-xs text-slate-500 mt-0.5">
-                                Bimbingan memerlukan konfirmasi admin
-                            </p>
                         </div>
                         <button
                             class="w-9 h-9 flex items-center justify-center rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 text-lg"

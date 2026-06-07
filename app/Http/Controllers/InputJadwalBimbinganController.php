@@ -111,28 +111,20 @@ class InputJadwalBimbinganController extends Controller
      */
     private function checkClash($dosenUserId, $slot)
     {
-        $clashingEvents = KalenderAkademik::where('user_id', $dosenUserId)
-            ->where('tanggal_mulai', '<=', $slot->tanggal)
-            ->where('tanggal_selesai', '>=', $slot->tanggal)
-            ->get();
-
-        foreach ($clashingEvents as $event) {
-            // Jika kegiatan seharian penuh (tidak ada jam_mulai), maka bentrok dengan semua slot pada hari itu
-            if (empty($event->jam_mulai)) {
-                return true;
-            }
-
-            // Samakan format waktu untuk perbandingan yang konsisten
-            $eventTime = date('H:i:s', strtotime($event->jam_mulai));
-            $slotStart = date('H:i:s', strtotime($slot->waktu_mulai));
-            $slotEnd = date('H:i:s', strtotime($slot->waktu_selesai));
-
-            // Bentrok terjadi jika waktu mulai kegiatan berada di dalam rentang slot bimbingan
-            if ($eventTime >= $slotStart && $eventTime < $slotEnd) {
-                return true;
-            }
-        }
-
-        return false;
+        return KalenderAkademik::where(function ($query) use ($dosenUserId) {
+                $query->where('user_id', $dosenUserId)
+                      ->orWhereNull('user_id');
+            })
+            ->where('tipe_kegiatan', '!=', 'bimbingan')
+            ->where(function ($query) use ($slot) {
+                $query->where(function ($q) use ($slot) {
+                    $q->whereDate('tanggal_mulai', '<=', $slot->tanggal)
+                      ->whereDate('tanggal_selesai', '>=', $slot->tanggal);
+                })->orWhere(function ($q) use ($slot) {
+                    $q->whereDate('tanggal_mulai', '=', $slot->tanggal)
+                      ->whereNull('tanggal_selesai');
+                });
+            })
+            ->exists();
     }
 }

@@ -32,36 +32,9 @@
                                 <h3 class="text-2xl font-black text-slate-800 tracking-tight">
                                     {{ currentMonthName }} {{ currentYear }}
                                 </h3>
-                                <p class="text-xs text-slate-500 mt-0.5">
-                                    Klik tanggal untuk melihat kegiatan akademik dalam pop-up modal
-                                </p>
                             </div>
 
-                            <!-- Google Calendar Connect Section -->
-                            <div class="flex items-center gap-3">
-                                <a
-                                    v-if="!isGoogleConnected"
-                                    :href="route('google.connect')"
-                                    class="inline-flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-xl text-xs font-bold text-slate-600 hover:text-blue-600 hover:border-blue-200 shadow-sm transition-all"
-                                >
-                                    <svg
-                                        class="w-4 h-4 fill-current text-blue-500"
-                                        viewBox="0 0 24 24"
-                                    >
-                                        <path
-                                            d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"
-                                        />
-                                    </svg>
-                                    <span>Hubungkan Google Calendar</span>
-                                </a>
-                                <div
-                                    v-else
-                                    class="inline-flex items-center gap-2 px-4 py-2 bg-emerald-50 border border-emerald-200 rounded-xl text-xs font-bold text-emerald-700 shadow-sm animate-pulse"
-                                >
-                                    <span class="w-2 h-2 rounded-full bg-emerald-500" />
-                                    <span>Terhubung ke Google Calendar</span>
-                                </div>
-                            </div>
+
 
                             <div class="flex gap-2.5">
                                 <button
@@ -347,28 +320,7 @@
                                 </p>
                             </div>
 
-                            <!-- Request Advisement Direct Link -->
-                            <div class="pt-4 border-t border-slate-250 flex flex-col gap-3">
-                                <button
-                                    class="w-full inline-flex items-center justify-center gap-2 px-5 py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-2xl shadow-sm hover:shadow-md transition-all duration-200 active:scale-95 text-sm"
-                                    @click="initBookingForm"
-                                >
-                                    <svg
-                                        class="w-4.5 h-4.5"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        viewBox="0 0 24 24"
-                                        stroke-width="2"
-                                    >
-                                        <path
-                                            stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                            d="M12 4.5v15m7.5-7.5h-15"
-                                        />
-                                    </svg>
-                                    <span>Ajukan Bimbingan Baru</span>
-                                </button>
-                            </div>
+
                         </div>
 
                         <!-- Advisement Booking Form -->
@@ -514,7 +466,7 @@
                     </div>
 
                     <!-- Modal Footer -->
-                    <div class="px-6 py-4 bg-slate-50 border-t border-slate-100 flex justify-end">
+                    <div class="px-6 py-4 bg-slate-50 border-t border-slate-100 flex justify-end gap-3">
                         <button
                             class="px-5 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-600 hover:bg-slate-50 transition active:scale-95"
                             @click="
@@ -523,6 +475,13 @@
                             "
                         >
                             Tutup
+                        </button>
+                        <button
+                            v-if="!showBookingForm"
+                            class="px-5 py-2.5 bg-blue-600 border border-blue-600 rounded-xl text-sm font-bold text-white shadow-sm hover:bg-blue-700 hover:border-blue-700 transition active:scale-95"
+                            @click="initBookingForm"
+                        >
+                            Ajukan Jadwal
                         </button>
                     </div>
                 </div>
@@ -558,8 +517,9 @@
     });
 
     // Calendar States
-    const currentDate = ref(new Date(2026, 4, 1)); // Default starts on May 2026
-    const selectedDay = ref(15); // Default active date (selected date: 15)
+    const today = new Date();
+    const currentDate = ref(new Date(today.getFullYear(), today.getMonth(), 1));
+    const selectedDay = ref(today.getDate());
     const isDetailModalOpen = ref(false); // Modal visibility state
 
     const page = usePage();
@@ -607,10 +567,18 @@
     });
 
     const selectedSlotHasClash = computed(() => {
-        const selectedSlot = availableSchedules.value.find(
-            (s) => s.id === bookingForm.ketersediaan_jadwal_id,
-        );
-        return selectedSlot ? !!selectedSlot.has_clash : false;
+        if (bookingForm.ketersediaan_jadwal_id) {
+            const selectedSlot = availableSchedules.value.find(
+                (s) => s.id === bookingForm.ketersediaan_jadwal_id,
+            );
+            return selectedSlot ? !!selectedSlot.has_clash : false;
+        }
+
+        if (bookingForm.dosen_id && availableSchedules.value.length > 0) {
+            return availableSchedules.value.every(s => s.has_clash);
+        }
+        
+        return false;
     });
 
     const initBookingForm = () => {

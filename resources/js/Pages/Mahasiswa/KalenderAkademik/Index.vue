@@ -61,9 +61,10 @@
     }
 
     // ── Calendar state & Logic ──────────────────────────────────────────────────
-    const currentMonth = ref(4); // Mei (0-indexed)
-    const currentYear = ref(2026);
-    const selectedDay = ref(null);
+    const today = new Date();
+    const currentMonth = ref(today.getMonth());
+    const currentYear = ref(today.getFullYear());
+    const selectedDay = ref(today.getDate());
     const showDayPopup = ref(false);
     const popupDay = ref(null);
 
@@ -209,7 +210,7 @@
     // Returns the day-of-week label for the popup header
     const popupDayLabel = computed(() => {
         if (!popupDay.value) return '';
-        const date = new Date(2026, 4, popupDay.value); // May 2026
+        const date = new Date(currentYear.value, currentMonth.value, popupDay.value);
         return date.toLocaleDateString('id-ID', { weekday: 'long' }).toUpperCase();
     });
 
