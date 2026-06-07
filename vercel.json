@@ -1,0 +1,4 @@
+{
+  "buildCommand": "composer install && npm run build",
+  "installCommand": "composer install --no-dev && npm install"
+}
