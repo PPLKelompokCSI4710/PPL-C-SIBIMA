@@ -135,6 +135,12 @@
                         >
                             Dashboard
                         </ResponsiveNavLink>
+                        <ResponsiveNavLink
+                            :href="route('mahasiswa.jadwal.index')"
+                            :active="route().current('mahasiswa.jadwal.*')"
+                        >
+                            Monitoring Jadwal Bimbingan
+                        </ResponsiveNavLink>
                     </div>
 
                     <!-- Responsive Settings Options -->

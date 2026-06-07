@@ -1,40 +1,26 @@
 <script setup>
-import StudentLayout from '@/Layouts/StudentLayout.vue';
-import { Head } from '@inertiajs/vue3';
-import { ref, onMounted } from 'vue';
+    import StudentLayout from '@/Layouts/StudentLayout.vue';
+    import { Head } from '@inertiajs/vue3';
+    import { ref, onMounted } from 'vue';
 
-// Mock data (Normally passed via props from controller)
-const props = defineProps({
-    upcomingBimbingan: {
-        type: Object,
-        default: () => ({
-            dosen: 'Dr. Budi Santoso, M.Kom',
-            topic: 'Review Draft Bab 3 & Analisis Data',
-            date: '2026-04-25',
-            dateFormatted: '25 April 2026',
-            timeFormatted: '10:00 - 11:30 WIB',
-            location: 'Ruang Rapat Gedung Kuliah Utama (Lantai 2)',
-            status: 'Upcoming',
-            preparationNotes: [
-                'Cetak draft Bab 3 sebanyak 1 rangkap',
-                'Siapkan dataset yang akan dianalisis',
-                'Isi logbook progres sebelumnya',
-            ],
-            type: 'Offline',
-        }),
-    },
-});
+    // Data passed from BimbinganReminderController
+    const props = defineProps({
+        upcomingBimbingan: {
+            type: Object,
+            default: () => null,
+        },
+    });
 
-// Calculate countdown
-const daysLeft = ref(0);
-onMounted(() => {
-    if (props.upcomingBimbingan && props.upcomingBimbingan.date) {
-        const target = new Date(props.upcomingBimbingan.date);
-        const today = new Date();
-        const diffTime = Math.abs(target - today);
-        daysLeft.value = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    }
-});
+    // Calculate countdown
+    const daysLeft = ref(0);
+    onMounted(() => {
+        if (props.upcomingBimbingan && props.upcomingBimbingan.date) {
+            const target = new Date(props.upcomingBimbingan.date);
+            const today = new Date();
+            const diffTime = Math.abs(target - today);
+            daysLeft.value = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        }
+    });
 </script>
 
 <template>
@@ -56,7 +42,8 @@ onMounted(() => {
                     Reminder Bimbingan
                 </h1>
                 <p class="text-brand-text-secondary text-sm mt-1">
-                    Detail jadwal bimbingan Anda yang akan datang beserta preferensi pengingat otomatis.
+                    Detail jadwal bimbingan Anda yang akan datang beserta preferensi pengingat
+                    otomatis.
                 </p>
             </div>
 

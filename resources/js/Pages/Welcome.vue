@@ -1,4 +1,4 @@
-<script setup>
+﻿<script setup>
     import { Head, Link } from '@inertiajs/vue3';
     import { LayoutDashboardIcon } from 'lucide-vue-next';
     import AiAssistantWidget from '@/Components/AiAssistantWidget.vue';

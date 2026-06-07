@@ -503,7 +503,7 @@
 
 <script setup>
     import { ref, computed } from 'vue';
-    import { useForm, router, Head } from '@inertiajs/vue3';
+    import { useForm, router, Head, Link } from '@inertiajs/vue3';
     import StudentLayout from '@/Layouts/StudentLayout.vue';
     import {
         AlertTriangleIcon,

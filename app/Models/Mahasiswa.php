@@ -15,7 +15,15 @@ class Mahasiswa extends Model
 {
     use HasFactory, SoftDeletes;
 
+    /**
+     * The table associated with the model.
+     */
     protected $table = 'mahasiswa';
+
+    /**
+     * Guard all attributes.
+     */
+    protected $guarded = [];
 
     protected $fillable = [
         'user_id', 'nim', 'nama_lengkap', 'program_studi', 'fakultas',
@@ -26,22 +34,16 @@ class Mahasiswa extends Model
         'consecutive_progress_reminders',
     ];
 
-    protected function casts(): array
-    {
-        return [
-            'status_akademik' => AkademikStatus::class,
-            'tanggal_lahir' => 'date',
-            'ipk' => 'decimal:2',
-            'status_kelulusan_bimbingan' => 'boolean',
-            'last_progress_reminder_sent_at' => 'datetime',
-            'progress_reminder_enabled' => 'boolean',
-        ];
-    }
+    protected $casts = [
+        'status_akademik' => AkademikStatus::class,
+        'tanggal_lahir' => 'date',
+        'ipk' => 'decimal:2',
+        'status_kelulusan_bimbingan' => 'boolean',
+        'last_progress_reminder_sent_at' => 'datetime',
+        'progress_reminder_enabled' => 'boolean',
+    ];
 
-    // =========================================================================
-    // RELATIONSHIPS
-    // =========================================================================
-
+    // Relationships
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
@@ -64,17 +66,12 @@ class Mahasiswa extends Model
 
     public function dosens(): BelongsToMany
     {
-        return $this->belongsToMany(Dosen::class, 'dosen_mahasiswa')->withPivot(['tanggal_penugasan', 'tanggal_berakhir', 'is_active', 'catatan']);
+        return $this->belongsToMany(Dosen::class, 'dosen_mahasiswa')
+            ->withPivot(['tanggal_penugasan', 'tanggal_berakhir', 'is_active', 'catatan']);
     }
-
-    // =========================================================================
-    // LIFECYCLE HOOKS
-    // =========================================================================
 
     protected static function booted(): void
     {
-        // Ketika mahasiswa dihapus (soft-delete), hapus juga akun User-nya
-        // agar email tidak menghalangi import ulang di masa mendatang.
         static::deleting(function (Mahasiswa $mahasiswa) {
             if ($mahasiswa->user) {
                 $mahasiswa->user->delete();

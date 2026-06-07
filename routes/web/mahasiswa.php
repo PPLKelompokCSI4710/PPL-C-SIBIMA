@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\InputJadwalBimbinganController;
+use App\Http\Controllers\KalenderAkademikController;
 use App\Http\Controllers\Mahasiswa\BimbinganReminderController;
 use App\Http\Controllers\Mahasiswa\CourseController;
 use App\Http\Controllers\Mahasiswa\DashboardController;
@@ -8,6 +9,7 @@ use App\Http\Controllers\Mahasiswa\ProgressController;
 use App\Http\Controllers\Mahasiswa\ProgressReminderController;
 use App\Http\Controllers\Mahasiswa\StudyPlanController;
 use App\Http\Controllers\MonitoringJadwalBimbinganController;
+use App\Http\Controllers\Mahasiswa\ExportBimbinganController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -20,6 +22,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::middleware(['auth', 'role:mahasiswa'])->prefix('mahasiswa')->name('mahasiswa.')->group(function () {
+    // Route::get('/akademik', [AkademikController::class, 'index'])->name('akademik.index'); // Contoh untuk PBI-ZZZ
     Route::get('/bimbingan/reminder', [BimbinganReminderController::class, 'index'])->name('bimbingan.reminder');
     Route::get('/bimbingan/progress-reminder', [ProgressReminderController::class, 'index'])->name('bimbingan.progress_reminder');
     Route::post('/bimbingan/progress-reminder/frequency', [ProgressReminderController::class, 'updateFrequency'])->name('bimbingan.progress_reminder.update');
@@ -28,11 +31,12 @@ Route::middleware(['auth', 'role:mahasiswa'])->prefix('mahasiswa')->name('mahasi
     Route::get('/jadwal-bimbingan/schedules/{dosenId}', [InputJadwalBimbinganController::class, 'getSchedules'])->name('jadwal-bimbingan.schedules');
     Route::post('/jadwal-bimbingan', [InputJadwalBimbinganController::class, 'store'])->name('jadwal-bimbingan.store');
     Route::get('/jadwal-bimbingan', [MonitoringJadwalBimbinganController::class, 'index'])->name('jadwal.index');
+    Route::get('/jadwal-bimbingan/export-pdf', [ExportBimbinganController::class, 'exportPdf'])->name('jadwal.exportPdf');
     Route::patch('/jadwal-bimbingan/{id}/cancel', [MonitoringJadwalBimbinganController::class, 'cancel'])->name('jadwal.cancel');
     Route::delete('/jadwal-bimbingan/{id}', [MonitoringJadwalBimbinganController::class, 'destroy'])->name('jadwal.destroy');
 
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    Route::get('/calendar', [DashboardController::class, 'calendar'])->name('calendar');
+    Route::get('/calendar', [KalenderAkademikController::class, 'mahasiswaIndex'])->name('calendar');
 
     // Study Plan routes
     Route::get('/study-plans', [StudyPlanController::class, 'index'])->name('study-plans.index');

@@ -18,6 +18,7 @@ class JadwalBimbingan extends Model
         'judul_ta',
         'topik_bimbingan',
         'tipe',
+        'lokasi',
         'status',
     ];
 
@@ -34,5 +35,10 @@ class JadwalBimbingan extends Model
     public function ketersediaanJadwal()
     {
         return $this->belongsTo(KetersediaanJadwal::class, 'ketersediaan_jadwal_id');
+    }
+
+    public function catatanKonsultasi()
+    {
+        return $this->hasOne(CatatanKonsultasi::class, 'jadwal_bimbingan_id');
     }
 }

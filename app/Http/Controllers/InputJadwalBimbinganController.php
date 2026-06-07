@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreJadwalBimbinganRequest;
 use App\Models\Dosen;
 use App\Models\JadwalBimbingan;
+use App\Models\KalenderAkademik;
 use App\Models\KetersediaanJadwal;
 use App\Models\Mahasiswa;
 use Illuminate\Support\Facades\Auth;
@@ -31,12 +32,18 @@ class InputJadwalBimbinganController extends Controller
     // Mendapatkan jadwal dosen (dipanggil via axios/fetch API)
     public function getSchedules($dosenId)
     {
+        $dosen = Dosen::findOrFail($dosenId);
+
         $schedules = KetersediaanJadwal::where('dosen_id', $dosenId)
             ->where('tanggal', '>=', now()->toDateString())
-            ->where('kuota', '>', 0)
             ->orderBy('tanggal', 'asc')
             ->orderBy('waktu_mulai', 'asc')
-            ->get();
+            ->get()
+            ->map(function ($s) use ($dosen) {
+                $s->has_clash = $this->checkClash($dosen->user_id, $s);
+
+                return $s;
+            });
 
         return response()->json($schedules);
     }
@@ -60,6 +67,16 @@ class InputJadwalBimbinganController extends Controller
 
                 return redirect()->back()->withErrors([
                     'ketersediaan_jadwal_id' => 'Jadwal yang dipilih sudah penuh atau tidak tersedia.',
+                ]);
+            }
+
+            // Verify if there is a conflict/clash with Dosen's busy schedule on that day
+            $dosen = Dosen::findOrFail($ketersediaan->dosen_id);
+            if ($this->checkClash($dosen->user_id, $ketersediaan)) {
+                DB::rollBack();
+
+                return redirect()->back()->withErrors([
+                    'ketersediaan_jadwal_id' => 'Maaf dosen sedang ada kegiatan, mohon pilih jadwal lain.',
                 ]);
             }
 
@@ -87,5 +104,35 @@ class InputJadwalBimbinganController extends Controller
                 'error' => 'Terjadi kesalahan saat memproses pengajuan Anda. Silakan coba lagi.',
             ]);
         }
+    }
+
+    /**
+     * Check if a specific slot clashes with the lecturer's academic calendar events.
+     */
+    private function checkClash($dosenUserId, $slot)
+    {
+        $clashingEvents = KalenderAkademik::where('user_id', $dosenUserId)
+            ->where('tanggal_mulai', '<=', $slot->tanggal)
+            ->where('tanggal_selesai', '>=', $slot->tanggal)
+            ->get();
+
+        foreach ($clashingEvents as $event) {
+            // Jika kegiatan seharian penuh (tidak ada jam_mulai), maka bentrok dengan semua slot pada hari itu
+            if (empty($event->jam_mulai)) {
+                return true;
+            }
+
+            // Samakan format waktu untuk perbandingan yang konsisten
+            $eventTime = date('H:i:s', strtotime($event->jam_mulai));
+            $slotStart = date('H:i:s', strtotime($slot->waktu_mulai));
+            $slotEnd = date('H:i:s', strtotime($slot->waktu_selesai));
+
+            // Bentrok terjadi jika waktu mulai kegiatan berada di dalam rentang slot bimbingan
+            if ($eventTime >= $slotStart && $eventTime < $slotEnd) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

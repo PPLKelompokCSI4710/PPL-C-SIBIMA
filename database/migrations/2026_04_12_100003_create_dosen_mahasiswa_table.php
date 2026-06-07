@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('dosen_mahasiswa', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('dosen_id')->constrained('dosen')->cascadeOnDelete();
+            $table->foreignId('dosen_id')->constrained('users')->cascadeOnDelete();
             $table->foreignId('mahasiswa_id')->constrained('mahasiswa')->cascadeOnDelete();
             $table->date('tanggal_penugasan');
             $table->date('tanggal_berakhir')->nullable();
