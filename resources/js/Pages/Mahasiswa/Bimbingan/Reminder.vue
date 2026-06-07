@@ -1,6 +1,6 @@
 <script setup>
     import StudentLayout from '@/Layouts/StudentLayout.vue';
-    import { Head } from '@inertiajs/vue3';
+    import { Head, Link } from '@inertiajs/vue3';
     import { ref, onMounted } from 'vue';
 
     // Data passed from BimbinganReminderController
@@ -243,7 +243,9 @@
                                 >
                                     Siap Hadir
                                 </button>
-                                <button
+                                <Link
+                                    v-if="props.upcomingBimbingan?.id"
+                                    :href="route('mahasiswa.jadwal.edit-reschedule', props.upcomingBimbingan.id)"
                                     class="w-full sm:w-auto px-6 py-3 bg-brand-white hover:bg-brand-bg text-brand-text-primary rounded-xl font-bold font-medium shadow-sm border border-brand-text-secondary/20 transition-all duration-300 hover:text-brand-primary focus:ring-4 focus:ring-brand-bg flex items-center justify-center"
                                 >
                                     <svg
@@ -261,7 +263,7 @@
                                         />
                                     </svg>
                                     Ajukan Reschedule
-                                </button>
+                                </Link>
                             </div>
                         </div>
                     </div>
