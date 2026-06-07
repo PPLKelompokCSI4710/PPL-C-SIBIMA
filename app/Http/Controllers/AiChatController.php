@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AcademicAssistantUsage;
+use App\Models\AppSetting;
 use App\Services\GeminiService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Cache;
 
 class AiChatController extends Controller
 {
@@ -16,16 +17,25 @@ class AiChatController extends Controller
             'history.*.content' => 'required|string',
         ]);
 
-        $maxQuota = 20;
-        $identifier = auth()->check() ? 'user_'.auth()->id() : 'ip_'.$request->ip();
-        $cacheKey = "ai_quota_{$identifier}";
+        // Fetch dynamic quota from AppSetting, fallback to 20
+        $maxQuota = (int) AppSetting::get('ai_daily_quota', 20);
 
-        $currentUsage = Cache::get($cacheKey, 0);
+        // Determine the user identifier
+        $userId = auth()->check() ? auth()->id() : null;
+
+        // Get today's usage from database (for authenticated users) or Cache (for guests)
+        if ($userId) {
+            $currentUsage = AcademicAssistantUsage::todayCountForUser($userId);
+        } else {
+            $identifier = 'ip_' . $request->ip();
+            $cacheKey = "ai_quota_{$identifier}";
+            $currentUsage = \Illuminate\Support\Facades\Cache::get($cacheKey, 0);
+        }
 
         if ($currentUsage >= $maxQuota) {
             return response()->json([
                 'success' => false,
-                'message' => 'Kuota bertanya Anda (20/20) telah habis. Silakan coba lagi nanti.',
+                'message' => "Kuota bertanya Anda ({$maxQuota}/{$maxQuota}) telah habis. Silakan coba lagi besok.",
                 'quota' => 0,
                 'max_quota' => $maxQuota,
             ], 429);
@@ -35,13 +45,19 @@ class AiChatController extends Controller
             $gemini = new GeminiService;
             $reply = $gemini->generateResponse($request->history);
 
-            // Increment usage
-            Cache::put($cacheKey, $currentUsage + 1, now()->addHours(12));
+            // Increment usage in DB (authenticated) or Cache (guest)
+            if ($userId) {
+                AcademicAssistantUsage::incrementForUser($userId, today()->toDateString());
+                $newUsage = $currentUsage + 1;
+            } else {
+                \Illuminate\Support\Facades\Cache::put($cacheKey, $currentUsage + 1, now()->addHours(24));
+                $newUsage = $currentUsage + 1;
+            }
 
             return response()->json([
                 'success' => true,
                 'reply' => $reply,
-                'quota' => $maxQuota - ($currentUsage + 1),
+                'quota' => $maxQuota - $newUsage,
                 'max_quota' => $maxQuota,
             ]);
         } catch (\Exception $e) {

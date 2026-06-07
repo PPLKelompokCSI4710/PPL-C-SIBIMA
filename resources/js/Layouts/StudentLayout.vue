@@ -94,19 +94,7 @@
                     class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors"
                 >
                     <BellIcon class="w-5 h-5" />
-                    <span>Reminder Jadwal</span>
-                </Link>
-                <Link
-                    :href="route('mahasiswa.bimbingan.progress_reminder')"
-                    :class="[
-                        route().current('mahasiswa.bimbingan.progress_reminder')
-                            ? 'bg-blue-50 text-blue-700 font-semibold'
-                            : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900',
-                    ]"
-                    class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors"
-                >
-                    <TrendingUpIcon class="w-5 h-5" />
-                    <span>Reminder Progres</span>
+                    <span>Reminder</span>
                 </Link>
             </nav>
             <div class="p-4 border-t border-slate-200">

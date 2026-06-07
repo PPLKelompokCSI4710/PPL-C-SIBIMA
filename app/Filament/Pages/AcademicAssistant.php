@@ -2,21 +2,21 @@
 
 namespace App\Filament\Pages;
 
-use App\Models\AcademicAssistantMessage;
-use App\Models\AcademicAssistantSession;
-use App\Services\GeminiService;
+use App\Models\AcademicAssistantUsage;
+use App\Models\AppSetting;
+use App\Models\User;
+use Filament\Notifications\Notification;
 use Filament\Pages\Page;
-use Illuminate\Support\Facades\Auth;
 
 class AcademicAssistant extends Page
 {
     protected string $view = 'filament.pages.academic-assistant';
 
-    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-chat-bubble-left-right';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-chart-bar';
 
-    protected static ?string $navigationLabel = 'AI Academic Assistant';
+    protected static ?string $navigationLabel = 'AI Monitoring';
 
-    protected static ?string $title = 'AI Academic Assistant';
+    protected static ?string $title = 'AI Academic Assistant — Monitoring';
 
     protected static ?string $slug = 'academic-assistant';
 
@@ -31,145 +31,83 @@ class AcademicAssistant extends Page
     // LIVEWIRE PROPERTIES
     // =========================================================================
 
-    public ?int $currentSessionId = null;
+    public int $dailyQuota = 20;
 
-    public string $messageText = '';
-
-    public bool $isLoading = false;
-
-    public string $errorMessage = '';
+    public string $filterDate = '';
 
     // =========================================================================
-    // COMPUTED DATA
+    // LIFECYCLE
     // =========================================================================
 
-    public function getSessions()
+    public function mount(): void
     {
-        return AcademicAssistantSession::where('user_id', Auth::id())
-            ->orderByDesc('updated_at')
-            ->get();
+        $this->dailyQuota = (int) AppSetting::get('ai_daily_quota', 20);
+        $this->filterDate = today()->toDateString();
     }
 
-    public function getMessages()
-    {
-        if (! $this->currentSessionId) {
-            return collect([]);
-        }
+    // =========================================================================
+    // COMPUTED STATS
+    // =========================================================================
 
-        return AcademicAssistantMessage::where('session_id', $this->currentSessionId)
-            ->orderBy('created_at', 'asc')
-            ->get();
+    /** Total requests consumed today */
+    public function getTodayTotalRequests(): int
+    {
+        return AcademicAssistantUsage::where('date', today()->toDateString())
+            ->sum('requests_count');
+    }
+
+    /** Total requests ever consumed (all time) */
+    public function getAllTimeRequests(): int
+    {
+        return AcademicAssistantUsage::sum('requests_count');
+    }
+
+    /** Number of unique users who used AI today */
+    public function getActiveUsersToday(): int
+    {
+        return AcademicAssistantUsage::where('date', today()->toDateString())
+            ->count();
+    }
+
+    /** Usage data for the selected date, grouped by user */
+    public function getUsageTableData(): \Illuminate\Support\Collection
+    {
+        $date = $this->filterDate ?: today()->toDateString();
+
+        return AcademicAssistantUsage::with('user')
+            ->where('date', $date)
+            ->orderByDesc('requests_count')
+            ->get()
+            ->map(function ($usage) {
+                return [
+                    'user_id' => $usage->user_id,
+                    'name' => $usage->user?->name ?? '—',
+                    'email' => $usage->user?->email ?? '—',
+                    'requests_count' => $usage->requests_count,
+                    'date' => $usage->date->format('d M Y'),
+                    'quota_used_pct' => $this->dailyQuota > 0
+                        ? round(($usage->requests_count / $this->dailyQuota) * 100)
+                        : 0,
+                ];
+            });
     }
 
     // =========================================================================
     // ACTIONS
     // =========================================================================
 
-    public function startNewSession(): void
+    /** Save the daily quota to AppSetting */
+    public function saveQuota(): void
     {
-        $session = AcademicAssistantSession::create([
-            'user_id' => Auth::id(),
-            'title' => 'Sesi Baru',
+        $this->validate([
+            'dailyQuota' => 'required|integer|min:1|max:500',
         ]);
 
-        $this->currentSessionId = $session->id;
-        $this->messageText = '';
-        $this->errorMessage = '';
-    }
+        AppSetting::set('ai_daily_quota', $this->dailyQuota);
 
-    public function selectSession(int $sessionId): void
-    {
-        $session = AcademicAssistantSession::where('user_id', Auth::id())
-            ->where('id', $sessionId)
-            ->first();
-
-        if ($session) {
-            $this->currentSessionId = $session->id;
-            $this->errorMessage = '';
-        }
-    }
-
-    public function deleteSession(int $sessionId): void
-    {
-        $session = AcademicAssistantSession::where('user_id', Auth::id())
-            ->where('id', $sessionId)
-            ->first();
-
-        if ($session) {
-            $session->delete();
-
-            if ($this->currentSessionId === $sessionId) {
-                $this->currentSessionId = null;
-            }
-        }
-    }
-
-    public function sendMessage(): void
-    {
-        $text = trim($this->messageText);
-        if (empty($text)) {
-            return;
-        }
-
-        $this->errorMessage = '';
-
-        // Auto-create session if none selected
-        if (! $this->currentSessionId) {
-            $this->startNewSession();
-        }
-
-        // Save user message
-        AcademicAssistantMessage::create([
-            'session_id' => $this->currentSessionId,
-            'role' => 'user',
-            'content' => $text,
-        ]);
-
-        // Auto-generate session title from first message
-        $session = AcademicAssistantSession::find($this->currentSessionId);
-        if ($session && $session->title === 'Sesi Baru') {
-            $session->update([
-                'title' => mb_substr($text, 0, 50).(mb_strlen($text) > 50 ? '...' : ''),
-            ]);
-        }
-
-        $this->messageText = '';
-        $this->isLoading = true;
-
-        try {
-            // Build conversation history for multi-turn context
-            $history = AcademicAssistantMessage::where('session_id', $this->currentSessionId)
-                ->orderBy('created_at', 'asc')
-                ->get()
-                ->map(fn ($msg) => [
-                    'role' => $msg->role,
-                    'content' => $msg->content,
-                ])
-                ->toArray();
-
-            $gemini = new GeminiService;
-            $reply = $gemini->generateResponse($history);
-
-            // Save AI response
-            AcademicAssistantMessage::create([
-                'session_id' => $this->currentSessionId,
-                'role' => 'model',
-                'content' => $reply,
-            ]);
-
-            // Touch session to update its timestamp
-            $session->touch();
-
-        } catch (\Exception $e) {
-            $this->errorMessage = $e->getMessage();
-        } finally {
-            $this->isLoading = false;
-        }
-    }
-
-    public function useSuggestion(string $suggestion): void
-    {
-        $this->messageText = $suggestion;
-        $this->sendMessage();
+        Notification::make()
+            ->title('Kuota harian berhasil disimpan!')
+            ->success()
+            ->send();
     }
 }

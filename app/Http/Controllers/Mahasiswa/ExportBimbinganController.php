@@ -48,19 +48,22 @@ class ExportBimbinganController extends Controller
 
         // 4. Prepare data for the Blade view
         $data = [
-            'mahasiswa' => $mahasiswa,
-            'bimbingan' => $bimbingan,
-            'filters'   => [
+            'mahasiswa'        => $mahasiswa,
+            'jadwalBimbingans' => [], // Empty as requested
+            'filters'          => [
                 'status' => $status ?? 'all',
                 'search' => $search ?? '',
             ],
             'exportAt' => now()->locale('id')->translatedFormat('d F Y H:i') . ' WIB',
         ];
 
-        // 5. Render PDF and download
-        $pdf = Pdf::loadView('mahasiswa.bimbingan.export-pdf', $data);
-        $cleanName = str_replace([' ', '/', '\\', ':', '*', '?', '"', '<', '>', '|'], '_', $mahasiswa->nama_lengkap);
-        $fileName = 'Laporan_Bimbingan_' . $mahasiswa->nim . '_' . $cleanName . '.pdf';
-        return $pdf->download($fileName);
+        // 5. Render HTML and return as a .doc file
+        $html = view('mahasiswa.bimbingan.export-pdf', $data)->render();
+        
+        $fileName = 'Logbook_Bimbingan_Kosong.doc';
+        
+        return response($html)
+            ->header('Content-Type', 'application/vnd.ms-word')
+            ->header('Content-Disposition', 'attachment; filename="' . $fileName . '"');
     }
 }
