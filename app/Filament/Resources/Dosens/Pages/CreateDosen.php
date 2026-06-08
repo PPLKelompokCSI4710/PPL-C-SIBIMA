@@ -14,4 +14,9 @@ class CreateDosen extends CreateRecord
         // Berikan role dosen secara otomatis
         $this->record->assignRole('dosen');
     }
+
+    protected function getRedirectUrl(): string
+    {
+        return $this->getResource()::getUrl('index');
+    }
 }

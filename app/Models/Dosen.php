@@ -17,11 +17,14 @@ class Dosen extends Model
     protected $fillable = [
         'user_id',
         'nidn',
+        'kode_dosen',
         'nama_lengkap',
         'program_studi',
         'fakultas',
+        'jabatan_akademik',
         'jabatan_fungsional',
         'gelar',
+        'keahlian',
         'no_telepon',
         'foto',
         'is_active',
@@ -42,12 +45,14 @@ class Dosen extends Model
         return $this->belongsTo(User::class);
     }
 
-    /**
-     * Daftar mahasiswa bimbingan dosen ini.
-     * (One-to-Many — satu dosen membimbing banyak mahasiswa)
-     */
-    public function mahasiswas(): HasMany
+    public function bimbingans()
     {
-        return $this->hasMany(Mahasiswa::class);
+        return $this->hasMany(Bimbingan::class);
+    }
+
+    public function mahasiswas()
+    {
+        return $this->belongsToMany(Mahasiswa::class, 'dosen_mahasiswa')
+            ->withPivot(['tanggal_penugasan', 'tanggal_berakhir', 'is_active', 'catatan']);
     }
 }

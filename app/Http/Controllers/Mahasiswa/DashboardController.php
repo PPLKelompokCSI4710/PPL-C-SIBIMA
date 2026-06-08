@@ -16,7 +16,7 @@ class DashboardController extends Controller
         $mahasiswa = $user->mahasiswa;
 
         // Fetch study plans
-        $studyPlans = $mahasiswa ? $mahasiswa->studyPlans()->with('course')->get() : [];
+        $studyPlans = $mahasiswa ? $mahasiswa->studyPlans()->with('course')->get() : collect([]);
 
         // Map study plans for easier frontend usage
         $mappedStudyPlans = $studyPlans->map(function ($plan) {

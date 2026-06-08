@@ -36,7 +36,6 @@ class RegisteredUserController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|lowercase|email|max:255|unique:'.User::class,
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
-            'role' => 'required|string|in:mahasiswa,dosen,admin',
         ]);
 
         $user = User::create([
@@ -44,6 +43,7 @@ class RegisteredUserController extends Controller
             'email' => $request->email,
             'password' => Hash::make($request->password),
         ]);
+
 
         $user->assignRole($request->role);
 
@@ -57,6 +57,7 @@ class RegisteredUserController extends Controller
                 'status_akademik' => 'aktif',
             ]);
         }
+
 
         event(new Registered($user));
 

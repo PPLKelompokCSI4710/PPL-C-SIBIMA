@@ -1,6 +1,7 @@
-<script setup>
+﻿<script setup>
     import { Head, Link } from '@inertiajs/vue3';
-    import { GraduationCapIcon, LayoutDashboardIcon } from 'lucide-vue-next';
+    import { LayoutDashboardIcon } from 'lucide-vue-next';
+    import AiAssistantWidget from '@/Components/AiAssistantWidget.vue';
 
     defineProps({
         canLogin: {
@@ -344,6 +345,9 @@
                 </p>
             </div>
         </footer>
+
+        <!-- SIBIMA AI Assistant Floating Widget -->
+        <AiAssistantWidget />
     </div>
 </template>
 

@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Database\Migrations\Migration;
-use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
@@ -16,7 +15,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::dropIfExists('dosen_mahasiswa');
+        // This migration has been disabled because dosen_mahasiswa is needed.
     }
 
     public function down(): void

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Staff;
 
+use App\Http\Controllers\KalenderAkademikController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth', 'role:admin|dosen'])->prefix('staff')->name('staff.')->group(function () {
@@ -16,6 +17,11 @@ Route::middleware(['auth', 'role:admin|dosen'])->prefix('staff')->name('staff.')
     // Progress Monitoring (Dosen & Admin)
     Route::get('/progress', [ProgressController::class, 'index'])->name('progress.index');
     Route::put('/progress/{mahasiswa}', [ProgressController::class, 'update'])->name('progress.update');
+
+    // Kalender & Jadwal Bimbingan Approval
+    Route::get('/calendar', [KalenderAkademikController::class, 'dosenIndex'])->name('calendar');
+    Route::put('/jadwal-bimbingan/{id}/approve', [KalenderAkademikController::class, 'approveBimbingan'])->name('bimbingan.approve');
+    Route::put('/jadwal-bimbingan/{id}/reject', [KalenderAkademikController::class, 'rejectBimbingan'])->name('bimbingan.reject');
 
     // Courses Management (Admin Only)
     Route::middleware('role:admin')->group(function () {
