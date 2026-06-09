@@ -15,10 +15,21 @@ class KetersediaanJadwal extends Model
         'waktu_mulai',
         'waktu_selesai',
         'kuota',
+        'tipe',
     ];
 
     public function dosen()
     {
         return $this->belongsTo(Dosen::class, 'dosen_id');
+    }
+
+    public function jadwalRequests()
+    {
+        return $this->hasMany(JadwalRequest::class, 'ketersediaan_jadwal_id');
+    }
+
+    public function jadwalBimbingans()
+    {
+        return $this->hasMany(JadwalBimbingan::class, 'ketersediaan_jadwal_id');
     }
 }

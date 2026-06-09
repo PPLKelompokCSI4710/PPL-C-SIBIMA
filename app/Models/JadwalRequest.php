@@ -12,6 +12,7 @@ class JadwalRequest extends Model
     protected $fillable = [
         'user_id',
         'dosen_id',
+        'ketersediaan_jadwal_id',
         'tipe_request',
         'judul',
         'deskripsi',
@@ -29,5 +30,15 @@ class JadwalRequest extends Model
     public function dosen()
     {
         return $this->belongsTo(User::class, 'dosen_id');
+    }
+
+    public function ketersediaanJadwal()
+    {
+        return $this->belongsTo(KetersediaanJadwal::class, 'ketersediaan_jadwal_id');
+    }
+
+    public function mahasiswa()
+    {
+        return $this->belongsTo(Mahasiswa::class, 'user_id', 'user_id');
     }
 }
