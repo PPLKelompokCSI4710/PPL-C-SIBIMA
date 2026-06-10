@@ -74,10 +74,10 @@ class StudyPlanController extends Controller
             'mahasiswa_id' => $mahasiswa->id,
             'course_id' => $request->course_id,
             'semester' => $request->semester,
-            'status' => 'pending',
+            'status' => 'approved',
         ]);
 
-        return back();
+        return back()->with('success', 'Mata kuliah berhasil ditambahkan ke KRS.');
     }
 
     public function update(Request $request, StudyPlan $studyPlan)
@@ -109,7 +109,7 @@ class StudyPlanController extends Controller
             'semester' => $request->semester,
         ]);
 
-        return back();
+        return back()->with('success', 'Rencana studi berhasil diperbarui.');
     }
 
     public function destroy(StudyPlan $studyPlan, Request $request)
@@ -122,6 +122,6 @@ class StudyPlanController extends Controller
 
         $studyPlan->delete();
 
-        return back();
+        return back()->with('success', 'Mata kuliah berhasil dihapus dari KRS.');
     }
 }
