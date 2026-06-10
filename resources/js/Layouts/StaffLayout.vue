@@ -162,17 +162,8 @@
                     {{ currentTitle }}
                 </h2>
                 <div class="flex items-center gap-4">
-                    <!-- Notifications (Mock) -->
-                    <div class="relative">
-                        <button
-                            class="relative p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all"
-                        >
-                            <BellIcon class="w-5 h-5" />
-                            <span
-                                class="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 border-2 border-white rounded-full"
-                            />
-                        </button>
-                    </div>
+                    <!-- Notification Bell -->
+                    <NotificationBell />
 
                     <div class="h-8 w-px bg-slate-200" />
                     <div class="text-right">
@@ -196,6 +187,7 @@
 <script setup>
     import { computed } from 'vue';
     import { Link, usePage } from '@inertiajs/vue3';
+    import NotificationBell from '@/Components/NotificationBell.vue';
     import {
         GraduationCapIcon,
         LayoutDashboardIcon,
@@ -203,7 +195,6 @@
         ClipboardCheckIcon,
         TrendingUpIcon,
         LogOutIcon,
-        BellIcon,
         CalendarDaysIcon,
     } from 'lucide-vue-next';
 

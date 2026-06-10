@@ -1,10 +1,15 @@
 <script setup>
     import StudentLayout from '@/Layouts/StudentLayout.vue';
+    import ProgressReminderHistory from '@/Components/ProgressReminderHistory.vue';
     import { Head, router, Link } from '@inertiajs/vue3';
     import { ref, watch } from 'vue';
 
     const props = defineProps({
         jadwalBimbingans: {
+            type: Array,
+            default: () => [],
+        },
+        progressReminderHistory: {
             type: Array,
             default: () => [],
         },
@@ -492,6 +497,9 @@ const searchQuery = ref(props.filters.search);
                         </table>
                     </div>
                 </div>
+
+                <!-- Progress Reminder History Section (PBI 33) -->
+                <ProgressReminderHistory :reminders="progressReminderHistory" />
             </div>
         
     </StudentLayout>

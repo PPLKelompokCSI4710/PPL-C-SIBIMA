@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Route;
 Route::middleware(['auth', 'role:admin|dosen'])->prefix('staff')->name('staff.')->group(function () {
 
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::post('/dashboard/ai-config', [DashboardController::class, 'updateAiConfig'])->name('dashboard.ai-config');
 
 
 

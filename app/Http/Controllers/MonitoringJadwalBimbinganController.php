@@ -44,8 +44,26 @@ class MonitoringJadwalBimbinganController extends Controller
 
         $jadwalBimbingans = $query->orderBy('ketersediaan_jadwals.tanggal', 'desc')->get();
 
+        // Progress reminder history (PBI 33 – displayed as section on this page)
+        $progressReminderHistory = Auth::user()
+            ->notifications()
+            ->where('type', 'App\\Notifications\\AcademicProgressNotification')
+            ->latest()
+            ->take(10)
+            ->get()
+            ->map(fn ($n) => [
+                'id' => $n->id,
+                'title' => data_get($n->data, 'title', 'Reminder Progres'),
+                'message' => data_get($n->data, 'message', ''),
+                'progress_summary' => data_get($n->data, 'progress_summary', []),
+                'days_since_last_bimbingan' => data_get($n->data, 'days_since_last_bimbingan'),
+                'read_at' => $n->read_at,
+                'created_at' => $n->created_at->diffForHumans(),
+            ]);
+
         return Inertia::render('MonitoringJadwal/Index', [
             'jadwalBimbingans' => $jadwalBimbingans,
+            'progressReminderHistory' => $progressReminderHistory,
             'filters' => [
                 'status' => $status ?? 'all',
                 'search' => $search ?? '',

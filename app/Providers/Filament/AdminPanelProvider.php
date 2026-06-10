@@ -50,6 +50,7 @@ class AdminPanelProvider extends PanelProvider
             ->font('Inter')
             ->darkMode()
             ->databaseNotifications()
+            ->databaseNotificationsPolling('30s')
             ->sidebarCollapsibleOnDesktop()
 
             // ─── Resource & Page Discovery ────────────────────────────────
@@ -62,6 +63,7 @@ class AdminPanelProvider extends PanelProvider
             ->widgets([
                 AccountWidget::class,
                 FilamentInfoWidget::class,
+                \App\Filament\Widgets\AiAssistantUsageWidget::class,
             ])
 
             // ─── Middleware ──────────────────────────────────────────────

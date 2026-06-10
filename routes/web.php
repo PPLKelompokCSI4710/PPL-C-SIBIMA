@@ -5,6 +5,7 @@ use App\Http\Controllers\AiChatController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\JadwalRequestController;
 use App\Http\Controllers\KalenderAkademikController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReminderSettingsController;
 use Illuminate\Foundation\Application;
@@ -107,6 +108,18 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/settings/reminders', [ReminderSettingsController::class, 'edit'])->name('reminders.edit');
     Route::post('/settings/reminders', [ReminderSettingsController::class, 'update'])->name('reminders.update');
+
+    // Notification Bell API (used by NotificationBell.vue)
+    Route::get('/api/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::post('/api/notifications/mark-all-read', [NotificationController::class, 'markAllRead'])->name('notifications.markAllRead');
+    Route::post('/api/notifications/{id}/mark-read', [NotificationController::class, 'markRead'])->name('notifications.markRead');
+
+    // AI Academic Assistant Session API Routes
+    Route::get('/api/ai-chat/sessions', [AiChatController::class, 'getSessions'])->name('api.ai-chat.sessions');
+    Route::post('/api/ai-chat/sessions', [AiChatController::class, 'createSession'])->name('api.ai-chat.create-session');
+    Route::delete('/api/ai-chat/sessions/{id}', [AiChatController::class, 'deleteSession'])->name('api.ai-chat.delete-session');
+    Route::get('/api/ai-chat/sessions/{id}/messages', [AiChatController::class, 'getSessionMessages'])->name('api.ai-chat.messages');
+    Route::post('/api/ai-chat/sessions/{id}/messages', [AiChatController::class, 'sendMessage'])->name('api.ai-chat.send-message');
 
     // Google Calendar Connection Routes
     Route::get('/google/connect', [GoogleCalendarAuthController::class, 'redirectToGoogle'])->name('google.connect');

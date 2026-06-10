@@ -54,16 +54,16 @@
     <div class="doc-title">Laporan Hasil Bimbingan Akademik</div>
     <table class="student-box">
         <tr>
-            <td class="label">Nama Lengkap</td><td class="colon">:</td><td class="value"><strong>{{ $mahasiswa->nama_lengkap }}</strong></td>
-            <td class="label">Program Studi</td><td class="colon">:</td><td class="value">{{ $mahasiswa->program_studi }}</td>
+            <td class="label">Nama Lengkap</td><td class="colon">:</td><td class="value"><strong></strong></td>
+            <td class="label">Program Studi</td><td class="colon">:</td><td class="value"></td>
         </tr>
         <tr>
-            <td class="label">NIM</td><td class="colon">:</td><td class="value">{{ $mahasiswa->nim }}</td>
-            <td class="label">Fakultas</td><td class="colon">:</td><td class="value">{{ $mahasiswa->fakultas }}</td>
+            <td class="label">NIM</td><td class="colon">:</td><td class="value"></td>
+            <td class="label">Fakultas</td><td class="colon">:</td><td class="value"></td>
         </tr>
         <tr>
-            <td class="label">Angkatan / Sem</td><td class="colon">:</td><td class="value">Angkatan {{ $mahasiswa->angkatan }} / Semester {{ $mahasiswa->semester }}</td>
-            <td class="label">Status Akademik</td><td class="colon">:</td><td class="value"><span style="text-transform: uppercase; font-weight: bold; color: #059669;">{{ is_object($mahasiswa->status_akademik) ? $mahasiswa->status_akademik->value : $mahasiswa->status_akademik }}</span></td>
+            <td class="label">Angkatan / Sem</td><td class="colon">:</td><td class="value"></td>
+            <td class="label">Status Akademik</td><td class="colon">:</td><td class="value"></td>
         </tr>
     </table>
     <table class="data-table">
@@ -73,45 +73,19 @@
                 <th style="width:25%;">Dosen Pembimbing</th>
                 <th style="width:20%;">Tanggal &amp; Waktu</th>
                 <th style="width:35%;">Topik &amp; Judul TA</th>
-                <th style="width:15%; text-align:center;">Status</th>
+                <th style="width:15%; text-align:center;">Tanda Tangan Dosen</th>
             </tr>
         </thead>
         <tbody>
-            @forelse($jadwalBimbingans as $index => $jadwal)
+            @for($i = 1; $i <= 8; $i++)
                 <tr>
-                    <td style="text-align:center;">{{ $index + 1 }}</td>
-                    <td>
-                        <strong>{{ $jadwal->dosen?->nama_lengkap ?? 'N/A' }}</strong><br>
-                        <span style="color:#7A7A7A; font-size:9px;">NIDN: {{ $jadwal->dosen?->nidn ?? '-' }}</span>
-                    </td>
-                    <td>
-                        {{ \Carbon\Carbon::parse($jadwal->ketersediaanJadwal?->tanggal)->locale('id')->translatedFormat('d F Y') }}<br>
-                        <span style="color:#7A7A7A; font-size:9px;">
-                            {{ \Carbon\Carbon::parse($jadwal->ketersediaanJadwal?->waktu_mulai)->format('H:i') }} - {{ \Carbon\Carbon::parse($jadwal->ketersediaanJadwal?->waktu_selesai)->format('H:i') }} WIB
-                        </span><br>
-                        <span class="{{ $jadwal->tipe === 'online' ? 'tipe-online' : 'tipe-offline' }}" style="font-size:8px;">({{ strtoupper($jadwal->tipe ?? 'offline') }})</span>
-                    </td>
-                    <td>
-                        @if($jadwal->judul_ta)
-                            <div style="font-weight:bold; color:#1B3F66; margin-bottom:3px;">TA: {{ $jadwal->judul_ta }}</div>
-                        @endif
-                        <div style="color:#2F2F2F;">Catatan: {{ $jadwal->topik_bimbingan ?? '-' }}</div>
-                    </td>
-                    <td style="text-align:center; vertical-align:middle;">
-                        @php
-                            $statusClass = 'badge-pending';
-                            $statusLabel = 'PENDING';
-                            if ($jadwal->status === 'approved') { $statusClass = 'badge-approved'; $statusLabel = 'DISETUJUI'; }
-                            elseif ($jadwal->status === 'completed') { $statusClass = 'badge-completed'; $statusLabel = 'SELESAI'; }
-                            elseif ($jadwal->status === 'rejected') { $statusClass = 'badge-rejected'; $statusLabel = 'DITOLAK'; }
-                            elseif ($jadwal->status === 'canceled') { $statusClass = 'badge-canceled'; $statusLabel = 'DIBATALKAN'; }
-                        @endphp
-                        <span class="badge {{ $statusClass }}">{{ $statusLabel }}</span>
-                    </td>
+                    <td style="text-align:center; height: 50px;">{{ $i }}</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
                 </tr>
-            @empty
-                <tr><td colspan="5" style="text-align:center; color:#7A7A7A; padding:20px;">Tidak ada riwayat bimbingan akademik ditemukan.</td></tr>
-            @endforelse
+            @endfor
         </tbody>
     </table>
     <table class="signature-table">
@@ -119,19 +93,15 @@
             <td>
                 <div class="signature-title">Mahasiswa bersangkutan,</div>
                 <div style="height:50px;"></div>
-                <div class="signature-name">{{ $mahasiswa->nama_lengkap }}</div>
-                <div class="signature-nip">NIM. {{ $mahasiswa->nim }}</div>
+                <div class="signature-name">............................................</div>
+                <div class="signature-nip">NIM. ........................................</div>
             </td>
             <td style="text-align:right;">
                 <div class="signature-title">Mengetahui,<br>Dosen Pembimbing Utama</div>
                 <div style="height:50px;"></div>
-                <div class="signature-name">{{ $jadwalBimbingans->first()?->dosen?->nama_lengkap ?? '............................................' }}</div>
+                <div class="signature-name">............................................</div>
                 <div class="signature-nip">
-                    @if($jadwalBimbingans->first()?->dosen?->nidn)
-                        NIDN. {{ $jadwalBimbingans->first()->dosen->nidn }}
-                    @else
-                        NIDN. ............................................
-                    @endif
+                    NIDN. ........................................
                 </div>
             </td>
         </tr>
