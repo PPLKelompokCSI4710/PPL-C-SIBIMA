@@ -75,7 +75,7 @@
                     :href="route('mahasiswa.jadwal.index')"
                     :class="[
                         route().current('mahasiswa.jadwal.*') ||
-                        route().current('mahasiswa.jadwal-bimbingan.*')
+                            route().current('mahasiswa.jadwal-bimbingan.*')
                             ? 'bg-blue-50 text-blue-700 font-semibold'
                             : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900',
                     ]"

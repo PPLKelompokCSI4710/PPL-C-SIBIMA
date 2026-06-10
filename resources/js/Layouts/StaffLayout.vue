@@ -145,7 +145,6 @@
         GraduationCapIcon,
         LayoutDashboardIcon,
         BookOpenIcon,
-        ClipboardCheckIcon,
         TrendingUpIcon,
         LogOutIcon,
         CalendarDaysIcon,
