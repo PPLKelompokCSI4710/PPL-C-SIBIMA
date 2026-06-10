@@ -16,13 +16,19 @@
                     >
                         {{ $page.props.auth.user?.name?.charAt(0) }}
                     </div>
-                    <div class="overflow-hidden">
+                    <div class="overflow-hidden flex-1">
                         <p class="text-sm font-bold text-slate-800 truncate">
                             {{ $page.props.auth.user?.name }}
                         </p>
-                        <p class="text-xs text-slate-500 capitalize">
-                            {{ userRole }}
-                        </p>
+                        <div class="flex items-center justify-between mt-0.5">
+                            <span class="text-xs text-slate-500 capitalize">{{ userRole }}</span>
+                            <Link
+                                :href="route('profile.edit')"
+                                class="text-xs text-indigo-600 hover:text-indigo-700 font-bold hover:underline"
+                            >
+                                Edit Profile
+                            </Link>
+                        </div>
                     </div>
                 </div>
 
@@ -213,6 +219,7 @@
         if (route().current('staff.calendar')) return 'Kalender Akademik';
         if (route().current('dosen.ketersediaan-jadwal.*')) return 'Ketersediaan Jadwal';
         if (route().current('dosen.monitoring-jadwal.*')) return 'Monitoring Jadwal';
+        if (route().current('profile.edit')) return 'Profile Settings';
         return 'Staff Portal';
     });
 </script>

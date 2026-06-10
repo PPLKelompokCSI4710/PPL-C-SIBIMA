@@ -152,7 +152,7 @@
                                 <div class="text-center py-6">
                                     <div class="inline-block relative">
                                         <span class="text-6xl font-black text-slate-800 tracking-tight">{{ auth.progress?.total_sks || '0' }}</span>
-                                        <span class="text-lg font-bold text-slate-400 ml-1">/ 144</span>
+                                        <span class="text-lg font-bold text-slate-400 ml-1">/ 144 SKS</span>
                                         <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Total SKS Lulus</p>
                                     </div>
                                 </div>
@@ -163,7 +163,7 @@
                                 <div class="space-y-2.5">
                                     <div class="flex justify-between text-xs font-semibold">
                                         <span class="text-slate-500">Progress Kelulusan</span>
-                                        <span class="text-emerald-600 font-bold">{{ progressPercentage }}%</span>
+                                        <span class="text-emerald-600 font-bold">{{ progressPercentage }}% Completed</span>
                                     </div>
                                     <div class="relative w-full h-3.5 bg-slate-100 rounded-full overflow-hidden shadow-inner">
                                         <!-- Target SKS bar marker (light blue/cyan background highlight) -->
