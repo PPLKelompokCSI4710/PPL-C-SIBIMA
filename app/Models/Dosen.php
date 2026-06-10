@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Dosen extends Model
@@ -15,6 +17,7 @@ class Dosen extends Model
     protected $fillable = [
         'user_id',
         'nidn',
+        'kode_dosen',
         'nama_lengkap',
         'program_studi',
         'fakultas',
@@ -33,7 +36,11 @@ class Dosen extends Model
         'is_active' => 'boolean',
     ];
 
-    public function user()
+    // =========================================================================
+    // RELATIONSHIPS
+    // =========================================================================
+
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
@@ -43,9 +50,8 @@ class Dosen extends Model
         return $this->hasMany(Bimbingan::class);
     }
 
-    public function mahasiswas()
+    public function mahasiswas(): HasMany
     {
-        return $this->belongsToMany(Mahasiswa::class, 'dosen_mahasiswa')
-            ->withPivot(['tanggal_penugasan', 'tanggal_berakhir', 'is_active', 'catatan']);
+        return $this->hasMany(Mahasiswa::class);
     }
 }

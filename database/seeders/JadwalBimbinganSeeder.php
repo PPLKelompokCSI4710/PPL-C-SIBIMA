@@ -40,6 +40,36 @@ class JadwalBimbinganSeeder extends Seeder
             ]
         );
 
+        $mahasiswaProfiles = [$mahasiswaProfile];
+
+        $newMahasiswas = [
+            ['name' => 'Jack', 'email' => 'jack@sibima.test', 'nim' => '2021001002'],
+            ['name' => 'Mulyono', 'email' => 'mulyono@sibima.test', 'nim' => '2021001003'],
+            ['name' => 'Wowo', 'email' => 'wowo@sibima.test', 'nim' => '2021001004'],
+        ];
+
+        foreach ($newMahasiswas as $m) {
+            $u = User::firstOrCreate(
+                ['email' => $m['email']],
+                ['name' => $m['name'], 'password' => Hash::make('password')]
+            );
+            $u->assignRole('mahasiswa');
+
+            $p = Mahasiswa::firstOrCreate(
+                ['user_id' => $u->id],
+                [
+                    'nim' => $m['nim'],
+                    'nama_lengkap' => $m['name'],
+                    'program_studi' => 'Teknik Informatika',
+                    'fakultas' => 'FMIPA',
+                    'angkatan' => '2021',
+                    'semester' => '7',
+                    'status_akademik' => 'aktif',
+                ]
+            );
+            $mahasiswaProfiles[] = $p;
+        }
+
         // 2. Data beberapa Dosen
         $dosenList = [
             [
@@ -121,30 +151,30 @@ class JadwalBimbinganSeeder extends Seeder
             $jadwalData = [
                 [
                     'dosen_id' => $dosenUtama->id,
-                    'mahasiswa_id' => $mahasiswaProfile->id,
+                    'mahasiswa_id' => $mahasiswaProfiles[1]->id, // Jack
                     'ketersediaan_jadwal_id' => $schedulesUtama[0]->id,
-                    'judul_ta' => 'Analisis Algoritma X untuk Optimasi Y',
-                    'topik_bimbingan' => 'Konsultasi Bab 1 - Pendahuluan & Latar Belakang',
+                    'judul_ta' => 'Implementasi AI pada Sistem Rekomendasi',
+                    'topik_bimbingan' => 'Pengajuan Bab 1',
+                    'tipe' => 'online',
+                    'status' => 'pending',
+                ],
+                [
+                    'dosen_id' => $dosenUtama->id,
+                    'mahasiswa_id' => $mahasiswaProfiles[2]->id, // Mulyono
+                    'ketersediaan_jadwal_id' => $schedulesUtama[1]->id,
+                    'judul_ta' => 'Sistem Informasi Manajemen Skripsi',
+                    'topik_bimbingan' => 'Diskusi Alur Sistem',
                     'tipe' => 'offline',
                     'status' => 'pending',
                 ],
                 [
                     'dosen_id' => $dosenUtama->id,
-                    'mahasiswa_id' => $mahasiswaProfile->id,
-                    'ketersediaan_jadwal_id' => $schedulesUtama[1]->id,
-                    'judul_ta' => 'Analisis Algoritma X untuk Optimasi Y',
-                    'topik_bimbingan' => 'Review Bab 2 - Tinjauan Pustaka & Landasan Teori',
-                    'tipe' => 'online',
-                    'status' => 'approved',
-                ],
-                [
-                    'dosen_id' => $dosenUtama->id,
-                    'mahasiswa_id' => $mahasiswaProfile->id,
+                    'mahasiswa_id' => $mahasiswaProfiles[3]->id, // Wowo
                     'ketersediaan_jadwal_id' => $schedulesUtama[2]->id,
-                    'judul_ta' => 'Analisis Algoritma X untuk Optimasi Y',
-                    'topik_bimbingan' => 'Diskusi Metodologi Penelitian - Bab 3',
-                    'tipe' => 'offline',
-                    'status' => 'completed',
+                    'judul_ta' => 'Keamanan Jaringan Komputer',
+                    'topik_bimbingan' => 'Review Latar Belakang Masalah',
+                    'tipe' => 'online',
+                    'status' => 'pending',
                 ],
             ];
 

@@ -18,7 +18,6 @@ class DashboardController extends Controller
         $stats = [
             'total_mahasiswa' => Mahasiswa::count(),
             'total_courses' => Course::count(),
-            'pending_krs' => StudyPlan::where('status', 'pending')->count(),
             'avg_ipk' => Mahasiswa::avg('ipk') ?? 0,
         ];
 

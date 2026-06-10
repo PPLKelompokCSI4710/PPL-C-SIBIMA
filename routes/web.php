@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\GoogleCalendarAuthController;
 use App\Http\Controllers\AiChatController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\JadwalRequestController;
 use App\Http\Controllers\KalenderAkademikController;
 use App\Http\Controllers\NotificationController;
@@ -12,6 +13,10 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::get('/', function () {
+    if (auth()->check()) {
+        return redirect()->route('dashboard');
+    }
+
     return Inertia::render('Welcome', [
         'canLogin' => Route::has('login'),
         'canRegister' => Route::has('register'),
@@ -22,19 +27,79 @@ Route::get('/', function () {
 
 Route::post('/api/ai-chat', [AiChatController::class, 'generate'])->name('api.ai-chat');
 
-Route::get('/dashboard', function () {
-    $user = auth()->user();
+Route::get('/dashboard', [DashboardController::class, '__invoke'])->middleware(['auth', 'verified'])->name('dashboard');
 
-    if ($user->hasRole('mahasiswa')) {
-        return redirect()->route('mahasiswa.dashboard');
-    }
+Route::middleware('auth')->group(function () {
+    Route::get('/study-plan', function () {
+        $user = auth()->user();
+        if ($user->hasRole('mahasiswa')) {
+            return redirect()->route('mahasiswa.study-plans.index');
+        }
+        if ($user->hasRole('admin') || $user->hasRole('dosen')) {
+            return redirect()->route('dashboard');
+        }
 
-    if ($user->hasRole('admin') || $user->hasRole('dosen') || $user->hasRole('staff')) {
-        return redirect()->route('staff.dashboard');
-    }
+        return redirect()->route('dashboard');
+    })->name('study-plan.redirect');
 
-    return Inertia::render('Dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+    Route::get('/study-plans', function () {
+        return redirect('/study-plan');
+    })->name('study-plans.redirect');
+
+    // Smart redirect for Progress Studi
+    Route::get('/progress', function () {
+        $user = auth()->user();
+        if ($user->hasRole('mahasiswa')) {
+            return redirect()->route('mahasiswa.progress.index');
+        }
+        if ($user->hasRole('admin') || $user->hasRole('dosen')) {
+            return redirect()->route('staff.progress.index');
+        }
+
+        return redirect()->route('dashboard');
+    })->name('progress.redirect');
+
+    // Smart redirect for Kalender Akademik
+    Route::get('/calendar', function () {
+        $user = auth()->user();
+        if ($user->hasRole('mahasiswa')) {
+            return redirect()->route('mahasiswa.calendar');
+        }
+
+        return redirect()->route('dashboard');
+    })->name('calendar.redirect');
+
+    Route::get('/kalender', function () {
+        return redirect('/calendar');
+    })->name('kalender.redirect');
+
+    // Smart redirect for Jadwal Bimbingan
+    Route::get('/jadwal', function () {
+        $user = auth()->user();
+        if ($user->hasRole('mahasiswa')) {
+            return redirect()->route('mahasiswa.jadwal.index');
+        }
+
+        return redirect()->route('dashboard');
+    })->name('jadwal.redirect');
+
+    Route::get('/jadwal-bimbingan', function () {
+        return redirect('/jadwal');
+    })->name('jadwal-bimbingan.redirect');
+
+    // Smart redirect for Courses
+    Route::get('/courses', function () {
+        $user = auth()->user();
+        if ($user->hasRole('mahasiswa')) {
+            return redirect()->route('mahasiswa.courses.index');
+        }
+        if ($user->hasRole('admin')) {
+            return redirect()->route('staff.courses.index');
+        }
+
+        return redirect()->route('dashboard');
+    })->name('courses.redirect');
+});
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

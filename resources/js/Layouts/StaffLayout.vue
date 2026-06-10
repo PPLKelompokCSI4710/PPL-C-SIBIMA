@@ -16,13 +16,19 @@
                     >
                         {{ $page.props.auth.user?.name?.charAt(0) }}
                     </div>
-                    <div class="overflow-hidden">
+                    <div class="overflow-hidden flex-1">
                         <p class="text-sm font-bold text-slate-800 truncate">
                             {{ $page.props.auth.user?.name }}
                         </p>
-                        <p class="text-xs text-slate-500 capitalize">
-                            {{ userRole }}
-                        </p>
+                        <div class="flex items-center justify-between mt-0.5">
+                            <span class="text-xs text-slate-500 capitalize">{{ userRole }}</span>
+                            <Link
+                                :href="route('profile.edit')"
+                                class="text-xs text-indigo-600 hover:text-indigo-700 font-bold hover:underline"
+                            >
+                                Edit Profile
+                            </Link>
+                        </div>
                     </div>
                 </div>
 
@@ -55,19 +61,7 @@
                         <span>Manajemen Kursus</span>
                     </Link>
 
-                    <!-- Dosen & Admin: KRS Approval -->
-                    <Link
-                        :href="route('staff.study-plans.index')"
-                        :class="[
-                            route().current('staff.study-plans.index')
-                                ? 'bg-indigo-50 text-indigo-700 font-semibold'
-                                : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900',
-                        ]"
-                        class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors"
-                    >
-                        <ClipboardCheckIcon class="w-5 h-5" />
-                        <span>Persetujuan KRS</span>
-                    </Link>
+
 
                     <!-- Dosen & Admin: Student Progress -->
                     <Link
@@ -95,6 +89,53 @@
                     >
                         <CalendarDaysIcon class="w-5 h-5" />
                         <span>Kalender Akademik</span>
+                    </Link>
+
+                    <!-- Dosen: Ketersediaan Jadwal -->
+                    <Link
+                        v-if="!isAdmin"
+                        :href="route('dosen.ketersediaan-jadwal.index')"
+                        :class="[
+                            route().current('dosen.ketersediaan-jadwal.*')
+                                ? 'bg-indigo-50 text-indigo-700 font-semibold'
+                                : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900',
+                        ]"
+                        class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors"
+                    >
+                        <CalendarDaysIcon class="w-5 h-5" />
+                        <span>Ketersediaan Jadwal</span>
+                    </Link>
+
+                    <!-- Dosen: Monitoring Jadwal -->
+                    <Link
+                        v-if="!isAdmin"
+                        :href="route('dosen.monitoring-jadwal.index')"
+                        :class="[
+                            route().current('dosen.monitoring-jadwal.*')
+                                ? 'bg-indigo-50 text-indigo-700 font-semibold'
+                                : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900',
+                        ]"
+                        class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors"
+                    >
+                        <ClipboardCheckIcon class="w-5 h-5" />
+                        <span>Monitoring Jadwal</span>
+                    </Link>
+
+                    <!-- Dosen: Riwayat Bimbingan -->
+                    <Link
+                        v-if="!isAdmin"
+                        :href="route('dosen.riwayat-bimbingan.index')"
+                        :class="[
+                            route().current('dosen.riwayat-bimbingan.*')
+                                ? 'bg-indigo-50 text-indigo-700 font-semibold'
+                                : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900',
+                        ]"
+                        class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors"
+                    >
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span>Riwayat Bimbingan</span>
                     </Link>
                 </nav>
             </div>
@@ -164,9 +205,12 @@
     const currentTitle = computed(() => {
         if (route().current('staff.dashboard')) return 'Dashboard';
         if (route().current('staff.courses.index')) return 'Manajemen Kursus';
-        if (route().current('staff.study-plans.index')) return 'Persetujuan KRS';
+
         if (route().current('staff.progress.index')) return 'Progres Mahasiswa';
         if (route().current('staff.calendar')) return 'Kalender Akademik';
+        if (route().current('dosen.ketersediaan-jadwal.*')) return 'Ketersediaan Jadwal';
+        if (route().current('dosen.monitoring-jadwal.*')) return 'Monitoring Jadwal';
+        if (route().current('profile.edit')) return 'Profile Settings';
         return 'Staff Portal';
     });
 </script>

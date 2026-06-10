@@ -4,7 +4,7 @@
 
         <div class="space-y-8">
             <!-- Stats Grid -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
                     <div class="flex justify-between items-start mb-4">
                         <div
@@ -19,19 +19,7 @@
                     </p>
                 </div>
 
-                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-                    <div class="flex justify-between items-start mb-4">
-                        <div
-                            class="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center text-amber-600"
-                        >
-                            <ClipboardCheckIcon class="w-5 h-5" />
-                        </div>
-                    </div>
-                    <p class="text-slate-500 text-sm font-medium">Pending KRS</p>
-                    <p class="text-3xl font-bold text-slate-800 mt-1">
-                        {{ stats?.pending_krs || 0 }}
-                    </p>
-                </div>
+
 
                 <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
                     <div class="flex justify-between items-start mb-4">
@@ -74,16 +62,8 @@
                             class="font-bold uppercase text-white bg-white/20 px-2 py-0.5 rounded ml-1"
                             >{{ role }}</span
                         >. Gunakan menu di sebelah kiri untuk mengelola data akademik mahasiswa,
-                        menyetujui KRS, atau memantau progres studi.
+                        memantau progres studi, atau mengelola data kursus.
                     </p>
-                    <div class="mt-6 flex gap-4">
-                        <Link
-                            :href="route('staff.study-plans.index')"
-                            class="px-6 py-2 bg-white text-indigo-600 rounded-xl font-bold text-sm hover:bg-indigo-50 transition-colors"
-                        >
-                            Lihat Pending KRS
-                        </Link>
-                    </div>
                 </div>
                 <!-- Abstract patterns -->
                 <div
