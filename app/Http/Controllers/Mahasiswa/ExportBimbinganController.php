@@ -25,18 +25,32 @@ class ExportBimbinganController extends Controller
             abort(404, 'Data mahasiswa tidak ditemukan.');
         }
 
-        // 2. Ambil query filter opsional dari request (untuk fleksibilitas ekspor sesuai filter)
-        $status = $request->query('status');
-        $search = $request->query('search');
-        $format = $request->query('format', 'pdf'); // default pdf
+        // 2. Ambil optional list ID yang dipilih mahasiswa
+        $idsParam = $request->query('ids');
+        if (!$idsParam) {
+            // Jika tidak ada ID yang dipilih, kirim respons error
+            return redirect()->back()->with('error', 'Pilih minimal satu riwayat bimbingan untuk diexport.');
+        }
+        // ids dapat berupa string CSV atau array
+        $selectedIds = is_array($idsParam) ? $idsParam : explode(',', $idsParam);
+        // Pastikan semua elemen adalah integer
+        $selectedIds = array_filter($selectedIds, fn($id) => is_numeric($id));
+        if (empty($selectedIds)) {
+            return redirect()->back()->with('error', 'Tidak ada ID bimbingan yang valid dipilih.');
+        }
 
-        // 3. Query data bimbingan milik mahasiswa
+
+        // 3. Query data bimbingan milik mahasiswa dengan filter ID terpilih
         $query = JadwalBimbingan::select('jadwal_bimbingans.*')
             ->join('ketersediaan_jadwals', 'jadwal_bimbingans.ketersediaan_jadwal_id', '=', 'ketersediaan_jadwals.id')
             ->with(['dosen', 'mahasiswa', 'ketersediaanJadwal'])
-            ->where('jadwal_bimbingans.mahasiswa_id', $mahasiswa->id);
+            ->where('jadwal_bimbingans.mahasiswa_id', $mahasiswa->id)
+            ->whereIn('jadwal_bimbingans.id', $selectedIds);
 
-        // Filter berdasarkan status jika dipilih
+        // Ambil filter tambahan
+        $status = $request->query('status');
+        $search = $request->query('search');
+        $format = $request->query('format', 'pdf'); // default pdf
         if ($status && $status !== 'all') {
             $query->where('jadwal_bimbingans.status', $status);
         }
