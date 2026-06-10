@@ -26,7 +26,7 @@ class MonitoringJadwalBimbinganController extends Controller
         // Query jadwal milik mahasiswa ini dengan filter opsional
         $query = JadwalBimbingan::select('jadwal_bimbingans.*')
             ->join('ketersediaan_jadwals', 'jadwal_bimbingans.ketersediaan_jadwal_id', '=', 'ketersediaan_jadwals.id')
-            ->with(['dosen', 'mahasiswa', 'ketersediaanJadwal'])
+            ->with(['dosen', 'mahasiswa', 'ketersediaanJadwal', 'rescheduleRequests'])
             ->where('jadwal_bimbingans.mahasiswa_id', $mahasiswa?->id);
 
         // Filter berdasarkan status jika dipilih
@@ -47,10 +47,15 @@ class MonitoringJadwalBimbinganController extends Controller
 
         $jadwalBimbingans = $query->orderBy('ketersediaan_jadwals.tanggal', 'desc')->get();
         
-        // Append can_reschedule boolean
+        // Append can_reschedule dan has_pending_reschedule boolean
         $jadwalBimbingans->each(function ($jadwal) {
+            $hasPending = $jadwal->rescheduleRequests->where('status', 'pending')->first();
+            $hasApproved = $jadwal->rescheduleRequests->where('status', 'approved')->first();
+            $jadwal->has_pending_reschedule = (bool) $hasPending;
             $jadwal->can_reschedule = ($jadwal->status === 'approved') 
-                && Carbon::parse($jadwal->ketersediaanJadwal->tanggal)->startOfDay()->greaterThan(now()->startOfDay());
+                && Carbon::parse($jadwal->ketersediaanJadwal->tanggal)->startOfDay()->greaterThan(now()->startOfDay())
+                && !$hasPending
+                && !$hasApproved;
         });
 
         return Inertia::render('MonitoringJadwal/Index', [
@@ -109,6 +114,18 @@ class MonitoringJadwalBimbinganController extends Controller
         // Validasi Kepemilikan
         if ($jadwal->mahasiswa_id !== $mahasiswa?->id) {
             abort(403, 'Anda tidak memiliki akses untuk mereschedule jadwal ini.');
+        }
+
+        // Validasi jika sudah ada request reschedule pending
+        if ($jadwal->rescheduleRequests()->where('status', 'pending')->exists()) {
+            return redirect()->route('mahasiswa.jadwal.index')
+                ->with('error', 'Anda sudah memiliki pengajuan reschedule yang sedang menunggu persetujuan.');
+        }
+
+        // Validasi jika reschedule sudah disetujui sebelumnya
+        if ($jadwal->rescheduleRequests()->where('status', 'approved')->exists()) {
+            return redirect()->route('mahasiswa.jadwal.index')
+                ->with('error', 'Jadwal ini sudah pernah di-reschedule dan tidak dapat di-reschedule kembali.');
         }
 
         // Validasi Status
@@ -170,6 +187,18 @@ class MonitoringJadwalBimbinganController extends Controller
         // 1. Validasi Kepemilikan
         if ($jadwal->mahasiswa_id !== $mahasiswa?->id) {
             abort(403, 'Anda tidak memiliki akses untuk mereschedule jadwal ini.');
+        }
+
+        // Validasi jika sudah ada request reschedule pending
+        if ($jadwal->rescheduleRequests()->where('status', 'pending')->exists()) {
+            return redirect()->route('mahasiswa.jadwal.index')
+                ->with('error', 'Anda sudah memiliki pengajuan reschedule yang sedang menunggu persetujuan.');
+        }
+
+        // Validasi jika reschedule sudah disetujui sebelumnya
+        if ($jadwal->rescheduleRequests()->where('status', 'approved')->exists()) {
+            return redirect()->route('mahasiswa.jadwal.index')
+                ->with('error', 'Jadwal ini sudah pernah di-reschedule dan tidak dapat di-reschedule kembali.');
         }
 
         // 2. Validasi Status

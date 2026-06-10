@@ -127,6 +127,21 @@
                         <span>Monitoring Jadwal</span>
                     </Link>
 
+                    <!-- Dosen: Reschedule Jadwal -->
+                    <Link
+                        v-if="!isAdmin"
+                        :href="route('dosen.reschedule.index')"
+                        :class="[
+                            route().current('dosen.reschedule.*')
+                                ? 'bg-indigo-50 text-indigo-700 font-semibold'
+                                : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900',
+                        ]"
+                        class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors"
+                    >
+                        <CalendarDaysIcon class="w-5 h-5" />
+                        <span>Reschedule Jadwal</span>
+                    </Link>
+
                     <!-- Dosen: Riwayat Bimbingan -->
                     <Link
                         v-if="!isAdmin"
@@ -225,6 +240,7 @@
         if (route().current('staff.calendar')) return 'Kalender Akademik';
         if (route().current('dosen.ketersediaan-jadwal.*')) return 'Ketersediaan Jadwal';
         if (route().current('dosen.monitoring-jadwal.*')) return 'Monitoring Jadwal';
+        if (route().current('dosen.reschedule.*')) return 'Reschedule Jadwal';
         return 'Staff Portal';
     });
 </script>

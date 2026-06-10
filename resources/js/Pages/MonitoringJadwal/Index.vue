@@ -128,6 +128,30 @@ const searchQuery = ref(props.filters.search);
 
     // Cek apakah ada filter aktif
     const hasActiveFilter = () => selectedStatus.value !== 'all' || searchQuery.value !== '';
+
+    const formatDate = (dateStr) => {
+        if (!dateStr) return '-';
+        const date = new Date(dateStr);
+        return date.toLocaleDateString('id-ID', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+    };
+
+    const formatTime = (timeStr) => {
+        if (!timeStr) return '-';
+        return timeStr.substring(0, 5);
+    };
+
+    const toggleSelectAll = () => {
+        if (selectedIds.value.length === props.jadwalBimbingans.length) {
+            selectedIds.value = [];
+        } else {
+            selectedIds.value = props.jadwalBimbingans.map(j => j.id);
+        }
+    };
 </script>
 
 <template>
@@ -375,7 +399,13 @@ const searchQuery = ref(props.filters.search);
                                                     d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"
                                                 />
                                             </svg>
-                                            {{ jadwal.tanggal }} • {{ jadwal.waktu }} WIB
+                                            <template v-if="jadwal.ketersediaan_jadwal">
+                                                {{ formatDate(jadwal.ketersediaan_jadwal.tanggal) }} • 
+                                                {{ formatTime(jadwal.ketersediaan_jadwal.waktu_mulai) }} - {{ formatTime(jadwal.ketersediaan_jadwal.waktu_selesai) }} WIB
+                                            </template>
+                                            <template v-else>
+                                                Jadwal Tidak Tersedia
+                                            </template>
                                         </div>
                                         <div class="text-sm font-bold text-gray-900 mb-1">
                                             {{ jadwal.judul_ta }}
@@ -384,10 +414,10 @@ const searchQuery = ref(props.filters.search);
                                             {{ jadwal.topik_bimbingan }}
                                         </div>
                                         <span
-                                            :class="tipeColor(jadwal.tipe)"
+                                            :class="tipeColor(jadwal.ketersediaan_jadwal?.tipe || jadwal.tipe)"
                                             class="mt-1 inline-block text-xs font-semibold uppercase"
                                         >
-                                            {{ tipeLabel(jadwal.tipe) }}
+                                            {{ tipeLabel(jadwal.ketersediaan_jadwal?.tipe || jadwal.tipe) }}
                                         </span>
                                     </td>
 
@@ -447,7 +477,14 @@ const searchQuery = ref(props.filters.search);
                                                 Batalkan
                                             </button>
                                         </template>
-                                        <template v-else-if="jadwal.status === 'approved'">
+                                        <template v-else-if="jadwal.status === 'approved' && jadwal.has_pending_reschedule">
+                                            <span
+                                                class="inline-flex items-center rounded-md border border-amber-200 bg-amber-50 px-3 py-1.5 text-xs font-semibold text-amber-700"
+                                            >
+                                                Reschedule Diproses
+                                            </span>
+                                        </template>
+                                        <template v-else-if="jadwal.status === 'approved' && jadwal.can_reschedule">
                                             <Link
                                                 :href="route('mahasiswa.jadwal.edit-reschedule', jadwal.id)"
                                                 class="inline-flex items-center rounded-md border border-blue-300 bg-white px-3 py-1.5 text-xs font-medium text-blue-700 shadow-sm hover:bg-blue-50 transition-colors"
