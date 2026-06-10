@@ -29,6 +29,7 @@ class ExportBimbinganTest extends TestCase
             'nim' => '12345678',
             'nama_lengkap' => 'Test Mahasiswa',
             'program_studi' => 'Teknik Informatika',
+            'angkatan' => '2024',
         ]);
 
         $response = $this->actingAs($user)->get(route('mahasiswa.jadwal.exportPdf', ['format' => 'pdf']));
@@ -46,6 +47,7 @@ class ExportBimbinganTest extends TestCase
             'nim' => '12345678',
             'nama_lengkap' => 'Test Mahasiswa',
             'program_studi' => 'Teknik Informatika',
+            'angkatan' => '2024',
         ]);
 
         $response = $this->actingAs($user)->get(route('mahasiswa.jadwal.exportPdf', ['format' => 'excel']));

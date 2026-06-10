@@ -18,15 +18,28 @@
     const selectedStatus = ref(props.filters.status);
 const searchQuery = ref(props.filters.search);
 // New export format selector
-const exportFormat = ref('pdf');
-const exportBimbingan = () => {
-    const url = route('mahasiswa.jadwal.exportPdf', {
-        status: selectedStatus.value !== 'all' ? selectedStatus.value : undefined,
-        search: searchQuery.value || undefined,
-        format: exportFormat.value,
-    });
-    window.open(url, '_blank');
-};
+    
+    const selectedIds = ref([]);
+    const exportFormat = ref('pdf');
+    const exportBimbingan = () => {
+        if (selectedIds.value.length === 0) {
+            alert('Pilih minimal satu riwayat bimbingan untuk diexport.');
+            return;
+        }
+        // Build query parameters for GET request
+    const params = new URLSearchParams();
+    selectedIds.value.forEach(id => params.append('ids[]', id));
+    if (selectedStatus.value !== 'all') {
+        params.append('status', selectedStatus.value);
+    }
+    if (searchQuery.value) {
+        params.append('search', searchQuery.value);
+    }
+    params.append('format', exportFormat.value);
+    // Construct full URL and navigate to trigger download
+    const url = `${route('mahasiswa.jadwal.exportPdf')}?${params.toString()}`;
+    window.location.href = url;
+    };
 
 
     // Daftar opsi status filter
@@ -302,6 +315,9 @@ const exportBimbingan = () => {
                         <table class="min-w-full divide-y divide-gray-200">
                             <thead class="bg-gray-50">
                                 <tr>
+            <th class="px-6 py-3 text-center">
+                <input type="checkbox" @click="toggleSelectAll" :checked="selectedIds.length === jadwalBimbingans.length" class="h-4 w-4 text-indigo-600 border-gray-300 rounded">
+            </th>
                                     <th
                                         class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500"
                                     >
@@ -328,13 +344,20 @@ const exportBimbingan = () => {
                                         Tindakan
                                     </th>
                                 </tr>
+                <tr>
+                    <td colspan="6" class="px-6 py-4 text-center text-sm text-gray-500">
+                        Pilih data yang ingin di‑export kemudian tekan tombol Export.
+                    </td>
+                </tr>
                             </thead>
                             <tbody class="divide-y divide-gray-200 bg-white">
                                 <tr
-                                    v-for="jadwal in jadwalBimbingans"
-                                    :key="jadwal.id"
-                                    class="hover:bg-gray-50 transition-colors"
-                                >
+                v-for="jadwal in jadwalBimbingans"
+                :key="jadwal.id"
+                class="hover:bg-gray-50 transition-colors">
+                <td class="px-4 py-2 text-center">
+                    <input type="checkbox" :value="jadwal.id" v-model="selectedIds" class="h-4 w-4 text-indigo-600 border-gray-300 rounded" />
+                </td>
                                     <!-- Informasi Bimbingan -->
                                     <td class="px-6 py-4">
                                         <div class="flex items-center text-xs text-gray-400 mb-1">
