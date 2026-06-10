@@ -2,14 +2,14 @@
 
 namespace App\Filament\Resources\BimbinganRelation\Tables;
 
-use App\Models\Dosen;
+use App\Models\Mahasiswa;
 use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\EditAction;
 use Filament\Support\Enums\FontWeight;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
-use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 
 class BimbinganRelationTable
@@ -38,8 +38,6 @@ class BimbinganRelationTable
 
                 TextColumn::make('program_studi')
                     ->label('Program Studi')
-                    ->searchable()
-                    ->sortable()
                     ->toggleable(),
 
                 TextColumn::make('angkatan')
@@ -53,33 +51,29 @@ class BimbinganRelationTable
                     ->label('Dosen Pembimbing')
                     ->searchable()
                     ->sortable()
-                    ->placeholder('Belum ditetapkan')
+                    ->default('Belum Ditetapkan')
                     ->icon('heroicon-o-user')
                     ->badge()
                     ->color(fn (?string $state): string => $state ? 'success' : 'danger'),
             ])
             ->filters([
-                // Filter berdasarkan Dosen Pembimbing
-                SelectFilter::make('dosen_id')
-                    ->label('Dosen Pembimbing')
-                    ->relationship(
-                        name: 'dosen',
-                        titleAttribute: 'nama_lengkap',
-                        modifyQueryUsing: fn ($query) => $query->where('is_active', true),
+                // Filter berdasarkan Program Studi
+                SelectFilter::make('program_studi')
+                    ->label('Program Studi')
+                    ->options(
+                        fn () => Mahasiswa::query()
+                            ->distinct()
+                            ->pluck('program_studi', 'program_studi')
+                            ->toArray()
                     )
                     ->searchable()
                     ->preload(),
 
-                // Filter mahasiswa tanpa pembimbing
-                TernaryFilter::make('has_dosen')
-                    ->label('Status Penetapan')
-                    ->placeholder('Semua')
-                    ->trueLabel('Sudah ditetapkan')
-                    ->falseLabel('Belum ditetapkan')
-                    ->queries(
-                        true: fn ($query) => $query->whereNotNull('dosen_id'),
-                        false: fn ($query) => $query->whereNull('dosen_id'),
-                    ),
+                // Filter mahasiswa yang belum memiliki pembimbing
+                Filter::make('belum_ada_pembimbing')
+                    ->label('Belum Ada Pembimbing')
+                    ->query(fn ($query) => $query->whereNull('dosen_id'))
+                    ->toggle(),
             ])
             ->recordActions([
                 EditAction::make()

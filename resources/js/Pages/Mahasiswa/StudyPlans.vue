@@ -3,6 +3,32 @@
         <Head title="Study Plan (KRS) - SIBIMA" />
 
         <div class="space-y-6">
+            <!-- Toast Notification -->
+            <Transition
+                enter-active-class="transform ease-out duration-300 transition"
+                enter-from-class="translate-y-2 opacity-0 sm:translate-y-0 sm:translate-x-2"
+                enter-to-class="translate-y-0 opacity-100 sm:translate-x-0"
+                leave-active-class="transition ease-in duration-100"
+                leave-from-class="opacity-100"
+                leave-to-class="opacity-0"
+            >
+                <div
+                    v-if="showToast"
+                    class="fixed bottom-6 right-6 z-[60] flex items-center gap-3 bg-emerald-50 text-emerald-700 px-4 py-3 rounded-xl shadow-lg border border-emerald-100"
+                >
+                    <CheckCircle2Icon class="w-5 h-5 text-emerald-600" />
+                    <p class="text-sm font-medium">
+                        {{ toastMessage }}
+                    </p>
+                    <button
+                        class="ml-2 text-emerald-500 hover:text-emerald-700"
+                        @click="closeToast"
+                    >
+                        <XIcon class="w-4 h-4" />
+                    </button>
+                </div>
+            </Transition>
+
             <!-- Top Status Bar -->
             <div
                 class="flex items-center justify-between bg-white rounded-xl border border-slate-200 p-6 shadow-sm"
@@ -76,7 +102,7 @@
                             <th class="px-6 py-4 font-semibold">Course Code</th>
                             <th class="px-6 py-4 font-semibold">Credits</th>
                             <th class="px-6 py-4 font-semibold">Semester</th>
-                            <th class="px-6 py-4 font-semibold">Status</th>
+
                             <th class="px-6 py-4 font-semibold text-right">Actions</th>
                         </tr>
                     </thead>
@@ -112,31 +138,7 @@
                             <td class="px-6 py-4 text-slate-600 text-sm">
                                 Sem {{ course.semester }}
                             </td>
-                            <td class="px-6 py-4">
-                                <span
-                                    v-if="course.status === 'approved'"
-                                    class="inline-flex items-center gap-1.5 px-2 py-1 rounded-md bg-emerald-50 text-emerald-700 text-xs font-medium border border-emerald-100"
-                                >
-                                    <div class="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                                    Approved
-                                </span>
-                                <span
-                                    v-else-if="course.status === 'rejected'"
-                                    class="inline-flex items-center gap-1.5 px-2 py-1 rounded-md bg-red-50 text-red-700 text-xs font-medium border border-red-100"
-                                >
-                                    <div class="w-1.5 h-1.5 rounded-full bg-red-500" />
-                                    Rejected
-                                </span>
-                                <span
-                                    v-else
-                                    class="inline-flex items-center gap-1.5 px-2 py-1 rounded-md bg-amber-50 text-amber-700 text-xs font-medium border border-amber-100"
-                                >
-                                    <div
-                                        class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"
-                                    />
-                                    Pending
-                                </span>
-                            </td>
+
                             <td class="px-6 py-4 text-right">
                                 <div class="flex items-center justify-end gap-2">
                                     <button
@@ -159,7 +161,7 @@
                             </td>
                         </tr>
                         <tr v-if="filteredStudyPlans.length === 0">
-                            <td colspan="6" class="px-6 py-12 text-center">
+                            <td colspan="5" class="px-6 py-12 text-center">
                                 <div
                                     class="flex flex-col items-center justify-center text-slate-400"
                                 >
@@ -345,8 +347,8 @@
 </template>
 
 <script setup>
-    import { ref, computed } from 'vue';
-    import { Head, useForm, router } from '@inertiajs/vue3';
+    import { ref, computed, watch } from 'vue';
+    import { Head, useForm, router, usePage } from '@inertiajs/vue3';
     import StudentLayout from '@/Layouts/StudentLayout.vue';
     import {
         BookOpenIcon,
@@ -367,6 +369,28 @@
         studyPlans: { type: Array, default: () => [] },
         availableCourses: { type: Array, default: () => [] },
     });
+
+    const page = usePage();
+    const showToast = ref(false);
+    const toastMessage = ref('');
+
+    watch(
+        () => page.props.flash?.success,
+        (msg) => {
+            if (msg) {
+                showToast.value = true;
+                toastMessage.value = msg;
+                setTimeout(() => {
+                    showToast.value = false;
+                }, 3000);
+            }
+        },
+        { immediate: true },
+    );
+
+    const closeToast = () => {
+        showToast.value = false;
+    };
 
     // Search Filter
     const searchQuery = ref('');
