@@ -189,68 +189,70 @@
     />
 
     <!-- Schedule Detail Modal -->
-    <Transition
-        enter-active-class="transition ease-out duration-300"
-        enter-from-class="opacity-0 scale-95"
-        enter-to-class="opacity-100 scale-100"
-        leave-active-class="transition ease-in duration-200"
-        leave-from-class="opacity-100 scale-100"
-        leave-to-class="opacity-0 scale-95"
-    >
-        <div v-if="showModal" class="fixed inset-0 z-[100] flex items-center justify-center p-4">
-            <div class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm" @click="showModal = false"></div>
-            
-            <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden ring-1 ring-slate-100">
-                <div class="bg-gradient-to-br from-blue-600 to-indigo-700 p-6 text-white text-center">
-                    <div class="w-16 h-16 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center mx-auto mb-3 shadow-inner">
-                        <CalendarClockIcon class="w-8 h-8 text-white" />
-                    </div>
-                    <h2 class="text-xl font-bold">Detail Jadwal Bimbingan</h2>
-                    <p class="text-blue-100 text-sm mt-1 opacity-90">Pengingat Jadwal Anda</p>
-                </div>
+    <Teleport to="body">
+        <Transition
+            enter-active-class="transition ease-out duration-300"
+            enter-from-class="opacity-0 scale-95"
+            enter-to-class="opacity-100 scale-100"
+            leave-active-class="transition ease-in duration-200"
+            leave-from-class="opacity-100 scale-100"
+            leave-to-class="opacity-0 scale-95"
+        >
+            <div v-if="showModal" class="fixed inset-0 z-[100] flex items-center justify-center p-4">
+                <div class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm" @click="showModal = false"></div>
                 
-                <div class="p-6 space-y-4">
-                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
-                        <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Topik Bimbingan</h4>
-                        <p class="font-medium text-slate-800">{{ selectedSchedule?.topik || '-' }}</p>
+                <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden ring-1 ring-slate-100">
+                    <div class="bg-gradient-to-br from-blue-600 to-indigo-700 p-6 text-white text-center">
+                        <div class="w-16 h-16 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center mx-auto mb-3 shadow-inner">
+                            <CalendarClockIcon class="w-8 h-8 text-white" />
+                        </div>
+                        <h2 class="text-xl font-bold">Detail Jadwal Bimbingan</h2>
+                        <p class="text-blue-100 text-sm mt-1 opacity-90">Pengingat Jadwal Anda</p>
                     </div>
+                    
+                    <div class="p-6 space-y-4">
+                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                            <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Topik Bimbingan</h4>
+                            <p class="font-medium text-slate-800">{{ selectedSchedule?.topik || '-' }}</p>
+                        </div>
 
-                    <div class="grid grid-cols-2 gap-4">
-                        <div class="bg-blue-50/50 p-4 rounded-xl border border-blue-100/50">
-                            <h4 class="text-xs font-bold text-blue-400 uppercase tracking-wider mb-1">Waktu</h4>
-                            <p class="font-bold text-blue-900">{{ formatDateTime(selectedSchedule?.waktu_mulai) }}</p>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="bg-blue-50/50 p-4 rounded-xl border border-blue-100/50">
+                                <h4 class="text-xs font-bold text-blue-400 uppercase tracking-wider mb-1">Waktu</h4>
+                                <p class="font-bold text-blue-900">{{ formatDateTime(selectedSchedule?.waktu_mulai) }}</p>
+                            </div>
+                            <div class="bg-emerald-50/50 p-4 rounded-xl border border-emerald-100/50">
+                                <h4 class="text-xs font-bold text-emerald-400 uppercase tracking-wider mb-1">Tipe / Lokasi</h4>
+                                <p class="font-bold text-emerald-900">{{ selectedSchedule?.tipe_pertemuan || '-' }}</p>
+                                <p class="text-xs text-emerald-700 mt-0.5 truncate" :title="selectedSchedule?.lokasi">{{ selectedSchedule?.lokasi || '-' }}</p>
+                            </div>
                         </div>
-                        <div class="bg-emerald-50/50 p-4 rounded-xl border border-emerald-100/50">
-                            <h4 class="text-xs font-bold text-emerald-400 uppercase tracking-wider mb-1">Tipe / Lokasi</h4>
-                            <p class="font-bold text-emerald-900">{{ selectedSchedule?.tipe_pertemuan || '-' }}</p>
-                            <p class="text-xs text-emerald-700 mt-0.5 truncate" :title="selectedSchedule?.lokasi">{{ selectedSchedule?.lokasi || '-' }}</p>
-                        </div>
-                    </div>
 
-                    <div class="flex items-center gap-3 p-4 border border-slate-100 rounded-xl">
-                        <div class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center shrink-0">
-                            <InfoIcon class="w-5 h-5 text-slate-400" />
-                        </div>
-                        <div>
-                            <p class="text-xs text-slate-500 font-medium">Partisipan</p>
-                            <p class="text-sm font-bold text-slate-800">
-                                {{ selectedSchedule?.dosen || 'Dosen' }} & {{ selectedSchedule?.mahasiswa || 'Mahasiswa' }}
-                            </p>
+                        <div class="flex items-center gap-3 p-4 border border-slate-100 rounded-xl">
+                            <div class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center shrink-0">
+                                <InfoIcon class="w-5 h-5 text-slate-400" />
+                            </div>
+                            <div>
+                                <p class="text-xs text-slate-500 font-medium">Partisipan</p>
+                                <p class="text-sm font-bold text-slate-800">
+                                    {{ selectedSchedule?.dosen || 'Dosen' }} & {{ selectedSchedule?.mahasiswa || 'Mahasiswa' }}
+                                </p>
+                            </div>
                         </div>
                     </div>
-                </div>
-                
-                <div class="p-4 bg-slate-50 border-t border-slate-100 text-right">
-                    <button 
-                        @click="showModal = false"
-                        class="px-5 py-2.5 bg-white border border-slate-200 text-slate-600 rounded-lg text-sm font-bold hover:bg-slate-50 hover:text-slate-900 transition-colors shadow-sm"
-                    >
-                        Tutup
-                    </button>
+                    
+                    <div class="p-4 bg-slate-50 border-t border-slate-100 text-right">
+                        <button 
+                            @click="showModal = false"
+                            class="px-5 py-2.5 bg-white border border-slate-200 text-slate-600 rounded-lg text-sm font-bold hover:bg-slate-50 hover:text-slate-900 transition-colors shadow-sm"
+                        >
+                            Tutup
+                        </button>
+                    </div>
                 </div>
             </div>
-        </div>
-    </Transition>
+        </Transition>
+    </Teleport>
 </template>
 
 <script setup>
