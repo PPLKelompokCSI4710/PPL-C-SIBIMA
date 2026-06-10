@@ -424,6 +424,14 @@ const exportBimbingan = () => {
                                                 Batalkan
                                             </button>
                                         </template>
+                                        <template v-else-if="jadwal.status === 'approved'">
+                                            <Link
+                                                :href="route('mahasiswa.jadwal.edit-reschedule', jadwal.id)"
+                                                class="inline-flex items-center rounded-md border border-blue-300 bg-white px-3 py-1.5 text-xs font-medium text-blue-700 shadow-sm hover:bg-blue-50 transition-colors"
+                                            >
+                                                Reschedule
+                                            </Link>
+                                        </template>
                                         <template v-else>
                                             <span
                                                 class="inline-flex items-center rounded-md border border-gray-200 bg-gray-50 px-3 py-1.5 text-xs font-medium text-gray-400"

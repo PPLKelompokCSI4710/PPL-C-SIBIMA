@@ -100,64 +100,6 @@ class MonitoringJadwalBimbinganController extends Controller
             ->with('success', 'Pengajuan bimbingan berhasil dihapus.');
     }
 
-    // Menampilkan halaman form reschedule (Jalur Demo Asistensi)
-    public function pilihReschedule()
-    {
-        // MOCK DATA: Memasukkan data palsu agar UI form Reschedule langsung terbuka tanpa database
-        $mockJadwal = [
-            'id' => 9999,
-            'mahasiswa_id' => auth()->id(),
-            'dosen_id' => 2, // Asumsi ID dosen
-            'ketersediaan_jadwal_id' => 8888,
-            'judul_ta' => 'Sistem Informasi Manajemen Jadwal Bimbingan (Demo)',
-            'topik_bimbingan' => 'Pembahasan Progres UI/UX Fase 2',
-            'status' => 'approved',
-            'tipe' => 'offline',
-            'dosen' => [
-                'id' => 2,
-                'nama_lengkap' => 'Dr. Ir. Rahmat Hidayat, M.T.',
-                'email' => 'rahmat@sibima.test',
-            ],
-            'ketersediaan_jadwal' => [
-                'id' => 8888,
-                'dosen_id' => 2,
-                'tanggal' => now()->addDays(1)->toDateString(),
-                'waktu_mulai' => '09:00:00',
-                'waktu_selesai' => '11:00:00',
-                'kuota' => 1,
-                'ruangan' => 'Ruang Dosen Gedung A',
-                'status' => 'tersedia',
-            ]
-        ];
-
-        $mockKetersediaanJadwals = [
-            [
-                'id' => 8889,
-                'dosen_id' => 2,
-                'tanggal' => now()->addDays(3)->toDateString(),
-                'waktu_mulai' => '13:00:00',
-                'waktu_selesai' => '15:00:00',
-                'kuota' => 5,
-                'ruangan' => 'Laboratorium Komputer Dasar',
-                'status' => 'tersedia',
-            ],
-            [
-                'id' => 8890,
-                'dosen_id' => 2,
-                'tanggal' => now()->addDays(5)->toDateString(),
-                'waktu_mulai' => '10:00:00',
-                'waktu_selesai' => '12:00:00',
-                'kuota' => 3,
-                'ruangan' => 'Ruang Rapat Program Studi',
-                'status' => 'tersedia',
-            ]
-        ];
-
-        return Inertia::render('MonitoringJadwal/Reschedule', [
-            'jadwal' => $mockJadwal,
-            'ketersediaanJadwals' => $mockKetersediaanJadwals
-        ]);
-    }
 
     public function editReschedule($id)
     {
@@ -194,14 +136,33 @@ class MonitoringJadwalBimbinganController extends Controller
         ]);
     }
 
+    public function riwayatReschedule()
+    {
+        $mahasiswa = Mahasiswa::where('user_id', Auth::id())->first();
+
+        // Ambil data asli dari database jika ada
+        $riwayat = \App\Models\RescheduleRequest::with([
+            'jadwalBimbingan',
+            'ketersediaanJadwalLama',
+            'ketersediaanJadwalBaru.dosen'
+        ])
+        ->whereHas('jadwalBimbingan', function($q) use ($mahasiswa) {
+            $q->where('mahasiswa_id', $mahasiswa->id);
+        })
+        ->orderBy('created_at', 'desc')
+        ->get();
+
+
+
+        return Inertia::render('MonitoringJadwal/RiwayatReschedule', [
+            'riwayat' => $riwayat
+        ]);
+    }
+
     // Melakukan reschedule jadwal bimbingan (Oleh Mahasiswa)
     public function updateReschedule(RescheduleJadwalRequest $request, $id)
     {
-        // 0. Bypass untuk Mode Demo Asistensi
-        if ($id == 9999) {
-            return redirect()->route('mahasiswa.jadwal.index')
-                ->with('success', '[MODE DEMO] Jadwal berhasil direschedule dan menunggu persetujuan dosen.');
-        }
+
 
         $jadwal = JadwalBimbingan::with('ketersediaanJadwal')->findOrFail($id);
         $mahasiswa = Mahasiswa::where('user_id', Auth::id())->first();
@@ -240,18 +201,48 @@ class MonitoringJadwalBimbinganController extends Controller
             return redirect()->back()->with('error', 'Kuota untuk jadwal yang dipilih sudah penuh.');
         }
 
-        // 7. Refund Kuota
-        if ($jadwal->status === 'approved') {
-            $jadwal->ketersediaanJadwal->increment('kuota');
-        }
+        // 7. Booking Kuota Jadwal Baru (Kurangi kuota)
+        $newKetersediaan->decrement('kuota');
 
-        // 8. Update Data
-        $jadwal->update([
-            'ketersediaan_jadwal_id' => $newKetersediaan->id,
-            'topik_bimbingan' => $request->topik_bimbingan,
-            'status' => 'pending'
+        // 8. Buat Request Reschedule (Data Asli Tidak Berubah)
+        \App\Models\RescheduleRequest::create([
+            'jadwal_bimbingan_id' => $jadwal->id,
+            'ketersediaan_jadwal_lama_id' => $jadwal->ketersediaan_jadwal_id,
+            'ketersediaan_jadwal_baru_id' => $newKetersediaan->id,
+            'status' => 'pending',
+            'alasan' => 'Topik: ' . $request->topik_bimbingan, // Kita simpan topik baru di alasan sementara
         ]);
 
-        return redirect()->route('mahasiswa.jadwal.index')->with('success', 'Jadwal berhasil direschedule dan menunggu persetujuan dosen.');
+        return redirect()->route('mahasiswa.jadwal.riwayat-reschedule')
+            ->with('success', 'Pengajuan reschedule berhasil dikirim dan menunggu persetujuan dosen.');
+    }
+
+    // Membatalkan (menghapus) pengajuan reschedule yang masih pending
+    public function destroyReschedule($id)
+    {
+
+
+        $rescheduleRequest = \App\Models\RescheduleRequest::with(['jadwalBimbingan', 'ketersediaanJadwalBaru'])->findOrFail($id);
+        $mahasiswa = Mahasiswa::where('user_id', Auth::id())->first();
+
+        // 1. Validasi Kepemilikan
+        if ($rescheduleRequest->jadwalBimbingan->mahasiswa_id !== $mahasiswa?->id) {
+            abort(403, 'Anda tidak memiliki akses untuk membatalkan pengajuan ini.');
+        }
+
+        // 2. Validasi Status (Hanya pending yang bisa dihapus)
+        if ($rescheduleRequest->status !== 'pending') {
+            return redirect()->back()->with('error', 'Hanya pengajuan dengan status pending yang dapat dibatalkan.');
+        }
+
+        // 3. Refund Kuota
+        if ($rescheduleRequest->ketersediaanJadwalBaru) {
+            $rescheduleRequest->ketersediaanJadwalBaru->increment('kuota');
+        }
+
+        // 4. Hapus Pengajuan
+        $rescheduleRequest->delete();
+
+        return redirect()->back()->with('success', 'Pengajuan reschedule berhasil dibatalkan dan kuota jadwal telah dikembalikan.');
     }
 }

@@ -41,4 +41,9 @@ class JadwalBimbingan extends Model
     {
         return $this->hasOne(CatatanKonsultasi::class, 'jadwal_bimbingan_id');
     }
+
+    public function rescheduleRequests()
+    {
+        return $this->hasMany(RescheduleRequest::class, 'jadwal_bimbingan_id');
+    }
 }
