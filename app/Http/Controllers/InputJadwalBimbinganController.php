@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreJadwalBimbinganRequest;
 use App\Models\Dosen;
 use App\Models\JadwalBimbingan;
+use App\Models\Eskalasi;
 use App\Models\KalenderAkademik;
 use App\Models\KetersediaanJadwal;
 use App\Models\Mahasiswa;
@@ -92,6 +93,18 @@ class InputJadwalBimbinganController extends Controller
                 'topik_bimbingan' => $validated['topik_bimbingan'],
                 'status' => 'pending',
             ]);
+
+            // Tutup eskalasi yang aktif jika ada
+            $activeEskalasi = Eskalasi::where('mahasiswa_id', $mahasiswa->id)
+                ->where('status', 'active')
+                ->first();
+
+            if ($activeEskalasi) {
+                $activeEskalasi->update([
+                    'status' => 'resolved',
+                    'resolved_at' => now(),
+                ]);
+            }
 
             DB::commit();
 

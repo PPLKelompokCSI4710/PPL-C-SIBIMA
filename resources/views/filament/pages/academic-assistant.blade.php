@@ -77,7 +77,7 @@
 
                 {{-- Card Body --}}
                 <div class="p-6">
-                    <form wire:submit="saveQuota" class="space-y-5">
+                    <form wire:submit="saveSettings" class="space-y-5">
                         <div>
                             <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">
                                 Kuota Harian per Mahasiswa
@@ -98,11 +98,28 @@
                             @enderror
                         </div>
 
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                                System Prompt (Instruksi Dasar AI)
+                            </label>
+                            <div class="relative">
+                                <textarea
+                                    wire:model="systemPrompt"
+                                    id="system-prompt-input"
+                                    rows="6"
+                                    class="w-full rounded-xl border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-gray-800 text-gray-800 dark:text-white text-sm px-4 py-3 focus:ring-2 focus:ring-emerald-500/40 focus:border-emerald-400 dark:focus:border-emerald-500 transition-all duration-200 placeholder:text-gray-400 resize-y"
+                                ></textarea>
+                            </div>
+                            @error('systemPrompt')
+                                <p class="mt-1.5 text-[11px] text-red-500 font-medium">{{ $message }}</p>
+                            @enderror
+                        </div>
+
                         <div class="rounded-xl bg-amber-50 dark:bg-amber-500/10 border border-amber-100 dark:border-amber-500/20 p-3.5">
                             <div class="flex gap-2.5">
                                 <x-heroicon-o-information-circle class="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
                                 <p class="text-xs text-amber-700 dark:text-amber-300 leading-relaxed">
-                                    Setiap mahasiswa akan mendapatkan kuota ini per hari. Kuota reset otomatis setiap tengah malam.
+                                    Setiap mahasiswa akan mendapatkan kuota ini per hari. Kuota reset otomatis setiap tengah malam. System prompt digunakan untuk membatasi AI agar HANYA menjawab pertanyaan seputar akademik dan skripsi.
                                 </p>
                             </div>
                         </div>

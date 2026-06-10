@@ -10,7 +10,7 @@ class GeminiService
 {
     protected string $apiKey;
 
-    protected string $model = 'gemini-flash-latest';
+    protected string $model = 'gemini-flash-lite-latest';
 
     protected string $baseUrl = 'https://generativelanguage.googleapis.com/v1beta/models/';
 
@@ -34,12 +34,14 @@ class GeminiService
         }
 
         // 1. Definisikan System Prompt untuk Pembatasan Topik Pendidikan / Skripsi / Bimbingan
-        $systemInstructionText = "Anda adalah SIBIMA Academic Assistant, kecerdasan buatan yang dirancang khusus untuk membantu mahasiswa dalam konteks pendidikan, penyusunan Skripsi/Tugas Akhir, dan bimbingan akademik.\n\n"
+        $defaultPrompt = "Anda adalah SIBIMA Academic Assistant, kecerdasan buatan yang dirancang khusus untuk membantu mahasiswa dalam konteks pendidikan, penyusunan Skripsi/Tugas Akhir, dan bimbingan akademik.\n\n"
             ."ATURAN MUTLAK DAN TIDAK BOLEH DILANGGAR:\n"
             ."1. Anda HANYA diizinkan merespons pertanyaan yang secara spesifik berkaitan dengan konteks PENDIDIKAN, SKRIPSI, atau BIMBINGAN AKADEMIK.\n"
             ."2. Jika pengguna menanyakan APAPUN di luar topik pendidikan, skripsi, atau bimbingan (misalnya: membuat lelucon, resep makanan, menulis kode untuk proyek non-akademik, membuat puisi, berita umum, dll.), Anda WAJIB menolak untuk menjawab.\n"
             ."3. Untuk pertanyaan di luar konteks, berikan respons baku berikut (atau variasi sopan serupa): \"Maaf, saya hanya dapat membantu Anda dalam konteks pendidikan, penyusunan skripsi, dan bimbingan akademik. Silakan ajukan pertanyaan seputar topik tersebut.\"\n"
             ."4. Berikan jawaban dalam Bahasa Indonesia secara terstruktur, ilmiah, solutif, santun, dan memotivasi mahasiswa saat menjawab pertanyaan yang valid.";
+
+        $systemInstructionText = \App\Models\AppSetting::get('ai_system_prompt', $defaultPrompt);
 
         $systemInstruction = [
             'parts' => [
@@ -72,17 +74,21 @@ class GeminiService
             // 3. Penanganan Error HTTP Status
             if ($response->failed()) {
                 $status = $response->status();
+                $errorBody = $response->json();
+                $errorMessage = $errorBody['error']['message'] ?? 'Terjadi kesalahan tidak dikenal pada API.';
 
                 if ($status === 429) {
-                    throw new \Exception('Batas limit API tercapai. Silakan coba beberapa saat lagi.');
+                    throw new \Exception('Batas limit kuota API tercapai dari penyedia AI. Silakan coba beberapa saat lagi.');
+                }
+
+                if ($status === 503) {
+                    throw new \Exception('Layanan AI sedang menerima permintaan tinggi (Overloaded). Spikes in demand biasanya sementara. Silakan coba lagi nanti.');
                 }
 
                 if ($status >= 500) {
                     throw new \Exception('Layanan Gemini API sedang tidak tersedia (down). Silakan coba lagi nanti.');
                 }
 
-                $errorBody = $response->json();
-                $errorMessage = $errorBody['error']['message'] ?? 'Terjadi kesalahan tidak dikenal pada API.';
                 throw new \Exception("Gemini API Error (Status {$status}): {$errorMessage}");
             }
 
@@ -93,6 +99,10 @@ class GeminiService
             if (empty($text)) {
                 throw new \Exception('Respons dari Gemini API tidak valid atau kosong.');
             }
+
+            // Hapus format Markdown seperti ** (bold) dan ## (headers) sesuai permintaan
+            $text = str_replace('**', '', $text);
+            $text = preg_replace('/^#+\s*/m', '', $text); // Menghapus header markdown (#, ##, ###) di awal baris
 
             return $text;
 

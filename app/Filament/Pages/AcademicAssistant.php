@@ -33,6 +33,8 @@ class AcademicAssistant extends Page
 
     public int $dailyQuota = 20;
 
+    public string $systemPrompt = '';
+
     public string $filterDate = '';
 
     // =========================================================================
@@ -42,6 +44,16 @@ class AcademicAssistant extends Page
     public function mount(): void
     {
         $this->dailyQuota = (int) AppSetting::get('ai_daily_quota', 20);
+        
+        $defaultPrompt = "Anda adalah SIBIMA Academic Assistant, kecerdasan buatan yang dirancang khusus untuk membantu mahasiswa dalam konteks pendidikan, penyusunan Skripsi/Tugas Akhir, dan bimbingan akademik.\n\n"
+            ."ATURAN MUTLAK DAN TIDAK BOLEH DILANGGAR:\n"
+            ."1. Anda HANYA diizinkan merespons pertanyaan yang secara spesifik berkaitan dengan konteks PENDIDIKAN, SKRIPSI, atau BIMBINGAN AKADEMIK.\n"
+            ."2. Jika pengguna menanyakan APAPUN di luar topik pendidikan, skripsi, atau bimbingan (misalnya: membuat lelucon, resep makanan, menulis kode untuk proyek non-akademik, membuat puisi, berita umum, dll.), Anda WAJIB menolak untuk menjawab.\n"
+            ."3. Untuk pertanyaan di luar konteks, berikan respons baku berikut (atau variasi sopan serupa): \"Maaf, saya hanya dapat membantu Anda dalam konteks pendidikan, penyusunan skripsi, dan bimbingan akademik. Silakan ajukan pertanyaan seputar topik tersebut.\"\n"
+            ."4. Berikan jawaban dalam Bahasa Indonesia secara terstruktur, ilmiah, solutif, santun, dan memotivasi mahasiswa saat menjawab pertanyaan yang valid.";
+            
+        $this->systemPrompt = AppSetting::get('ai_system_prompt', $defaultPrompt);
+        
         $this->filterDate = today()->toDateString();
     }
 
@@ -52,7 +64,7 @@ class AcademicAssistant extends Page
     /** Total requests consumed today */
     public function getTodayTotalRequests(): int
     {
-        return AcademicAssistantUsage::where('date', today()->toDateString())
+        return AcademicAssistantUsage::whereDate('date', today())
             ->sum('requests_count');
     }
 
@@ -65,7 +77,7 @@ class AcademicAssistant extends Page
     /** Number of unique users who used AI today */
     public function getActiveUsersToday(): int
     {
-        return AcademicAssistantUsage::where('date', today()->toDateString())
+        return AcademicAssistantUsage::whereDate('date', today())
             ->count();
     }
 
@@ -75,7 +87,7 @@ class AcademicAssistant extends Page
         $date = $this->filterDate ?: today()->toDateString();
 
         return AcademicAssistantUsage::with('user')
-            ->where('date', $date)
+            ->whereDate('date', $date)
             ->orderByDesc('requests_count')
             ->get()
             ->map(function ($usage) {
@@ -96,17 +108,19 @@ class AcademicAssistant extends Page
     // ACTIONS
     // =========================================================================
 
-    /** Save the daily quota to AppSetting */
-    public function saveQuota(): void
+    /** Save settings to AppSetting */
+    public function saveSettings(): void
     {
         $this->validate([
             'dailyQuota' => 'required|integer|min:1|max:500',
+            'systemPrompt' => 'required|string|min:10',
         ]);
 
         AppSetting::set('ai_daily_quota', $this->dailyQuota);
+        AppSetting::set('ai_system_prompt', $this->systemPrompt);
 
         Notification::make()
-            ->title('Kuota harian berhasil disimpan!')
+            ->title('Konfigurasi berhasil disimpan!')
             ->success()
             ->send();
     }

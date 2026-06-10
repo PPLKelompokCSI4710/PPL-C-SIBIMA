@@ -29,10 +29,17 @@ class AcademicAssistantUsage extends Model
      */
     public static function incrementForUser(int $userId, string $date): self
     {
-        $record = static::firstOrCreate(
-            ['user_id' => $userId, 'date' => $date],
-            ['requests_count' => 0],
-        );
+        $record = static::where('user_id', $userId)
+            ->whereDate('date', $date)
+            ->first();
+
+        if (! $record) {
+            $record = static::create([
+                'user_id' => $userId,
+                'date' => $date,
+                'requests_count' => 0,
+            ]);
+        }
 
         $record->increment('requests_count');
 
@@ -45,7 +52,7 @@ class AcademicAssistantUsage extends Model
     public static function todayCountForUser(int $userId): int
     {
         return static::where('user_id', $userId)
-            ->where('date', today()->toDateString())
+            ->whereDate('date', today())
             ->value('requests_count') ?? 0;
     }
 }
