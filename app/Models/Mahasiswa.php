@@ -26,7 +26,7 @@ class Mahasiswa extends Model
     protected $guarded = [];
 
     protected $fillable = [
-        'user_id', 'nim', 'nama_lengkap', 'program_studi', 'fakultas',
+        'user_id', 'dosen_id', 'nim', 'nama_lengkap', 'program_studi', 'fakultas',
         'angkatan', 'semester', 'ipk', 'sks_lulus', 'sks_total',
         'status_akademik', 'no_telepon', 'foto', 'tanggal_lahir',
         'alamat', 'status_kelulusan_bimbingan', 'progress_reminder_frequency_days',

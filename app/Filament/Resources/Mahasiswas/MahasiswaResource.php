@@ -6,6 +6,9 @@ use App\Filament\Resources\Mahasiswas\Pages\CreateMahasiswa;
 use App\Filament\Resources\Mahasiswas\Pages\EditMahasiswa;
 use App\Filament\Resources\Mahasiswas\Pages\ListMahasiswas;
 use App\Filament\Resources\Mahasiswas\Pages\ViewMahasiswa;
+use App\Filament\Resources\Mahasiswas\RelationManagers\BimbingansRelationManager;
+use App\Filament\Resources\Mahasiswas\RelationManagers\DosensRelationManager;
+use App\Filament\Resources\Mahasiswas\RelationManagers\StudyPlansRelationManager;
 use App\Filament\Resources\Mahasiswas\Schemas\MahasiswaForm;
 use App\Filament\Resources\Mahasiswas\Schemas\MahasiswaInfolist;
 use App\Filament\Resources\Mahasiswas\Tables\MahasiswasTable;
@@ -82,7 +85,9 @@ class MahasiswaResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            BimbingansRelationManager::class,
+            StudyPlansRelationManager::class,
+            DosensRelationManager::class,
         ];
     }
 

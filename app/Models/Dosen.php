@@ -50,9 +50,8 @@ class Dosen extends Model
         return $this->hasMany(Bimbingan::class);
     }
 
-    public function mahasiswas()
+    public function mahasiswas(): HasMany
     {
-        return $this->belongsToMany(Mahasiswa::class, 'dosen_mahasiswa')
-            ->withPivot(['tanggal_penugasan', 'tanggal_berakhir', 'is_active', 'catatan']);
+        return $this->hasMany(Mahasiswa::class);
     }
 }
