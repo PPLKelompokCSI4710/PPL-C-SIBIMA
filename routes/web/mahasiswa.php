@@ -9,7 +9,7 @@ use App\Http\Controllers\Mahasiswa\ProgressController;
 use App\Http\Controllers\Mahasiswa\ProgressReminderController;
 use App\Http\Controllers\Mahasiswa\StudyPlanController;
 use App\Http\Controllers\MonitoringJadwalBimbinganController;
-use App\Http\Controllers\Mahasiswa\ExportBimbinganController;
+use App\Http\Controllers\DraftSkripsiController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -24,6 +24,9 @@ use Illuminate\Support\Facades\Route;
 Route::middleware(['auth', 'role:mahasiswa'])->prefix('mahasiswa')->name('mahasiswa.')->group(function () {
     // Route::get('/akademik', [AkademikController::class, 'index'])->name('akademik.index'); // Contoh untuk PBI-ZZZ
     Route::get('/bimbingan/reminder', [BimbinganReminderController::class, 'index'])->name('bimbingan.reminder');
+    Route::post('/bimbingan/reminder/schedule-preferences', [BimbinganReminderController::class, 'updateSchedulePreferences'])->name('bimbingan.reminder.schedule');
+    Route::post('/bimbingan/reminder/progress-settings', [BimbinganReminderController::class, 'updateProgressSettings'])->name('bimbingan.reminder.progress');
+    // Legacy routes – kept for backward compatibility
     Route::get('/bimbingan/progress-reminder', [ProgressReminderController::class, 'index'])->name('bimbingan.progress_reminder');
     Route::post('/bimbingan/progress-reminder/frequency', [ProgressReminderController::class, 'updateFrequency'])->name('bimbingan.progress_reminder.update');
 
@@ -53,5 +56,10 @@ Route::middleware(['auth', 'role:mahasiswa'])->prefix('mahasiswa')->name('mahasi
 
     // Progress routes
     Route::get('/progress', [ProgressController::class, 'index'])->name('progress.index');
-    Route::put('/progress', [ProgressController::class, 'update'])->name('progress.update');
+    // Draft Skripsi routes
+    Route::get('/draft-skripsi', [DraftSkripsiController::class, 'index'])->name('draft-skripsi.index');
+    Route::post('/draft-skripsi', [DraftSkripsiController::class, 'store'])->name('draft-skripsi.store');
+    Route::post('/draft-skripsi/{draft}', [DraftSkripsiController::class, 'update'])->name('draft-skripsi.update');
+    Route::put('/draft-skripsi/{draft}/catatan', [DraftSkripsiController::class, 'updateCatatan'])->name('draft-skripsi.updateCatatan');
+    Route::delete('/draft-skripsi/{draft}', [DraftSkripsiController::class, 'destroy'])->name('draft-skripsi.destroy');
 });

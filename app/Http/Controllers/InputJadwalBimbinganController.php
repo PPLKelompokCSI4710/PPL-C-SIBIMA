@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreJadwalBimbinganRequest;
 use App\Models\Dosen;
 use App\Models\JadwalBimbingan;
+use App\Models\Eskalasi;
 use App\Models\KalenderAkademik;
 use App\Models\KetersediaanJadwal;
 use App\Models\Mahasiswa;
@@ -93,6 +94,18 @@ class InputJadwalBimbinganController extends Controller
                 'status' => 'pending',
             ]);
 
+            // Tutup eskalasi yang aktif jika ada
+            $activeEskalasi = Eskalasi::where('mahasiswa_id', $mahasiswa->id)
+                ->where('status', 'active')
+                ->first();
+
+            if ($activeEskalasi) {
+                $activeEskalasi->update([
+                    'status' => 'resolved',
+                    'resolved_at' => now(),
+                ]);
+            }
+
             DB::commit();
 
             return redirect()->route('mahasiswa.jadwal.index')
@@ -111,28 +124,17 @@ class InputJadwalBimbinganController extends Controller
      */
     private function checkClash($dosenUserId, $slot)
     {
-        $clashingEvents = KalenderAkademik::where('user_id', $dosenUserId)
-            ->where('tanggal_mulai', '<=', $slot->tanggal)
-            ->where('tanggal_selesai', '>=', $slot->tanggal)
-            ->get();
-
-        foreach ($clashingEvents as $event) {
-            // Jika kegiatan seharian penuh (tidak ada jam_mulai), maka bentrok dengan semua slot pada hari itu
-            if (empty($event->jam_mulai)) {
-                return true;
-            }
-
-            // Samakan format waktu untuk perbandingan yang konsisten
-            $eventTime = date('H:i:s', strtotime($event->jam_mulai));
-            $slotStart = date('H:i:s', strtotime($slot->waktu_mulai));
-            $slotEnd = date('H:i:s', strtotime($slot->waktu_selesai));
-
-            // Bentrok terjadi jika waktu mulai kegiatan berada di dalam rentang slot bimbingan
-            if ($eventTime >= $slotStart && $eventTime < $slotEnd) {
-                return true;
-            }
-        }
-
-        return false;
+        return KalenderAkademik::where('user_id', $dosenUserId)
+            ->where('tipe_kegiatan', '!=', 'bimbingan')
+            ->where(function ($query) use ($slot) {
+                $query->where(function ($q) use ($slot) {
+                    $q->whereDate('tanggal_mulai', '<=', $slot->tanggal)
+                      ->whereDate('tanggal_selesai', '>=', $slot->tanggal);
+                })->orWhere(function ($q) use ($slot) {
+                    $q->whereDate('tanggal_mulai', '=', $slot->tanggal)
+                      ->whereNull('tanggal_selesai');
+                });
+            })
+            ->exists();
     }
 }

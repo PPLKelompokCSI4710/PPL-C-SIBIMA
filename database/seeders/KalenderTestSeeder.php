@@ -7,12 +7,6 @@ use App\Models\KalenderAkademik;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 
-/**
- * Seeder ini mengisi data kalender yang berbeda-beda per user untuk demonstrasi:
- * - Jadwal nasional (user_id = null) → tampil di SEMUA user
- * - Jadwal Siti (user_id = siti) → tampil di Siti + mahasiswa bimbingan Siti
- * - Jadwal Rahmat (user_id = rahmat) → tampil di Rahmat + mahasiswa bimbingan Rahmat
- */
 class KalenderTestSeeder extends Seeder
 {
     public function run(): void

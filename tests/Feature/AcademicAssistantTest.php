@@ -152,4 +152,123 @@ class AcademicAssistantTest extends TestCase
         $session->refresh();
         $this->assertEquals('Bagaimana cara membuat proposal skripsi yang baik ...', $session->title);
     }
+
+    public function test_user_can_get_sessions_via_api(): void
+    {
+        $this->actingAs($this->user);
+
+        AcademicAssistantSession::create([
+            'user_id' => $this->user->id,
+            'title' => 'Sesi A',
+        ]);
+
+        $response = $this->getJson(route('api.ai-chat.sessions'));
+
+        $response->assertStatus(200)
+            ->assertJsonStructure(['sessions', 'quota', 'max_quota'])
+            ->assertJsonFragment(['title' => 'Sesi A']);
+    }
+
+    public function test_user_can_create_session_via_api(): void
+    {
+        $this->actingAs($this->user);
+
+        $response = $this->postJson(route('api.ai-chat.create-session'));
+
+        $response->assertStatus(201)
+            ->assertJsonFragment(['title' => 'Sesi Baru']);
+
+        $this->assertDatabaseHas('academic_assistant_sessions', [
+            'user_id' => $this->user->id,
+            'title' => 'Sesi Baru',
+        ]);
+    }
+
+    public function test_user_can_get_session_messages_via_api(): void
+    {
+        $this->actingAs($this->user);
+
+        $session = AcademicAssistantSession::create([
+            'user_id' => $this->user->id,
+            'title' => 'Sesi Test',
+        ]);
+
+        AcademicAssistantMessage::create([
+            'session_id' => $session->id,
+            'role' => 'user',
+            'content' => 'Halo AI',
+        ]);
+
+        $response = $this->getJson(route('api.ai-chat.messages', ['id' => $session->id]));
+
+        $response->assertStatus(200)
+            ->assertJsonFragment(['content' => 'Halo AI']);
+    }
+
+    public function test_user_can_delete_session_via_api(): void
+    {
+        $this->actingAs($this->user);
+
+        $session = AcademicAssistantSession::create([
+            'user_id' => $this->user->id,
+            'title' => 'Delete Me',
+        ]);
+
+        $response = $this->deleteJson(route('api.ai-chat.delete-session', ['id' => $session->id]));
+
+        $response->assertStatus(200);
+
+        $this->assertDatabaseMissing('academic_assistant_sessions', [
+            'id' => $session->id,
+        ]);
+    }
+
+    public function test_user_can_send_message_in_session_and_get_reply(): void
+    {
+        $this->actingAs($this->user);
+        \Illuminate\Support\Facades\Http::fake([
+            'generativelanguage.googleapis.com/*' => \Illuminate\Support\Facades\Http::response([
+                'candidates' => [
+                    [
+                        'content' => [
+                            'parts' => [
+                                ['text' => 'Ini adalah tanggapan skripsi Anda.'],
+                            ],
+                        ],
+                    ],
+                ],
+            ], 200),
+        ]);
+
+        $session = AcademicAssistantSession::create([
+            'user_id' => $this->user->id,
+            'title' => 'Sesi Baru',
+        ]);
+
+        $response = $this->postJson(route('api.ai-chat.send-message', ['id' => $session->id]), [
+            'content' => 'Bagaimana cara menentukan rumusan masalah?',
+        ]);
+
+        $response->assertStatus(200)
+            ->assertJsonFragment([
+                'success' => true,
+                'reply' => 'Ini adalah tanggapan skripsi Anda.',
+                'session_title' => 'Bagaimana cara menentukan rumusan masalah?',
+            ]);
+
+        $this->assertDatabaseHas('academic_assistant_messages', [
+            'session_id' => $session->id,
+            'role' => 'user',
+            'content' => 'Bagaimana cara menentukan rumusan masalah?',
+        ]);
+
+        $this->assertDatabaseHas('academic_assistant_messages', [
+            'session_id' => $session->id,
+            'role' => 'model',
+            'content' => 'Ini adalah tanggapan skripsi Anda.',
+        ]);
+
+        $session->refresh();
+        $this->assertEquals('Bagaimana cara menentukan rumusan masalah?', $session->title);
+    }
 }

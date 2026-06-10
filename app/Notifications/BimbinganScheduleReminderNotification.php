@@ -77,11 +77,27 @@ class BimbinganScheduleReminderNotification extends Notification
             default => strtoupper($this->stage),
         };
 
+        $isMahasiswa = false;
+        if (method_exists($notifiable, 'hasRole') && $notifiable->hasRole('mahasiswa')) {
+            $isMahasiswa = true;
+        }
+
+        $dosenName = $this->payload['dosen'] ?? 'Dosen';
+        $mahasiswaName = $this->payload['mahasiswa'] ?? 'Mahasiswa';
+
+        $title = $isMahasiswa 
+            ? "Reminder Jadwal Bimbingan ({$stageLabel})" 
+            : "Reminder Bimbingan Mahasiswa ({$stageLabel})";
+
+        $message = $isMahasiswa
+            ? "Jangan lupa jadwal bimbingan Anda dengan {$dosenName}."
+            : "Anda memiliki jadwal membimbing mahasiswa {$mahasiswaName}.";
+
         return [
             'type' => 'bimbingan_schedule_reminder',
             'stage' => $this->stage,
-            'title' => "Reminder Jadwal Bimbingan ({$stageLabel})",
-            'message' => 'Jangan lupa jadwal bimbingan Anda.',
+            'title' => $title,
+            'message' => $message,
             'detail' => [
                 'mahasiswa' => $this->payload['mahasiswa'] ?? null,
                 'dosen' => $this->payload['dosen'] ?? null,

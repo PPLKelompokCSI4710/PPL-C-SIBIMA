@@ -79,9 +79,9 @@
 
                     <!-- Dosen & Admin: Kalender Akademik -->
                     <Link
-                        :href="route('staff.calendar')"
+                        :href="isAdmin ? route('preview.kalender-admin') : route('staff.calendar')"
                         :class="[
-                            route().current('staff.calendar')
+                            (route().current('staff.calendar') || route().current('preview.kalender-admin'))
                                 ? 'bg-indigo-50 text-indigo-700 font-semibold'
                                 : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900',
                         ]"
@@ -90,7 +90,6 @@
                         <CalendarDaysIcon class="w-5 h-5" />
                         <span>Kalender Akademik</span>
                     </Link>
-
                     <!-- Dosen: Ketersediaan Jadwal -->
                     <Link
                         v-if="!isAdmin"
@@ -177,17 +176,8 @@
                     {{ currentTitle }}
                 </h2>
                 <div class="flex items-center gap-4">
-                    <!-- Notifications (Mock) -->
-                    <div class="relative">
-                        <button
-                            class="relative p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all"
-                        >
-                            <BellIcon class="w-5 h-5" />
-                            <span
-                                class="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 border-2 border-white rounded-full"
-                            />
-                        </button>
-                    </div>
+                    <!-- Notification Bell -->
+                    <NotificationBell />
 
                     <div class="h-8 w-px bg-slate-200" />
                     <div class="text-right">
@@ -211,14 +201,13 @@
 <script setup>
     import { computed } from 'vue';
     import { Link, usePage } from '@inertiajs/vue3';
+    import NotificationBell from '@/Components/NotificationBell.vue';
     import {
         GraduationCapIcon,
         LayoutDashboardIcon,
         BookOpenIcon,
-        ClipboardCheckIcon,
         TrendingUpIcon,
         LogOutIcon,
-        BellIcon,
         CalendarDaysIcon,
     } from 'lucide-vue-next';
 
@@ -231,7 +220,7 @@
         if (route().current('staff.courses.index')) return 'Manajemen Kursus';
 
         if (route().current('staff.progress.index')) return 'Progres Mahasiswa';
-        if (route().current('staff.calendar')) return 'Kalender Akademik';
+        if (route().current('staff.calendar') || route().current('preview.kalender-admin')) return 'Kalender Akademik';
         if (route().current('dosen.ketersediaan-jadwal.*')) return 'Ketersediaan Jadwal';
         if (route().current('dosen.monitoring-jadwal.*')) return 'Monitoring Jadwal';
         if (route().current('dosen.reschedule.*')) return 'Reschedule Jadwal';
