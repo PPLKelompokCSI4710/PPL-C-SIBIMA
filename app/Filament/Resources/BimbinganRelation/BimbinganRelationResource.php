@@ -20,7 +20,7 @@ class BimbinganRelationResource extends Resource
 {
     protected static ?string $model = Mahasiswa::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedLink;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedUserGroup;
 
     protected static ?string $recordTitleAttribute = 'nama_lengkap';
 
@@ -41,12 +41,18 @@ class BimbinganRelationResource extends Resource
 
     public static function getNavigationGroup(): string|UnitEnum|null
     {
-        return 'Manajemen Pengguna';
+        return 'Manajemen Akademik';
     }
 
     public static function getNavigationSort(): ?int
     {
         return 3;
+    }
+
+    public static function canViewAny(): bool
+    {
+        \Log::info('canViewAny called in BimbinganRelationResource. User: ' . (auth()->user()?->email ?? 'Guest'));
+        return auth()->user()?->hasRole('admin') ?? false;
     }
 
     // =========================================================================

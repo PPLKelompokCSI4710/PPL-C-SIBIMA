@@ -13,6 +13,11 @@ class UpdateStudyPlanTest extends DuskTestCase
      */
     public function test_mahasiswa_dapat_menginput_krs()
     {
+        \App\Models\Course::firstOrCreate(
+            ['code' => 'IF1234'],
+            ['name' => 'Pemrograman Berorientasi Objek', 'credits' => 3, 'semester' => 5]
+        );
+
         $user = User::role('mahasiswa')->first();
 
         $this->browse(function (Browser $browser) use ($user) {
@@ -28,14 +33,14 @@ class UpdateStudyPlanTest extends DuskTestCase
                     // (Pilih mata kuliah yang belum pernah Anda ambil sebelumnya)
                 ->select('course_id')
                 ->select('semester', '5')
+                ->waitUntilMissing('button[type="submit"][disabled]', 10)
 
                     // 3. Menyimpan Data
-                ->press('Tambah')
+                ->click('button[type="submit"]')
 
                     // 4. Verifikasi: Apakah data berhasil masuk ke tabel?
                 ->pause(2000)
                 ->assertSee('Sem 5') // Memastikan semester yang dipilih tampil di tabel
-                ->assertSee('Pending') // Status awal biasanya Pending
                 ->screenshot('PBI-19_Input_KRS_Sukses');
         });
     }

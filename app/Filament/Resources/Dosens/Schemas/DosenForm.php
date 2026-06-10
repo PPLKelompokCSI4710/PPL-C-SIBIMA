@@ -35,6 +35,17 @@ class DosenForm
                             ->maxLength(255)
                             ->unique(table: 'users', column: 'email', ignoreRecord: true),
 
+                        TextInput::make('kode_dosen')
+                            ->label('Kode Dosen')
+                            ->required()
+                            ->maxLength(3)
+                            ->regex('/^[A-Z]+$/')
+                            ->unique(table: 'users', column: 'kode_dosen', ignoreRecord: true)
+                            ->dehydrateStateUsing(fn (string $state): string => strtoupper($state))
+                            ->validationMessages([
+                                'regex' => 'Kode dosen hanya boleh huruf kapital A-Z tanpa spasi.',
+                            ]),
+
                         TextInput::make('password')
                             ->label('Password')
                             ->password()

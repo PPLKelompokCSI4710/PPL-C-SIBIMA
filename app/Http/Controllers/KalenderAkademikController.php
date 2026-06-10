@@ -342,10 +342,11 @@ class KalenderAkademikController extends Controller
             $bimbingan->ketersediaanJadwal->decrement('kuota');
         }
 
-        // Add to Kalender Akademik so both see it (use updateOrCreate to prevent duplicates if clicked twice)
-        $kalenderItem = KalenderAkademik::updateOrCreate([
+        // Add to Kalender Akademik for Dosen (updateOrCreate to prevent duplicates)
+        $kalenderItemDosen = KalenderAkademik::updateOrCreate([
             'user_id' => $bimbingan->dosen->user_id ?? Auth::id() ?? 1,
-            'nama_kegiatan' => 'Bimbingan: '.($bimbingan->mahasiswa->nama_lengkap ?? 'Mahasiswa'),
+            'nama_kegiatan' => 'Bimbingan dengan Mahasiswa: '.($bimbingan->mahasiswa->nama_lengkap ?? 'Mahasiswa'),
+            'tipe_kegiatan' => 'bimbingan',
             'tanggal_mulai' => $bimbingan->ketersediaanJadwal?->tanggal ?? date('Y-m-d'),
             'jam_mulai' => $bimbingan->ketersediaanJadwal?->waktu_mulai ?? '08:00:00',
         ], [
@@ -355,16 +356,31 @@ class KalenderAkademikController extends Controller
             'status' => 'Active',
         ]);
 
+        // Add to Kalender Akademik for Mahasiswa
+        $kalenderItemMahasiswa = null;
+        if ($bimbingan->mahasiswa && $bimbingan->mahasiswa->user_id) {
+            $kalenderItemMahasiswa = KalenderAkademik::create([
+                'user_id' => $bimbingan->mahasiswa->user_id,
+                'nama_kegiatan' => 'Jadwal Bimbingan: '.($bimbingan->dosen->nama_lengkap ?? 'Dosen'),
+                'tipe_kegiatan' => 'bimbingan',
+                'tanggal_mulai' => $bimbingan->ketersediaanJadwal->tanggal ?? date('Y-m-d'),
+                'tanggal_selesai' => $bimbingan->ketersediaanJadwal->tanggal ?? date('Y-m-d'),
+                'jam_mulai' => $bimbingan->ketersediaanJadwal->waktu_mulai ?? '08:00:00',
+                'deskripsi' => $bimbingan->topik_bimbingan.' (Lokasi: '.$request->lokasi.', Tipe: '.$request->tipe.')',
+                'status' => 'Active',
+            ]);
+        }
+
         // Google Calendar Sync for Dosen
         if ($bimbingan->dosen && $bimbingan->dosen->user && $bimbingan->dosen->user->google_access_token) {
             $googleService = new GoogleCalendarService;
-            $googleService->syncEvent($bimbingan->dosen->user, $kalenderItem);
+            $googleService->syncEvent($bimbingan->dosen->user, $kalenderItemDosen);
         }
 
         // Google Calendar Sync for Mahasiswa
-        if ($bimbingan->mahasiswa && $bimbingan->mahasiswa->user && $bimbingan->mahasiswa->user->google_access_token) {
+        if ($kalenderItemMahasiswa && $bimbingan->mahasiswa && $bimbingan->mahasiswa->user && $bimbingan->mahasiswa->user->google_access_token) {
             $googleService = new GoogleCalendarService;
-            $googleService->syncEvent($bimbingan->mahasiswa->user, $kalenderItem);
+            $googleService->syncEvent($bimbingan->mahasiswa->user, $kalenderItemMahasiswa);
         }
 
         return redirect()->back()->with('success', 'Request bimbingan berhasil disetujui.');

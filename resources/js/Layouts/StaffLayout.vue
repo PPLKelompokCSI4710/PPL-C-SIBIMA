@@ -16,13 +16,19 @@
                     >
                         {{ $page.props.auth.user?.name?.charAt(0) }}
                     </div>
-                    <div class="overflow-hidden">
+                    <div class="overflow-hidden flex-1">
                         <p class="text-sm font-bold text-slate-800 truncate">
                             {{ $page.props.auth.user?.name }}
                         </p>
-                        <p class="text-xs text-slate-500 capitalize">
-                            {{ userRole }}
-                        </p>
+                        <div class="flex items-center justify-between mt-0.5">
+                            <span class="text-xs text-slate-500 capitalize">{{ userRole }}</span>
+                            <Link
+                                :href="route('profile.edit')"
+                                class="text-xs text-indigo-600 hover:text-indigo-700 font-bold hover:underline"
+                            >
+                                Edit Profile
+                            </Link>
+                        </div>
                     </div>
                 </div>
 
@@ -55,19 +61,7 @@
                         <span>Manajemen Kursus</span>
                     </Link>
 
-                    <!-- Dosen & Admin: KRS Approval -->
-                    <Link
-                        :href="route('staff.study-plans.index')"
-                        :class="[
-                            route().current('staff.study-plans.index')
-                                ? 'bg-indigo-50 text-indigo-700 font-semibold'
-                                : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900',
-                        ]"
-                        class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors"
-                    >
-                        <ClipboardCheckIcon class="w-5 h-5" />
-                        <span>Persetujuan KRS</span>
-                    </Link>
+
 
                     <!-- Dosen & Admin: Student Progress -->
                     <Link
@@ -121,17 +115,8 @@
                     {{ currentTitle }}
                 </h2>
                 <div class="flex items-center gap-4">
-                    <!-- Notifications (Mock) -->
-                    <div class="relative">
-                        <button
-                            class="relative p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all"
-                        >
-                            <BellIcon class="w-5 h-5" />
-                            <span
-                                class="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 border-2 border-white rounded-full"
-                            />
-                        </button>
-                    </div>
+                    <!-- Notification Bell -->
+                    <NotificationBell />
 
                     <div class="h-8 w-px bg-slate-200" />
                     <div class="text-right">
@@ -155,6 +140,7 @@
 <script setup>
     import { computed } from 'vue';
     import { Link, usePage } from '@inertiajs/vue3';
+    import NotificationBell from '@/Components/NotificationBell.vue';
     import {
         GraduationCapIcon,
         LayoutDashboardIcon,
@@ -162,7 +148,6 @@
         ClipboardCheckIcon,
         TrendingUpIcon,
         LogOutIcon,
-        BellIcon,
         CalendarDaysIcon,
     } from 'lucide-vue-next';
 
@@ -173,9 +158,12 @@
     const currentTitle = computed(() => {
         if (route().current('staff.dashboard')) return 'Dashboard';
         if (route().current('staff.courses.index')) return 'Manajemen Kursus';
-        if (route().current('staff.study-plans.index')) return 'Persetujuan KRS';
+
         if (route().current('staff.progress.index')) return 'Progres Mahasiswa';
         if (route().current('staff.calendar') || route().current('preview.kalender-admin')) return 'Kalender Akademik';
+        if (route().current('dosen.ketersediaan-jadwal.*')) return 'Ketersediaan Jadwal';
+        if (route().current('dosen.monitoring-jadwal.*')) return 'Monitoring Jadwal';
+        if (route().current('profile.edit')) return 'Profile Settings';
         return 'Staff Portal';
     });
 </script>

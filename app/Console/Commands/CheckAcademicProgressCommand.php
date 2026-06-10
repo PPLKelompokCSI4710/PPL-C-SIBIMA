@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\AppSetting;
 use App\Models\Eskalasi;
+use App\Models\JadwalBimbingan;
 use App\Models\Mahasiswa;
 use App\Models\User;
 use App\Notifications\AcademicProgressNotification;
@@ -86,13 +87,22 @@ class CheckAcademicProgressCommand extends Command
             }
 
             // Check if we should escalate to admin
-            if ($mahasiswa->consecutive_progress_reminders >= $escalationThreshold) {
+            // Condition 1: reached escalation threshold (consecutive reminders)
+            $condition1 = $mahasiswa->consecutive_progress_reminders >= $escalationThreshold;
+
+            // Condition 2: daysSinceLast >= 7 AND no pending/approved upcoming schedule
+            $hasUpcoming = JadwalBimbingan::where('mahasiswa_id', $mahasiswa->id)
+                ->whereIn('status', ['pending', 'approved'])
+                ->exists();
+            $condition2 = ($daysSinceLast >= 7 && !$hasUpcoming);
+
+            if ($condition1 || $condition2) {
                 $escalationDelayDays = (int) (AppSetting::get('escalation_delay_days', 3) ?? 3);
                 $lastSent = $mahasiswa->last_progress_reminder_sent_at;
 
-                // If delay is 0, escalate immediately.
-                // Otherwise, check if enough days have passed since the last reminder was sent.
-                $eligibleForEscalation = ($escalationDelayDays === 0) ||
+                // If escalated due to condition 2, we might not wait for delay if it hasn't been sent yet
+                // But let's just apply the delay if it's based on reminders, or immediate if condition2
+                $eligibleForEscalation = $condition2 || ($escalationDelayDays === 0) ||
                     ($lastSent && $lastSent->copy()->startOfDay()->addDays($escalationDelayDays)->isPast());
 
                 if ($eligibleForEscalation) {

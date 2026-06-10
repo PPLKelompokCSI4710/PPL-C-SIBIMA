@@ -28,8 +28,8 @@ class ViewProgressStudiTest extends DuskTestCase
                 ->assertSee('SKS LULUS')
                 ->assertSee('MK LULUS')
 
-                    // Cek apakah data mahasiswa tampil (Atina Wildannur)
-                ->assertSee('Atina Wildannur')
+                    // Cek apakah data mahasiswa tampil (Jack)
+                ->assertSee('Jack')
 
                     // Bukti screenshot
                 ->screenshot('dosen-monitoring-sukses');

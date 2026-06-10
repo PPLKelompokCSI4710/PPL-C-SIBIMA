@@ -75,7 +75,7 @@ class AiChatControllerTest extends TestCase
         $response->assertStatus(429)
             ->assertJson([
                 'success' => false,
-                'message' => 'Kuota bertanya Anda (20/20) telah habis. Silakan coba lagi nanti.',
+                'message' => 'Kuota bertanya Anda (20/20) telah habis. Silakan coba lagi besok.',
                 'quota' => 0,
             ]);
     }

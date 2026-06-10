@@ -96,30 +96,6 @@
                     <CalendarDaysIcon class="w-5 h-5" />
                     <span>Kalender Akademik</span>
                 </Link>
-                <Link
-                    :href="route('mahasiswa.bimbingan.reminder')"
-                    :class="[
-                        route().current('mahasiswa.bimbingan.reminder')
-                            ? 'bg-blue-50 text-blue-700 font-semibold'
-                            : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900',
-                    ]"
-                    class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors"
-                >
-                    <BellIcon class="w-5 h-5" />
-                    <span>Reminder Jadwal</span>
-                </Link>
-                <Link
-                    :href="route('mahasiswa.bimbingan.progress_reminder')"
-                    :class="[
-                        route().current('mahasiswa.bimbingan.progress_reminder')
-                            ? 'bg-blue-50 text-blue-700 font-semibold'
-                            : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900',
-                    ]"
-                    class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors"
-                >
-                    <TrendingUpIcon class="w-5 h-5" />
-                    <span>Reminder Progres</span>
-                </Link>
             </nav>
             <div class="p-4 border-t border-slate-200">
                 <div class="flex items-center gap-3 p-2 bg-slate-50 rounded-xl">
@@ -128,11 +104,19 @@
                     >
                         {{ $page.props.auth.user.name.charAt(0) }}
                     </div>
-                    <div class="overflow-hidden">
+                    <div class="overflow-hidden flex-1">
                         <p class="text-sm font-semibold text-slate-800 truncate">
                             {{ $page.props.auth.user.name }}
                         </p>
-                        <p class="text-xs text-slate-500">Student</p>
+                        <div class="flex items-center justify-between mt-0.5">
+                            <span class="text-xs text-slate-500">Student</span>
+                            <Link
+                                :href="route('profile.edit')"
+                                class="text-xs text-blue-600 hover:text-blue-700 font-bold hover:underline"
+                            >
+                                Edit Profile
+                            </Link>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -154,86 +138,8 @@
                 </div>
 
                 <div class="flex items-center gap-4">
-                    <!-- Notifications -->
-                    <div class="relative">
-                        <button
-                            class="relative p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
-                            :class="{ 'text-blue-600 bg-blue-50': showNotifications }"
-                            @click="showNotifications = !showNotifications"
-                        >
-                            <BellIcon class="w-5 h-5" />
-                            <span
-                                class="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 border-2 border-white rounded-full"
-                            />
-                        </button>
-
-                        <!-- Notification Dropdown -->
-                        <Transition
-                            enter-active-class="transition ease-out duration-200"
-                            enter-from-class="opacity-0 scale-95 translate-y-2"
-                            enter-to-class="opacity-100 scale-100 translate-y-0"
-                            leave-active-class="transition ease-in duration-150"
-                            leave-from-class="opacity-100 scale-100 translate-y-0"
-                            leave-to-class="opacity-0 scale-95 translate-y-2"
-                        >
-                            <div
-                                v-if="showNotifications"
-                                class="absolute right-0 mt-3 w-80 bg-white rounded-2xl shadow-2xl border border-slate-100 z-50 overflow-hidden"
-                            >
-                                <div
-                                    class="p-4 border-b border-slate-50 bg-slate-50/50 flex justify-between items-center"
-                                >
-                                    <h3 class="font-bold text-slate-800 text-sm">Notifikasi</h3>
-                                    <button
-                                        class="text-xs text-blue-600 font-bold hover:underline"
-                                        @click="showNotifications = false"
-                                    >
-                                        Tandai dibaca
-                                    </button>
-                                </div>
-                                <div class="max-h-96 overflow-y-auto">
-                                    <div
-                                        v-for="(notif, index) in mockNotifications"
-                                        :key="index"
-                                        class="p-4 border-b border-slate-50 hover:bg-slate-50 transition-colors cursor-pointer group"
-                                    >
-                                        <div class="flex gap-3">
-                                            <div
-                                                :class="notif.color"
-                                                class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
-                                            >
-                                                <component :is="notif.icon" class="w-5 h-5" />
-                                            </div>
-                                            <div>
-                                                <p
-                                                    class="text-sm font-bold text-slate-800 group-hover:text-blue-600 transition-colors"
-                                                >
-                                                    {{ notif.title }}
-                                                </p>
-                                                <p
-                                                    class="text-xs text-slate-500 mt-0.5 line-clamp-2"
-                                                >
-                                                    {{ notif.desc }}
-                                                </p>
-                                                <p
-                                                    class="text-[10px] text-slate-400 mt-2 font-medium"
-                                                >
-                                                    {{ notif.time }}
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="p-3 text-center border-t border-slate-50">
-                                    <button
-                                        class="text-xs font-bold text-slate-500 hover:text-blue-600 transition-colors"
-                                    >
-                                        Lihat Semua Aktivitas
-                                    </button>
-                                </div>
-                            </div>
-                        </Transition>
-                    </div>
+                    <!-- Notification Bell -->
+                    <NotificationBell />
 
                     <div class="w-px h-8 bg-slate-200" />
 
@@ -255,37 +161,27 @@
             </main>
         </div>
 
-        <!-- Overlay for mobile/notifications -->
-        <div
-            v-if="showNotifications"
-            class="fixed inset-0 z-40"
-            @click="showNotifications = false"
-        />
+
         <!-- SIBIMA AI Assistant Floating Widget -->
         <AiAssistantWidget />
     </div>
 </template>
 
 <script setup>
-    import { ref, computed } from 'vue';
+    import { computed } from 'vue';
     import { Link } from '@inertiajs/vue3';
     import AiAssistantWidget from '@/Components/AiAssistantWidget.vue';
+    import NotificationBell from '@/Components/NotificationBell.vue';
     import {
         GraduationCapIcon,
         LayoutDashboardIcon,
         BookOpenIcon,
         CalendarDaysIcon,
         TrendingUpIcon,
-        BellIcon,
         LogOutIcon,
-        CheckCircle2Icon,
-        AlertCircleIcon,
-        InfoIcon,
         UsersIcon,
         FileTextIcon,
     } from 'lucide-vue-next';
-
-    const showNotifications = ref(false);
 
     const pageTitle = computed(() => {
         if (route().current('mahasiswa.dashboard')) return 'Dashboard';
@@ -302,6 +198,7 @@
         if (route().current('mahasiswa.bimbingan.progress_reminder'))
             return 'Monitoring Progres Akademik';
         if (route().current('mahasiswa.draft-skripsi.*')) return 'Manajemen Draft Skripsi';
+        if (route().current('profile.edit')) return 'Profile Settings';
         return 'SIBIMA';
     });
 
@@ -320,30 +217,7 @@
         if (route().current('mahasiswa.bimbingan.progress_reminder'))
             return 'Frekuensi Notifikasi Progres';
         if (route().current('mahasiswa.draft-skripsi.*')) return 'Upload & Catatan Draft';
+        if (route().current('profile.edit')) return 'Update Your Account Credentials';
         return 'Portal Mahasiswa';
     });
-
-    const mockNotifications = [
-        {
-            title: 'KRS Disetujui',
-            desc: 'Mata kuliah "Algoritma & Struktur Data" telah disetujui oleh Dosen Pembimbing.',
-            time: '5 menit yang lalu',
-            icon: CheckCircle2Icon,
-            color: 'bg-emerald-100 text-emerald-600',
-        },
-        {
-            title: 'Peringatan SKS',
-            desc: 'Anda belum mencukupi batas minimum 18 SKS untuk semester depan.',
-            time: '2 jam yang lalu',
-            icon: AlertCircleIcon,
-            color: 'bg-amber-100 text-amber-600',
-        },
-        {
-            title: 'Update Kurikulum',
-            desc: 'Ada perubahan pada mata kuliah prasyarat untuk Tugas Akhir. Silakan cek katalog.',
-            time: 'Kemarin',
-            icon: InfoIcon,
-            color: 'bg-blue-100 text-blue-600',
-        },
-    ];
 </script>
