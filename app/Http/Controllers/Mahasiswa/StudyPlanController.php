@@ -74,7 +74,7 @@ class StudyPlanController extends Controller
             'mahasiswa_id' => $mahasiswa->id,
             'course_id' => $request->course_id,
             'semester' => $request->semester,
-            'status' => 'pending',
+            'status' => 'approved',
         ]);
 
         return back()->with('success', 'Mata kuliah berhasil ditambahkan ke KRS.');

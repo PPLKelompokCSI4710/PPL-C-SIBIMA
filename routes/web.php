@@ -35,7 +35,7 @@ Route::middleware('auth')->group(function () {
             return redirect()->route('mahasiswa.study-plans.index');
         }
         if ($user->hasRole('admin') || $user->hasRole('dosen')) {
-            return redirect()->route('staff.study-plans.index');
+            return redirect()->route('dashboard');
         }
 
         return redirect()->route('dashboard');

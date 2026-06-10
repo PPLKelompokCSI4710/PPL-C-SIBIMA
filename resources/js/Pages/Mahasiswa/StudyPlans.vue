@@ -102,7 +102,7 @@
                             <th class="px-6 py-4 font-semibold">Course Code</th>
                             <th class="px-6 py-4 font-semibold">Credits</th>
                             <th class="px-6 py-4 font-semibold">Semester</th>
-                            <th class="px-6 py-4 font-semibold">Status</th>
+
                             <th class="px-6 py-4 font-semibold text-right">Actions</th>
                         </tr>
                     </thead>
@@ -138,31 +138,7 @@
                             <td class="px-6 py-4 text-slate-600 text-sm">
                                 Sem {{ course.semester }}
                             </td>
-                            <td class="px-6 py-4">
-                                <span
-                                    v-if="course.status === 'approved'"
-                                    class="inline-flex items-center gap-1.5 px-2 py-1 rounded-md bg-emerald-50 text-emerald-700 text-xs font-medium border border-emerald-100"
-                                >
-                                    <div class="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                                    Approved
-                                </span>
-                                <span
-                                    v-else-if="course.status === 'rejected'"
-                                    class="inline-flex items-center gap-1.5 px-2 py-1 rounded-md bg-red-50 text-red-700 text-xs font-medium border border-red-100"
-                                >
-                                    <div class="w-1.5 h-1.5 rounded-full bg-red-500" />
-                                    Rejected
-                                </span>
-                                <span
-                                    v-else
-                                    class="inline-flex items-center gap-1.5 px-2 py-1 rounded-md bg-amber-50 text-amber-700 text-xs font-medium border border-amber-100"
-                                >
-                                    <div
-                                        class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"
-                                    />
-                                    Pending
-                                </span>
-                            </td>
+
                             <td class="px-6 py-4 text-right">
                                 <div class="flex items-center justify-end gap-2">
                                     <button
@@ -185,7 +161,7 @@
                             </td>
                         </tr>
                         <tr v-if="filteredStudyPlans.length === 0">
-                            <td colspan="6" class="px-6 py-12 text-center">
+                            <td colspan="5" class="px-6 py-12 text-center">
                                 <div
                                     class="flex flex-col items-center justify-center text-slate-400"
                                 >

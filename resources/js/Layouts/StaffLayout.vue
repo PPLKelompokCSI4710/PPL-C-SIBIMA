@@ -55,19 +55,7 @@
                         <span>Manajemen Kursus</span>
                     </Link>
 
-                    <!-- Dosen & Admin: KRS Approval -->
-                    <Link
-                        :href="route('staff.study-plans.index')"
-                        :class="[
-                            route().current('staff.study-plans.index')
-                                ? 'bg-indigo-50 text-indigo-700 font-semibold'
-                                : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900',
-                        ]"
-                        class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors"
-                    >
-                        <ClipboardCheckIcon class="w-5 h-5" />
-                        <span>Persetujuan KRS</span>
-                    </Link>
+
 
                     <!-- Dosen & Admin: Student Progress -->
                     <Link
@@ -220,7 +208,7 @@
     const currentTitle = computed(() => {
         if (route().current('staff.dashboard')) return 'Dashboard';
         if (route().current('staff.courses.index')) return 'Manajemen Kursus';
-        if (route().current('staff.study-plans.index')) return 'Persetujuan KRS';
+
         if (route().current('staff.progress.index')) return 'Progres Mahasiswa';
         if (route().current('staff.calendar')) return 'Kalender Akademik';
         if (route().current('dosen.ketersediaan-jadwal.*')) return 'Ketersediaan Jadwal';

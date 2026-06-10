@@ -19,7 +19,7 @@
             </div>
 
             <!-- Top Cards Section -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
                 <!-- GPA Card -->
                 <div
                     class="bg-white rounded-xl border border-slate-200 p-6 shadow-sm hover:shadow-md transition-shadow relative group"
@@ -40,7 +40,7 @@
                     </div>
                     <h3 class="text-slate-500 text-sm font-medium">Cumulative GPA (IPK)</h3>
                     <p class="text-3xl font-bold text-slate-800 mt-1">
-                        {{ auth.progress?.ipk || auth.mahasiswa?.ipk || '0.00' }}
+                        {{ formatIpk(auth.progress?.ipk || auth.mahasiswa?.ipk) || '0.00' }}
                     </p>
                 </div>
 
@@ -98,6 +98,67 @@
                             class="bg-emerald-500 h-full rounded-full transition-all duration-1000"
                             :style="`width: ${progressPercentage}%`"
                         />
+                    </div>
+                </div>
+
+                <!-- TAK Progress Card -->
+                <div
+                    v-if="isS1"
+                    class="bg-white rounded-xl border border-slate-200 p-6 shadow-sm hover:shadow-md transition-shadow relative group"
+                >
+                    <div class="flex justify-between items-start mb-4">
+                        <div
+                            class="w-10 h-10 rounded-lg bg-orange-50 flex items-center justify-center text-orange-600"
+                        >
+                            <TrophyIcon class="w-5 h-5" />
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-xl font-bold text-slate-800"
+                                >{{ takPercentage }}%</span
+                            >
+                            <button
+                                class="p-1.5 bg-slate-50 text-slate-400 hover:text-blue-600 rounded-md transition-colors opacity-0 group-hover:opacity-100"
+                                title="Update Progress"
+                                @click="openProgressModal"
+                            >
+                                <Edit2Icon class="w-4 h-4" />
+                            </button>
+                        </div>
+                    </div>
+                    <h3 class="text-slate-500 text-sm font-medium mb-2">
+                        TAK Progress ({{ auth.progress?.tak || 0 }}/120)
+                    </h3>
+                    <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                        <div
+                            class="bg-orange-500 h-full rounded-full transition-all duration-1000"
+                            :style="`width: ${takPercentage}%`"
+                        />
+                    </div>
+                </div>
+
+                <!-- Target Akademik Card -->
+                <div
+                    class="bg-white rounded-xl border border-slate-200 p-6 shadow-sm hover:shadow-md transition-shadow relative group"
+                >
+                    <div class="flex justify-between items-start mb-4">
+                        <div
+                            class="w-10 h-10 rounded-lg bg-amber-50 flex items-center justify-center text-amber-600"
+                        >
+                            <TargetIcon class="w-5 h-5" />
+                        </div>
+                        <button
+                            class="p-1.5 bg-slate-50 text-slate-400 hover:text-blue-600 rounded-md transition-colors opacity-0 group-hover:opacity-100"
+                            title="Update Target"
+                            @click="openProgressModal"
+                        >
+                            <Edit2Icon class="w-4 h-4" />
+                        </button>
+                    </div>
+                    <h3 class="text-slate-500 text-sm font-medium">Target Akademik</h3>
+                    <div class="mt-2 space-y-1 text-xs font-semibold text-slate-700">
+                        <p>Target IPK: <span class="text-slate-800 font-bold">{{ formatIpk(auth.progress?.target_ipk) || '-' }}</span></p>
+                        <p>Target SKS: <span class="text-slate-800 font-bold">{{ auth.progress?.target_sks ? `${auth.progress.target_sks} SKS` : '-' }}</span></p>
+                        <p>Target Lulus: <span class="text-slate-800 font-bold">{{ auth.progress?.target_semester ? `Sem ${auth.progress.target_semester}` : '-' }}</span></p>
                     </div>
                 </div>
 
@@ -407,6 +468,45 @@
                             <div class="p-6 space-y-5">
                                 <div>
                                     <label class="block text-sm font-medium text-slate-700 mb-1"
+                                        >NIM <span class="text-red-500">*</span></label
+                                    >
+                                    <input
+                                        v-model="progressForm.nim"
+                                        type="text"
+                                        required
+                                        class="w-full rounded-lg border-slate-300 border px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all bg-white text-slate-700"
+                                    />
+                                    <p v-if="progressForm.errors.nim" class="text-xs text-red-500 mt-1">{{ progressForm.errors.nim }}</p>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-700 mb-1"
+                                        >Semester Saat Ini <span class="text-red-500">*</span></label
+                                    >
+                                    <select
+                                        v-model="progressForm.semester"
+                                        required
+                                        class="w-full rounded-lg border-slate-300 border px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all bg-white text-slate-700"
+                                    >
+                                        <option v-for="n in 14" :key="n" :value="n">
+                                            Semester {{ n }}
+                                        </option>
+                                    </select>
+                                    <p v-if="progressForm.errors.semester" class="text-xs text-red-500 mt-1">{{ progressForm.errors.semester }}</p>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-700 mb-1"
+                                        >Program Studi / Jurusan <span class="text-red-500">*</span></label
+                                    >
+                                    <input
+                                        v-model="progressForm.program_studi"
+                                        type="text"
+                                        required
+                                        class="w-full rounded-lg border-slate-300 border px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all bg-white text-slate-700"
+                                    />
+                                    <p v-if="progressForm.errors.program_studi" class="text-xs text-red-500 mt-1">{{ progressForm.errors.program_studi }}</p>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-700 mb-1"
                                         >IPK Saat Ini <span class="text-red-500">*</span></label
                                     >
                                     <input
@@ -418,6 +518,7 @@
                                         required
                                         class="w-full rounded-lg border-slate-300 border px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all bg-white text-slate-700"
                                     />
+                                    <p v-if="progressForm.errors.ipk" class="text-xs text-red-500 mt-1">{{ progressForm.errors.ipk }}</p>
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-slate-700 mb-1"
@@ -431,6 +532,70 @@
                                         required
                                         class="w-full rounded-lg border-slate-300 border px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all bg-white text-slate-700"
                                     />
+                                    <p v-if="progressForm.errors.total_sks" class="text-xs text-red-500 mt-1">{{ progressForm.errors.total_sks }}</p>
+                                </div>
+                                
+                                <!-- Poin TAK input inside Modal -->
+                                <div v-if="isS1">
+                                    <label class="block text-sm font-medium text-slate-700 mb-1"
+                                        >Poin TAK (Maksimal 120)</label
+                                    >
+                                    <input
+                                        v-model="progressForm.tak"
+                                        type="number"
+                                        min="0"
+                                        max="120"
+                                        class="w-full rounded-lg border-slate-300 border px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all bg-white text-slate-700"
+                                    />
+                                    <p v-if="progressForm.errors.tak" class="text-xs text-red-500 mt-1">{{ progressForm.errors.tak }}</p>
+                                </div>
+
+                                <div class="border-t border-slate-100 pt-3">
+                                    <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Target Akademik</p>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-700 mb-1"
+                                        >Target IPK Kelulusan</label
+                                    >
+                                    <input
+                                        v-model="progressForm.target_ipk"
+                                        type="number"
+                                        step="0.01"
+                                        :min="progressForm.ipk"
+                                        max="4"
+                                        class="w-full rounded-lg border-slate-300 border px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all bg-white text-slate-700"
+                                        placeholder="e.g. 3.80"
+                                    />
+                                    <p v-if="progressForm.errors.target_ipk" class="text-xs text-red-500 mt-1">{{ progressForm.errors.target_ipk }}</p>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-700 mb-1"
+                                        >Target Total SKS</label
+                                    >
+                                    <input
+                                        v-model="progressForm.target_sks"
+                                        type="number"
+                                        :min="progressForm.total_sks"
+                                        max="144"
+                                        class="w-full rounded-lg border-slate-300 border px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all bg-white text-slate-700"
+                                        placeholder="e.g. 144"
+                                    />
+                                    <p v-if="progressForm.errors.target_sks" class="text-xs text-red-500 mt-1">{{ progressForm.errors.target_sks }}</p>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-700 mb-1"
+                                        >Target Semester Lulus</label
+                                    >
+                                    <select
+                                        v-model="progressForm.target_semester"
+                                        class="w-full rounded-lg border-slate-300 border px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all bg-white text-slate-700"
+                                    >
+                                        <option value="">-- Pilih target semester --</option>
+                                        <option v-for="n in 14" :key="n" :value="n">
+                                            Semester {{ n }}
+                                        </option>
+                                    </select>
+                                    <p v-if="progressForm.errors.target_semester" class="text-xs text-red-500 mt-1">{{ progressForm.errors.target_semester }}</p>
                                 </div>
                             </div>
 
@@ -520,6 +685,7 @@
         XIcon,
         SaveIcon,
         Edit2Icon,
+        TrophyIcon,
     } from 'lucide-vue-next';
 
     const props = defineProps({
@@ -532,6 +698,19 @@
     const passedSks = computed(() => props.auth.progress?.total_sks || 0);
     const progressPercentage = computed(() => {
         const p = Math.round((passedSks.value / 144) * 100);
+        return p > 100 ? 100 : p;
+    });
+
+    const isS1 = computed(() => {
+        const prog = (props.auth.mahasiswa?.program_studi || props.auth.user?.mahasiswa?.program_studi || '').toLowerCase();
+        if (prog.includes('s1')) return true;
+        if (prog.includes('d3') || prog.includes('d4') || prog.includes('s2') || prog.includes('s3')) return false;
+        return true;
+    });
+
+    const takPercentage = computed(() => {
+        const takPoints = props.auth.progress?.tak || 0;
+        const p = Math.round((takPoints / 120) * 100);
         return p > 100 ? 100 : p;
     });
 
@@ -600,11 +779,25 @@
     const progressForm = useForm({
         ipk: props.auth.progress?.ipk || props.auth.mahasiswa?.ipk || 0,
         total_sks: props.auth.progress?.total_sks || 0,
+        tak: props.auth.progress?.tak || 0,
+        target_ipk: props.auth.progress?.target_ipk || '',
+        target_sks: props.auth.progress?.target_sks || '',
+        target_semester: props.auth.progress?.target_semester || '',
+        nim: props.auth.user?.mahasiswa?.nim || '',
+        semester: props.auth.user?.mahasiswa?.semester || 1,
+        program_studi: props.auth.user?.mahasiswa?.program_studi || '',
     });
 
     const openProgressModal = () => {
         progressForm.ipk = props.auth.progress?.ipk || props.auth.mahasiswa?.ipk || 0;
         progressForm.total_sks = props.auth.progress?.total_sks || 0;
+        progressForm.tak = props.auth.progress?.tak || 0;
+        progressForm.target_ipk = props.auth.progress?.target_ipk || '';
+        progressForm.target_sks = props.auth.progress?.target_sks || '';
+        progressForm.target_semester = props.auth.progress?.target_semester || '';
+        progressForm.nim = props.auth.user?.mahasiswa?.nim || '';
+        progressForm.semester = props.auth.user?.mahasiswa?.semester || 1;
+        progressForm.program_studi = props.auth.user?.mahasiswa?.program_studi || '';
         progressForm.clearErrors();
         isProgressModalOpen.value = true;
     };
@@ -625,6 +818,12 @@
     const openDeleteModal = (plan) => {
         planToDelete.value = plan;
         isDeleteModalOpen.value = true;
+    };
+
+    const formatIpk = (value) => {
+        if (value === null || value === undefined || value === '') return '';
+        const num = parseFloat(value);
+        return isNaN(num) ? '' : num.toFixed(2);
     };
 
     const executeDelete = () => {
