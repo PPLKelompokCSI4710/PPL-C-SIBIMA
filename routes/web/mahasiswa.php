@@ -24,6 +24,9 @@ use Illuminate\Support\Facades\Route;
 Route::middleware(['auth', 'role:mahasiswa'])->prefix('mahasiswa')->name('mahasiswa.')->group(function () {
     // Route::get('/akademik', [AkademikController::class, 'index'])->name('akademik.index'); // Contoh untuk PBI-ZZZ
     Route::get('/bimbingan/reminder', [BimbinganReminderController::class, 'index'])->name('bimbingan.reminder');
+    Route::post('/bimbingan/reminder/schedule-preferences', [BimbinganReminderController::class, 'updateSchedulePreferences'])->name('bimbingan.reminder.schedule');
+    Route::post('/bimbingan/reminder/progress-settings', [BimbinganReminderController::class, 'updateProgressSettings'])->name('bimbingan.reminder.progress');
+    // Legacy routes – kept for backward compatibility
     Route::get('/bimbingan/progress-reminder', [ProgressReminderController::class, 'index'])->name('bimbingan.progress_reminder');
     Route::post('/bimbingan/progress-reminder/frequency', [ProgressReminderController::class, 'updateFrequency'])->name('bimbingan.progress_reminder.update');
 
