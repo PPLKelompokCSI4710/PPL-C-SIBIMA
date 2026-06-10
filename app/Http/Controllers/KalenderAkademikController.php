@@ -95,9 +95,8 @@ class KalenderAkademikController extends Controller
     {
         $validated = $request->validate([
             'nama_kegiatan' => 'required|string|max:255',
-            'tipe_kegiatan' => 'required|string',
             'tanggal_mulai' => 'required|date',
-            'jam_mulai' => 'nullable|date_format:H:i',
+            'jam_mulai' => 'nullable|string',
             'tanggal_selesai' => 'required|date|after_or_equal:tanggal_mulai',
             'deskripsi' => 'nullable|string',
         ]);
@@ -112,9 +111,8 @@ class KalenderAkademikController extends Controller
     {
         $validated = $request->validate([
             'nama_kegiatan' => 'required|string|max:255',
-            'tipe_kegiatan' => 'required|string',
             'tanggal_mulai' => 'required|date',
-            'jam_mulai' => 'nullable|date_format:H:i',
+            'jam_mulai' => 'nullable|string',
             'tanggal_selesai' => 'required|date|after_or_equal:tanggal_mulai',
             'deskripsi' => 'nullable|string',
             'status' => 'nullable|string',
@@ -156,7 +154,7 @@ class KalenderAkademikController extends Controller
                     'judul' => 'Bimbingan: '.($b->judul_ta ?? 'Tugas Akhir'),
                     'deskripsi' => $b->topik_bimbingan,
                     'tanggal' => $b->ketersediaanJadwal?->tanggal ?? '',
-                    'jam' => ($b->ketersediaanJadwal?->waktu_mulai ? substr($b->ketersediaanJadwal->waktu_mulai, 0, 5) : '').' - '.($b->ketersediaanJadwal?->waktu_selesai ? substr($b->ketersediaanJadwal->waktu_selesai, 0, 5) : ''),
+                    'jam' => ($b->ketersediaanJadwal?->waktu_mulai ? substr($b->ketersediaanJadwal?->waktu_mulai, 0, 5) : '').' - '.($b->ketersediaanJadwal?->waktu_selesai ? substr($b->ketersediaanJadwal?->waktu_selesai, 0, 5) : ''),
                     'status' => 'pending_dosen',
                     'user' => [
                         'name' => $b->mahasiswa->nama_lengkap ?? 'Mahasiswa',
@@ -253,20 +251,45 @@ class KalenderAkademikController extends Controller
 
         // Get student's own approved bimbingan events
         $mahasiswa = Mahasiswa::where('user_id', $studentId)->first();
-        $myBimbingans = JadwalBimbingan::with(['dosen', 'ketersediaanJadwal'])
+        
+        $myBimbingansQuery = JadwalBimbingan::with(['dosen', 'ketersediaanJadwal'])
             ->where('mahasiswa_id', $mahasiswa?->id)
             ->where('status', 'approved')
-            ->get()
-            ->map(function ($b) {
+            ->get();
+
+        $dosenUserIds = $myBimbingansQuery->pluck('dosen.user_id')->filter()->unique()->toArray();
+
+        $allBimbinganKalender = KalenderAkademik::whereIn('user_id', $dosenUserIds)
+            ->where('tipe_kegiatan', 'bimbingan')
+            ->get();
+
+        $myBimbingans = $myBimbingansQuery->map(function ($b) use ($mahasiswa, $allBimbinganKalender) {
+                // Find matching KalenderAkademik to reflect Admin edits
+                $kalenderItem = $allBimbinganKalender->first(function ($item) use ($mahasiswa, $b) {
+                    if ($item->user_id !== ($b->dosen->user_id ?? null)) return false;
+                    
+                    $expectedDescFragment = $b->topik_bimbingan.' (Lokasi: '.($b->lokasi ?? '-').', Tipe: '.($b->tipe ?? 'offline').')';
+                    if (stripos($item->deskripsi ?? '', $expectedDescFragment) !== false) {
+                        return true;
+                    }
+                    
+                    $topik = substr($b->topik_bimbingan ?? '', 0, 15);
+                    if ($topik && stripos($item->deskripsi ?? '', $topik) !== false) {
+                        return true;
+                    }
+                    
+                    return false;
+                });
+
                 return (object) [
                     'id' => 'bimbingan-'.$b->id,
                     'user_id' => $b->mahasiswa->user_id ?? null,
-                    'nama_kegiatan' => 'Bimbingan: '.($b->dosen->nama_lengkap ?? 'Dosen'),
+                    'nama_kegiatan' => $kalenderItem->nama_kegiatan ?? 'Bimbingan: '.($b->dosen->nama_lengkap ?? 'Dosen'),
                     'tipe_kegiatan' => 'bimbingan',
-                    'tanggal_mulai' => $b->ketersediaanJadwal?->tanggal ?? '',
-                    'tanggal_selesai' => $b->ketersediaanJadwal?->tanggal ?? '',
-                    'jam_mulai' => $b->ketersediaanJadwal?->waktu_mulai ?? '',
-                    'deskripsi' => $b->topik_bimbingan.' (Lokasi: '.($b->lokasi ?? '-').', Tipe: '.($b->tipe ?? 'offline').')',
+                    'tanggal_mulai' => $kalenderItem->tanggal_mulai ?? $b->ketersediaanJadwal?->tanggal ?? '',
+                    'tanggal_selesai' => $kalenderItem->tanggal_selesai ?? $b->ketersediaanJadwal?->tanggal ?? '',
+                    'jam_mulai' => $kalenderItem->jam_mulai ?? $b->ketersediaanJadwal?->waktu_mulai ?? '',
+                    'deskripsi' => $kalenderItem->deskripsi ?? $b->topik_bimbingan.' (Lokasi: '.($b->lokasi ?? '-').', Tipe: '.($b->tipe ?? 'offline').')',
                     'status' => 'Active',
                 ];
             });
@@ -283,7 +306,7 @@ class KalenderAkademikController extends Controller
                     'judul' => 'Bimbingan: '.($b->judul_ta ?? 'Tugas Akhir'),
                     'deskripsi' => $b->topik_bimbingan,
                     'tanggal' => $b->ketersediaanJadwal?->tanggal ?? '',
-                    'jam' => ($b->ketersediaanJadwal?->waktu_mulai ? substr($b->ketersediaanJadwal->waktu_mulai, 0, 5) : '').' - '.($b->ketersediaanJadwal?->waktu_selesai ? substr($b->ketersediaanJadwal->waktu_selesai, 0, 5) : ''),
+                    'jam' => ($b->ketersediaanJadwal?->waktu_mulai ? substr($b->ketersediaanJadwal?->waktu_mulai, 0, 5) : '').' - '.($b->ketersediaanJadwal?->waktu_selesai ? substr($b->ketersediaanJadwal?->waktu_selesai, 0, 5) : ''),
                     'status' => $b->status,
                     'tipe' => $b->tipe,
                     'lokasi' => $b->lokasi,
@@ -319,14 +342,15 @@ class KalenderAkademikController extends Controller
             $bimbingan->ketersediaanJadwal->decrement('kuota');
         }
 
-        // Add to Kalender Akademik so both see it
-        $kalenderItem = KalenderAkademik::create([
+        // Add to Kalender Akademik so both see it (use updateOrCreate to prevent duplicates if clicked twice)
+        $kalenderItem = KalenderAkademik::updateOrCreate([
             'user_id' => $bimbingan->dosen->user_id ?? Auth::id() ?? 1,
             'nama_kegiatan' => 'Bimbingan: '.($bimbingan->mahasiswa->nama_lengkap ?? 'Mahasiswa'),
-            'tipe_kegiatan' => 'bimbingan',
             'tanggal_mulai' => $bimbingan->ketersediaanJadwal?->tanggal ?? date('Y-m-d'),
-            'tanggal_selesai' => $bimbingan->ketersediaanJadwal?->tanggal ?? date('Y-m-d'),
             'jam_mulai' => $bimbingan->ketersediaanJadwal?->waktu_mulai ?? '08:00:00',
+        ], [
+            'tipe_kegiatan' => 'bimbingan',
+            'tanggal_selesai' => $bimbingan->ketersediaanJadwal?->tanggal ?? date('Y-m-d'),
             'deskripsi' => $bimbingan->topik_bimbingan.' (Lokasi: '.$request->lokasi.', Tipe: '.$request->tipe.')',
             'status' => 'Active',
         ]);

@@ -9,7 +9,7 @@ use App\Http\Controllers\Mahasiswa\ProgressController;
 use App\Http\Controllers\Mahasiswa\ProgressReminderController;
 use App\Http\Controllers\Mahasiswa\StudyPlanController;
 use App\Http\Controllers\MonitoringJadwalBimbinganController;
-use App\Http\Controllers\Mahasiswa\ExportBimbinganController;
+use App\Http\Controllers\DraftSkripsiController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -49,5 +49,10 @@ Route::middleware(['auth', 'role:mahasiswa'])->prefix('mahasiswa')->name('mahasi
 
     // Progress routes
     Route::get('/progress', [ProgressController::class, 'index'])->name('progress.index');
-    Route::put('/progress', [ProgressController::class, 'update'])->name('progress.update');
+    // Draft Skripsi routes
+    Route::get('/draft-skripsi', [DraftSkripsiController::class, 'index'])->name('draft-skripsi.index');
+    Route::post('/draft-skripsi', [DraftSkripsiController::class, 'store'])->name('draft-skripsi.store');
+    Route::post('/draft-skripsi/{draft}', [DraftSkripsiController::class, 'update'])->name('draft-skripsi.update');
+    Route::put('/draft-skripsi/{draft}/catatan', [DraftSkripsiController::class, 'updateCatatan'])->name('draft-skripsi.updateCatatan');
+    Route::delete('/draft-skripsi/{draft}', [DraftSkripsiController::class, 'destroy'])->name('draft-skripsi.destroy');
 });
