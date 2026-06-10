@@ -495,41 +495,42 @@
                                         <p v-if="form.errors.program_studi" class="text-xs text-rose-500 mt-1.5 font-medium">{{ form.errors.program_studi }}</p>
                                     </div>
 
-                                    <!-- Current IPK -->
-                                    <div>
-                                        <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5" for="ipk">
-                                            IPK Saat Ini <span class="text-red-500">*</span>
-                                        </label>
-                                        <div class="relative">
+                                    <!-- Current IPK & SKS Lulus -->
+                                    <div class="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5" for="ipk">
+                                                IPK Saat Ini <span class="text-red-500">*</span>
+                                            </label>
+                                            <div class="relative">
+                                                <input
+                                                    id="ipk"
+                                                    v-model="form.ipk"
+                                                    type="number"
+                                                    step="0.01"
+                                                    min="0"
+                                                    max="4"
+                                                    required
+                                                    class="w-full rounded-2xl border-slate-200 border px-4 py-3 text-sm focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 outline-none transition-all bg-slate-50/50 focus:bg-white text-slate-800 font-bold"
+                                                />
+                                            </div>
+                                            <p v-if="form.errors.ipk" class="text-xs text-rose-500 mt-1.5 font-medium">{{ form.errors.ipk }}</p>
+                                        </div>
+
+                                        <div>
+                                            <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5" for="total_sks">
+                                                SKS Lulus <span class="text-red-500">*</span>
+                                            </label>
                                             <input
-                                                id="ipk"
-                                                v-model="form.ipk"
+                                                id="total_sks"
+                                                v-model="form.total_sks"
                                                 type="number"
-                                                step="0.01"
                                                 min="0"
-                                                max="4"
+                                                max="144"
                                                 required
                                                 class="w-full rounded-2xl border-slate-200 border px-4 py-3 text-sm focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 outline-none transition-all bg-slate-50/50 focus:bg-white text-slate-800 font-bold"
                                             />
+                                            <p v-if="form.errors.total_sks" class="text-xs text-rose-500 mt-1.5 font-medium">{{ form.errors.total_sks }}</p>
                                         </div>
-                                        <p v-if="form.errors.ipk" class="text-xs text-rose-500 mt-1.5 font-medium">{{ form.errors.ipk }}</p>
-                                    </div>
-
-                                    <!-- Total SKS Lulus -->
-                                    <div>
-                                        <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5" for="total_sks">
-                                            Total SKS Lulus <span class="text-red-500">*</span>
-                                        </label>
-                                        <input
-                                            id="total_sks"
-                                            v-model="form.total_sks"
-                                            type="number"
-                                            min="0"
-                                            max="144"
-                                            required
-                                            class="w-full rounded-2xl border-slate-200 border px-4 py-3 text-sm focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 outline-none transition-all bg-slate-50/50 focus:bg-white text-slate-800 font-bold"
-                                        />
-                                        <p v-if="form.errors.total_sks" class="text-xs text-rose-500 mt-1.5 font-medium">{{ form.errors.total_sks }}</p>
                                     </div>
 
                                     <!-- Passed Courses & TAK (side-by-side on desktop) -->
@@ -573,26 +574,25 @@
                                 </h4>
 
                                 <div class="space-y-4">
-                                    <!-- Target IPK -->
-                                    <div>
-                                        <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5" for="target_ipk">
-                                            Target IPK Kelulusan
-                                        </label>
-                                        <input
-                                            id="target_ipk"
-                                            v-model="form.target_ipk"
-                                            type="number"
-                                            step="0.01"
-                                            :min="form.ipk"
-                                            max="4"
-                                            placeholder="contoh: 3.80"
-                                            class="w-full rounded-2xl border-slate-200 border px-4 py-3 text-sm focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 outline-none transition-all bg-slate-50/50 focus:bg-white text-slate-800 font-bold placeholder-slate-300"
-                                        />
-                                        <p v-if="form.errors.target_ipk" class="text-xs text-rose-500 mt-1.5 font-medium">{{ form.errors.target_ipk }}</p>
-                                    </div>
-
-                                    <!-- Target SKS & Target Semester (side-by-side) -->
+                                    <!-- Target IPK & Target SKS -->
                                     <div class="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5" for="target_ipk">
+                                                Target IPK
+                                            </label>
+                                            <input
+                                                id="target_ipk"
+                                                v-model="form.target_ipk"
+                                                type="number"
+                                                step="0.01"
+                                                :min="form.ipk"
+                                                max="4"
+                                                placeholder="contoh: 3.80"
+                                                class="w-full rounded-2xl border-slate-200 border px-4 py-3 text-sm focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 outline-none transition-all bg-slate-50/50 focus:bg-white text-slate-800 font-bold placeholder-slate-300"
+                                            />
+                                            <p v-if="form.errors.target_ipk" class="text-xs text-rose-500 mt-1.5 font-medium">{{ form.errors.target_ipk }}</p>
+                                        </div>
+
                                         <div>
                                             <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5" for="target_sks">
                                                 Target SKS
@@ -608,23 +608,24 @@
                                             />
                                             <p v-if="form.errors.target_sks" class="text-xs text-rose-500 mt-1.5 font-medium">{{ form.errors.target_sks }}</p>
                                         </div>
+                                    </div>
 
-                                        <div>
-                                            <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5" for="target_semester">
-                                                Target Semester Lulus
-                                            </label>
-                                            <select
-                                                id="target_semester"
-                                                v-model="form.target_semester"
-                                                class="w-full rounded-2xl border-slate-200 border px-4 py-3 text-sm focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 outline-none transition-all bg-slate-50/50 focus:bg-white text-slate-800 font-bold"
-                                            >
-                                                <option value="">-- Pilih target --</option>
-                                                <option v-for="n in 14" :key="n" :value="n">
-                                                    Semester {{ n }}
-                                                </option>
-                                            </select>
-                                            <p v-if="form.errors.target_semester" class="text-xs text-rose-500 mt-1.5 font-medium">{{ form.errors.target_semester }}</p>
-                                        </div>
+                                    <!-- Target Semester Lulus -->
+                                    <div>
+                                        <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5" for="target_semester">
+                                            Target Semester Lulus
+                                        </label>
+                                        <select
+                                            id="target_semester"
+                                            v-model="form.target_semester"
+                                            class="w-full rounded-2xl border-slate-200 border px-4 py-3 text-sm focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 outline-none transition-all bg-slate-50/50 focus:bg-white text-slate-800 font-bold"
+                                        >
+                                            <option value="">-- Pilih target --</option>
+                                            <option v-for="n in 14" :key="n" :value="n">
+                                                Semester {{ n }}
+                                            </option>
+                                        </select>
+                                        <p v-if="form.errors.target_semester" class="text-xs text-rose-500 mt-1.5 font-medium">{{ form.errors.target_semester }}</p>
                                     </div>
                                 </div>
                             </div>

@@ -448,7 +448,7 @@
             <div class="fixed inset-0 overflow-y-auto">
                 <div class="flex min-h-full items-center justify-center p-4">
                     <div
-                        class="relative transform overflow-hidden rounded-xl bg-white shadow-2xl transition-all w-full max-w-sm"
+                        class="relative transform overflow-hidden rounded-xl bg-white shadow-2xl transition-all w-full max-w-lg"
                     >
                         <div
                             class="px-6 py-4 border-b border-slate-200 flex items-center justify-between bg-slate-50/50"
@@ -466,33 +466,38 @@
 
                         <form @submit.prevent="submitProgress">
                             <div class="p-6 space-y-5">
-                                <div>
-                                    <label class="block text-sm font-medium text-slate-700 mb-1"
-                                        >NIM <span class="text-red-500">*</span></label
-                                    >
-                                    <input
-                                        v-model="progressForm.nim"
-                                        type="text"
-                                        required
-                                        class="w-full rounded-lg border-slate-300 border px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all bg-white text-slate-700"
-                                    />
-                                    <p v-if="progressForm.errors.nim" class="text-xs text-red-500 mt-1">{{ progressForm.errors.nim }}</p>
+                                <!-- NIM & Semester Saat Ini side-by-side -->
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-slate-700 mb-1"
+                                            >NIM <span class="text-red-500">*</span></label
+                                        >
+                                        <input
+                                            v-model="progressForm.nim"
+                                            type="text"
+                                            required
+                                            class="w-full rounded-lg border-slate-300 border px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all bg-white text-slate-700 font-semibold"
+                                        />
+                                        <p v-if="progressForm.errors.nim" class="text-xs text-red-500 mt-1">{{ progressForm.errors.nim }}</p>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-slate-700 mb-1"
+                                            >Semester Saat Ini <span class="text-red-500">*</span></label
+                                        >
+                                        <select
+                                            v-model="progressForm.semester"
+                                            required
+                                            class="w-full rounded-lg border-slate-300 border px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all bg-white text-slate-700 font-semibold"
+                                        >
+                                            <option v-for="n in 14" :key="n" :value="n">
+                                                Semester {{ n }}
+                                            </option>
+                                        </select>
+                                        <p v-if="progressForm.errors.semester" class="text-xs text-red-500 mt-1">{{ progressForm.errors.semester }}</p>
+                                    </div>
                                 </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-slate-700 mb-1"
-                                        >Semester Saat Ini <span class="text-red-500">*</span></label
-                                    >
-                                    <select
-                                        v-model="progressForm.semester"
-                                        required
-                                        class="w-full rounded-lg border-slate-300 border px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all bg-white text-slate-700"
-                                    >
-                                        <option v-for="n in 14" :key="n" :value="n">
-                                            Semester {{ n }}
-                                        </option>
-                                    </select>
-                                    <p v-if="progressForm.errors.semester" class="text-xs text-red-500 mt-1">{{ progressForm.errors.semester }}</p>
-                                </div>
+
+                                <!-- Program Studi / Jurusan -->
                                 <div>
                                     <label class="block text-sm font-medium text-slate-700 mb-1"
                                         >Program Studi / Jurusan <span class="text-red-500">*</span></label
@@ -505,34 +510,38 @@
                                     />
                                     <p v-if="progressForm.errors.program_studi" class="text-xs text-red-500 mt-1">{{ progressForm.errors.program_studi }}</p>
                                 </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-slate-700 mb-1"
-                                        >IPK Saat Ini <span class="text-red-500">*</span></label
-                                    >
-                                    <input
-                                        v-model="progressForm.ipk"
-                                        type="number"
-                                        step="0.01"
-                                        min="0"
-                                        max="4"
-                                        required
-                                        class="w-full rounded-lg border-slate-300 border px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all bg-white text-slate-700"
-                                    />
-                                    <p v-if="progressForm.errors.ipk" class="text-xs text-red-500 mt-1">{{ progressForm.errors.ipk }}</p>
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-slate-700 mb-1"
-                                        >Total SKS Lulus <span class="text-red-500">*</span></label
-                                    >
-                                    <input
-                                        v-model="progressForm.total_sks"
-                                        type="number"
-                                        min="0"
-                                        max="144"
-                                        required
-                                        class="w-full rounded-lg border-slate-300 border px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all bg-white text-slate-700"
-                                    />
-                                    <p v-if="progressForm.errors.total_sks" class="text-xs text-red-500 mt-1">{{ progressForm.errors.total_sks }}</p>
+
+                                <!-- IPK Saat Ini & Total SKS Lulus side-by-side -->
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-slate-700 mb-1"
+                                            >IPK Saat Ini <span class="text-red-500">*</span></label
+                                        >
+                                        <input
+                                            v-model="progressForm.ipk"
+                                            type="number"
+                                            step="0.01"
+                                            min="0"
+                                            max="4"
+                                            required
+                                            class="w-full rounded-lg border-slate-300 border px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all bg-white text-slate-700 font-semibold"
+                                        />
+                                        <p v-if="progressForm.errors.ipk" class="text-xs text-red-500 mt-1">{{ progressForm.errors.ipk }}</p>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-slate-700 mb-1"
+                                            >Total SKS Lulus <span class="text-red-500">*</span></label
+                                        >
+                                        <input
+                                            v-model="progressForm.total_sks"
+                                            type="number"
+                                            min="0"
+                                            max="144"
+                                            required
+                                            class="w-full rounded-lg border-slate-300 border px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all bg-white text-slate-700 font-semibold"
+                                        />
+                                        <p v-if="progressForm.errors.total_sks" class="text-xs text-red-500 mt-1">{{ progressForm.errors.total_sks }}</p>
+                                    </div>
                                 </div>
                                 
                                 <!-- Poin TAK input inside Modal -->
@@ -545,7 +554,7 @@
                                         type="number"
                                         min="0"
                                         max="120"
-                                        class="w-full rounded-lg border-slate-300 border px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all bg-white text-slate-700"
+                                        class="w-full rounded-lg border-slate-300 border px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all bg-white text-slate-700 font-semibold"
                                     />
                                     <p v-if="progressForm.errors.tak" class="text-xs text-red-500 mt-1">{{ progressForm.errors.tak }}</p>
                                 </div>
@@ -553,35 +562,41 @@
                                 <div class="border-t border-slate-100 pt-3">
                                     <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Target Akademik</p>
                                 </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-slate-700 mb-1"
-                                        >Target IPK Kelulusan</label
-                                    >
-                                    <input
-                                        v-model="progressForm.target_ipk"
-                                        type="number"
-                                        step="0.01"
-                                        :min="progressForm.ipk"
-                                        max="4"
-                                        class="w-full rounded-lg border-slate-300 border px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all bg-white text-slate-700"
-                                        placeholder="e.g. 3.80"
-                                    />
-                                    <p v-if="progressForm.errors.target_ipk" class="text-xs text-red-500 mt-1">{{ progressForm.errors.target_ipk }}</p>
+
+                                <!-- Target IPK Kelulusan & Target Total SKS side-by-side -->
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-slate-700 mb-1"
+                                            >Target IPK Kelulusan</label
+                                        >
+                                        <input
+                                            v-model="progressForm.target_ipk"
+                                            type="number"
+                                            step="0.01"
+                                            :min="progressForm.ipk"
+                                            max="4"
+                                            class="w-full rounded-lg border-slate-300 border px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all bg-white text-slate-700 font-semibold"
+                                            placeholder="e.g. 3.80"
+                                        />
+                                        <p v-if="progressForm.errors.target_ipk" class="text-xs text-red-500 mt-1">{{ progressForm.errors.target_ipk }}</p>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-slate-700 mb-1"
+                                            >Target Total SKS</label
+                                        >
+                                        <input
+                                            v-model="progressForm.target_sks"
+                                            type="number"
+                                            :min="progressForm.total_sks"
+                                            max="144"
+                                            class="w-full rounded-lg border-slate-300 border px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all bg-white text-slate-700 font-semibold"
+                                            placeholder="e.g. 144"
+                                        />
+                                        <p v-if="progressForm.errors.target_sks" class="text-xs text-red-500 mt-1">{{ progressForm.errors.target_sks }}</p>
+                                    </div>
                                 </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-slate-700 mb-1"
-                                        >Target Total SKS</label
-                                    >
-                                    <input
-                                        v-model="progressForm.target_sks"
-                                        type="number"
-                                        :min="progressForm.total_sks"
-                                        max="144"
-                                        class="w-full rounded-lg border-slate-300 border px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all bg-white text-slate-700"
-                                        placeholder="e.g. 144"
-                                    />
-                                    <p v-if="progressForm.errors.target_sks" class="text-xs text-red-500 mt-1">{{ progressForm.errors.target_sks }}</p>
-                                </div>
+
+                                <!-- Target Semester Lulus -->
                                 <div>
                                     <label class="block text-sm font-medium text-slate-700 mb-1"
                                         >Target Semester Lulus</label
