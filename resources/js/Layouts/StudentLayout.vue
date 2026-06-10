@@ -116,11 +116,19 @@
                     >
                         {{ $page.props.auth.user.name.charAt(0) }}
                     </div>
-                    <div class="overflow-hidden">
+                    <div class="overflow-hidden flex-1">
                         <p class="text-sm font-semibold text-slate-800 truncate">
                             {{ $page.props.auth.user.name }}
                         </p>
-                        <p class="text-xs text-slate-500">Student</p>
+                        <div class="flex items-center justify-between mt-0.5">
+                            <span class="text-xs text-slate-500">Student</span>
+                            <Link
+                                :href="route('profile.edit')"
+                                class="text-xs text-blue-600 hover:text-blue-700 font-bold hover:underline"
+                            >
+                                Edit Profile
+                            </Link>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -288,6 +296,7 @@
         if (route().current('mahasiswa.bimbingan.reminder')) return 'Reminder Jadwal Bimbingan';
         if (route().current('mahasiswa.bimbingan.progress_reminder'))
             return 'Monitoring Progres Akademik';
+        if (route().current('profile.edit')) return 'Profile Settings';
         return 'SIBIMA';
     });
 
@@ -305,6 +314,7 @@
         if (route().current('mahasiswa.bimbingan.reminder')) return 'Informasi Reminder Jadwal';
         if (route().current('mahasiswa.bimbingan.progress_reminder'))
             return 'Frekuensi Notifikasi Progres';
+        if (route().current('profile.edit')) return 'Update Your Account Credentials';
         return 'Portal Mahasiswa';
     });
 

@@ -33,6 +33,11 @@ class DosensTable
                     ->sortable()
                     ->copyable(),
 
+                TextColumn::make('kode_dosen')
+                    ->label('Kode Dosen')
+                    ->searchable()
+                    ->sortable(),
+
                 // ─── Akademik ─────────────────────────────────────────────────
                 TextColumn::make('program_studi')
                     ->label('Prodi')

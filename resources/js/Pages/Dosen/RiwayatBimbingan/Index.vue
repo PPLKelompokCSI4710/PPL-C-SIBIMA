@@ -119,6 +119,7 @@ const closeCatatanModal = () => {
                                         </div>
                                         <div class="min-w-0">
                                             <div class="font-semibold text-slate-900 truncate">{{ jadwal.mahasiswa?.nama_lengkap }}</div>
+                                            <div class="text-xs text-slate-500 mt-0.5">NIM: {{ jadwal.mahasiswa?.nim }}</div>
                                             <div class="text-sm text-slate-500 mt-0.5 truncate max-w-xs">{{ jadwal.topik_bimbingan }}</div>
                                         </div>
                                     </div>
@@ -188,7 +189,7 @@ const closeCatatanModal = () => {
                                     <div class="mt-2" v-if="activeJadwal">
                                         <div class="bg-slate-50 p-3 rounded-lg border border-slate-100 mb-4">
                                             <p class="text-sm text-slate-600">
-                                                Mahasiswa: <span class="font-semibold text-slate-900">{{ activeJadwal.mahasiswa?.nama_lengkap }}</span><br>
+                                                Mahasiswa: <span class="font-semibold text-slate-900">{{ activeJadwal.mahasiswa?.nama_lengkap }}</span> <span class="text-slate-500">(NIM: {{ activeJadwal.mahasiswa?.nim }})</span><br>
                                                 Topik: <span class="font-semibold text-slate-900">{{ activeJadwal.topik_bimbingan }}</span><br>
                                                 Waktu: <span class="text-slate-900">{{ formatDate(activeJadwal.ketersediaan_jadwal?.tanggal) }} ({{ formatTime(activeJadwal.ketersediaan_jadwal?.waktu_mulai) }} - {{ formatTime(activeJadwal.ketersediaan_jadwal?.waktu_selesai) }})</span>
                                             </p>

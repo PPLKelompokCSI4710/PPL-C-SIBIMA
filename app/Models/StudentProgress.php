@@ -13,6 +13,10 @@ class StudentProgress extends Model
         'total_sks',
         'ipk',
         'passed_courses',
+        'tak',
+        'target_ipk',
+        'target_sks',
+        'target_semester',
     ];
 
     public function user()
