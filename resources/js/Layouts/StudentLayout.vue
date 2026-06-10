@@ -85,6 +85,18 @@
                     <span>Jadwal Bimbingan</span>
                 </Link>
                 <Link
+                    :href="route('mahasiswa.jadwal.riwayat-reschedule')"
+                    :class="[
+                        route().current('mahasiswa.jadwal.riwayat-reschedule')
+                            ? 'bg-blue-50 text-blue-700 font-semibold'
+                            : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900',
+                    ]"
+                    class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors"
+                >
+                    <HistoryIcon class="w-5 h-5" />
+                    <span>Riwayat Reschedule</span>
+                </Link>
+                <Link
                     :href="route('mahasiswa.calendar')"
                     :class="[
                         route().current('mahasiswa.calendar')
@@ -180,6 +192,7 @@
         TrendingUpIcon,
         LogOutIcon,
         UsersIcon,
+        HistoryIcon,
         FileTextIcon,
     } from 'lucide-vue-next';
 
@@ -192,8 +205,15 @@
         if (
             route().current('mahasiswa.jadwal.*') ||
             route().current('mahasiswa.jadwal-bimbingan.*')
-        )
+        ) {
+            if (route().current('mahasiswa.jadwal.reschedule-list') || route().current('mahasiswa.jadwal.edit-reschedule')) {
+                return 'Reschedule Bimbingan';
+            }
+            if (route().current('mahasiswa.jadwal.riwayat-reschedule')) {
+                return 'Riwayat Reschedule';
+            }
             return 'Jadwal Bimbingan';
+        }
         if (route().current('mahasiswa.bimbingan.reminder')) return 'Reminder Jadwal Bimbingan';
         if (route().current('mahasiswa.bimbingan.progress_reminder'))
             return 'Monitoring Progres Akademik';
@@ -211,8 +231,15 @@
         if (
             route().current('mahasiswa.jadwal.*') ||
             route().current('mahasiswa.jadwal-bimbingan.*')
-        )
+        ) {
+            if (route().current('mahasiswa.jadwal.reschedule-list') || route().current('mahasiswa.jadwal.edit-reschedule')) {
+                return 'Pengajuan Reschedule Bimbingan';
+            }
+            if (route().current('mahasiswa.jadwal.riwayat-reschedule')) {
+                return 'Status Pemindahan Jadwal';
+            }
             return 'Bimbingan Akademik';
+        }
         if (route().current('mahasiswa.bimbingan.reminder')) return 'Informasi Reminder Jadwal';
         if (route().current('mahasiswa.bimbingan.progress_reminder'))
             return 'Frekuensi Notifikasi Progres';

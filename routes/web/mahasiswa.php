@@ -36,6 +36,10 @@ Route::middleware(['auth', 'role:mahasiswa'])->prefix('mahasiswa')->name('mahasi
     Route::get('/jadwal-bimbingan', [MonitoringJadwalBimbinganController::class, 'index'])->name('jadwal.index');
     Route::get('/jadwal-bimbingan/export-pdf', [ExportBimbinganController::class, 'exportPdf'])->name('jadwal.exportPdf');
     Route::patch('/jadwal-bimbingan/{id}/cancel', [MonitoringJadwalBimbinganController::class, 'cancel'])->name('jadwal.cancel');
+    Route::get('/jadwal-bimbingan/riwayat-reschedule', [MonitoringJadwalBimbinganController::class, 'riwayatReschedule'])->name('jadwal.riwayat-reschedule');
+    Route::delete('/jadwal-bimbingan/reschedule-request/{id}', [MonitoringJadwalBimbinganController::class, 'destroyReschedule'])->name('jadwal.cancel-reschedule');
+    Route::get('/jadwal-bimbingan/{id}/reschedule', [MonitoringJadwalBimbinganController::class, 'editReschedule'])->name('jadwal.edit-reschedule');
+    Route::put('/jadwal-bimbingan/{id}/reschedule', [MonitoringJadwalBimbinganController::class, 'updateReschedule'])->name('jadwal.reschedule');
     Route::delete('/jadwal-bimbingan/{id}', [MonitoringJadwalBimbinganController::class, 'destroy'])->name('jadwal.destroy');
 
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');

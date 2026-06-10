@@ -26,4 +26,8 @@ Route::middleware(['auth', 'role:dosen'])->prefix('dosen')->name('dosen.')->grou
 
     // Riwayat Bimbingan
     Route::get('/riwayat-bimbingan', [\App\Http\Controllers\Dosen\RiwayatBimbinganController::class, 'index'])->name('riwayat-bimbingan.index');
+
+    // Reschedule Jadwal
+    Route::get('/reschedule', [\App\Http\Controllers\Dosen\RescheduleController::class, 'index'])->name('reschedule.index');
+    Route::put('/reschedule/{id}/respond', [\App\Http\Controllers\Dosen\RescheduleController::class, 'respond'])->name('reschedule.respond');
 });
