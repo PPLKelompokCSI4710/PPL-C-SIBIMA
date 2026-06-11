@@ -81,6 +81,25 @@ class Mahasiswa extends Model
 
     protected static function booted(): void
     {
+        static::saved(function (Mahasiswa $mahasiswa) {
+            // Sync the dosen_mahasiswa pivot table whenever dosen_id changes,
+            // so the BelongsToMany `dosens` relationship stays consistent
+            // with the BelongsTo `dosen` relationship.
+            if ($mahasiswa->wasChanged('dosen_id')) {
+                if ($mahasiswa->dosen_id) {
+                    $mahasiswa->dosens()->sync([
+                        $mahasiswa->dosen_id => [
+                            'tanggal_penugasan' => now()->toDateString(),
+                            'is_active' => true,
+                        ],
+                    ]);
+                } else {
+                    // dosen_id was set to null — detach all dosen from pivot
+                    $mahasiswa->dosens()->detach();
+                }
+            }
+        });
+
         static::deleting(function (Mahasiswa $mahasiswa) {
             if ($mahasiswa->user) {
                 $mahasiswa->user->delete();
