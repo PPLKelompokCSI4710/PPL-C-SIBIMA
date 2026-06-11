@@ -180,7 +180,7 @@
 
                                 <!-- Actions -->
                                 <div class="flex items-center justify-end space-x-4 pt-6 border-t border-gray-100 mt-8">
-                                    <Link :href="route('mahasiswa.bimbingan.reminder')" class="px-5 py-2.5 text-sm font-bold text-brand-text-secondary hover:text-brand-primary-dark transition-colors">
+                                    <Link :href="route('mahasiswa.jadwal.riwayat-reschedule')" class="px-5 py-2.5 text-sm font-bold text-brand-text-secondary hover:text-brand-primary-dark transition-colors">
                                         Batal
                                     </Link>
                                     <button

@@ -342,6 +342,29 @@ class KalenderAkademikController extends Controller
             $bimbingan->ketersediaanJadwal->decrement('kuota');
         }
 
+        // Create Bimbingan record to trigger BimbinganReminderService and Escalasions
+        $waktuMulai = null;
+        $waktuSelesai = null;
+        if ($bimbingan->ketersediaanJadwal) {
+            $waktuMulai = $bimbingan->ketersediaanJadwal->tanggal . ' ' . $bimbingan->ketersediaanJadwal->waktu_mulai;
+            $waktuSelesai = $bimbingan->ketersediaanJadwal->tanggal . ' ' . $bimbingan->ketersediaanJadwal->waktu_selesai;
+        }
+        
+        \App\Models\Bimbingan::updateOrCreate(
+            [
+                'mahasiswa_id' => $bimbingan->mahasiswa_id,
+                'dosen_id' => $bimbingan->dosen_id,
+                'waktu_mulai' => $waktuMulai,
+            ],
+            [
+                'waktu_selesai' => $waktuSelesai,
+                'topik' => $bimbingan->topik_bimbingan,
+                'lokasi' => $request->lokasi,
+                'tipe_pertemuan' => $request->tipe,
+                'status' => 'disetujui',
+            ]
+        );
+
         // Add to Kalender Akademik for Dosen (updateOrCreate to prevent duplicates)
         $kalenderItemDosen = KalenderAkademik::updateOrCreate([
             'user_id' => $bimbingan->dosen->user_id ?? Auth::id() ?? 1,
