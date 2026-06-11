@@ -13,6 +13,8 @@ class EskalasiNotification extends Notification
         public readonly string $mahasiswaName,
         public readonly int $jumlahSesiBimbinganSelesai = 0,
         public readonly ?string $terakhirBimbinganPada = null,
+        public readonly ?int $mahasiswaId = null,
+        public readonly int $daysSinceLast = 0,
     ) {}
 
     /**
@@ -75,5 +77,28 @@ class EskalasiNotification extends Notification
                 ...$this->progressSummary,
             ],
         ];
+    }
+    /**
+     * Get the database representation of the notification for Filament.
+     *
+     * @return array<string, mixed>
+     */
+    public function toDatabase(object $notifiable): array
+    {
+        if ($this->mahasiswaId) {
+            return \Filament\Notifications\Notification::make()
+                ->warning()
+                ->title('Eskalasi Bimbingan: ' . $this->mahasiswaName)
+                ->body("Mahasiswa ini sudah {$this->daysSinceLast} hari tidak bimbingan. Segera tindak lanjuti.")
+                ->actions([
+                    \Filament\Notifications\Actions\Action::make('view_mahasiswa')
+                        ->label('Lihat Detail Mahasiswa')
+                        ->button()
+                        ->url(\App\Filament\Resources\Mahasiswas\MahasiswaResource::getUrl('edit', ['record' => $this->mahasiswaId])),
+                ])
+                ->getDatabaseMessage();
+        }
+
+        return $this->toArray($notifiable);
     }
 }

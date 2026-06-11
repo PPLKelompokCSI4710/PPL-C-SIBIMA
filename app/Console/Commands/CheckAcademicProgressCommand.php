@@ -132,6 +132,8 @@ class CheckAcademicProgressCommand extends Command
                                 $mahasiswa->nama_lengkap,
                                 $sesiSelesai,
                                 $terakhir,
+                                $mahasiswa->id,
+                                $daysSinceLast
                             ));
                         }
 

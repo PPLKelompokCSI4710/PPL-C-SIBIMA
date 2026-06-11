@@ -93,11 +93,16 @@ class BimbinganScheduleReminderNotification extends Notification
             ? "Jangan lupa jadwal bimbingan Anda dengan {$dosenName}."
             : "Anda memiliki jadwal membimbing mahasiswa {$mahasiswaName}.";
 
+        $actionUrl = $isMahasiswa 
+            ? route('mahasiswa.jadwal.index') 
+            : route('dosen.riwayat-bimbingan.index');
+
         return [
             'type' => 'bimbingan_schedule_reminder',
             'stage' => $this->stage,
             'title' => $title,
             'message' => $message,
+            'action_url' => $actionUrl,
             'detail' => [
                 'mahasiswa' => $this->payload['mahasiswa'] ?? null,
                 'dosen' => $this->payload['dosen'] ?? null,

@@ -241,13 +241,20 @@
                         </div>
                     </div>
                     
-                    <div class="p-4 bg-slate-50 border-t border-slate-100 text-right">
+                    <div class="p-4 bg-slate-50 border-t border-slate-100 flex justify-end gap-3">
                         <button 
                             @click="showModal = false"
                             class="px-5 py-2.5 bg-white border border-slate-200 text-slate-600 rounded-lg text-sm font-bold hover:bg-slate-50 hover:text-slate-900 transition-colors shadow-sm"
                         >
                             Tutup
                         </button>
+                        <a 
+                            v-if="selectedScheduleUrl"
+                            :href="selectedScheduleUrl"
+                            class="px-5 py-2.5 bg-blue-600 border border-transparent text-white rounded-lg text-sm font-bold hover:bg-blue-700 transition-colors shadow-sm inline-flex items-center"
+                        >
+                            Lihat Jadwal
+                        </a>
                     </div>
                 </div>
             </div>
@@ -274,6 +281,7 @@
     
     const showModal = ref(false);
     const selectedSchedule = ref(null);
+    const selectedScheduleUrl = ref(null);
     
     let pollInterval = null;
 
@@ -328,8 +336,11 @@
         
         if (notif.type === 'bimbingan_schedule_reminder' && notif.detail) {
             selectedSchedule.value = notif.detail;
+            selectedScheduleUrl.value = notif.action_url || null;
             showModal.value = true;
             isOpen.value = false; // close the bell dropdown
+        } else if (notif.action_url) {
+            window.location.href = notif.action_url;
         }
     }
 
