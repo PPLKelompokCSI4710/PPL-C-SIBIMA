@@ -53,6 +53,7 @@ class DispatchBimbinganScheduleRemindersCommand extends Command
                 $stageEnabled = match ($reminder->stage) {
                     'h3' => (bool) $pref->stage_h3_enabled,
                     'h1' => (bool) $pref->stage_h1_enabled,
+                    'h3jam' => (bool) $pref->stage_h3jam_enabled,
                     'h2' => (bool) $pref->stage_h2_enabled,
                     default => false,
                 };

@@ -253,7 +253,7 @@
                             :href="selectedScheduleUrl"
                             class="px-5 py-2.5 bg-blue-600 border border-transparent text-white rounded-lg text-sm font-bold hover:bg-blue-700 transition-colors shadow-sm inline-flex items-center"
                         >
-                            Lihat Jadwal
+                            Lihat Kalender
                         </a>
                     </div>
                 </div>
