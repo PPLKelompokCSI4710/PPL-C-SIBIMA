@@ -94,16 +94,73 @@ class RescheduleController extends Controller
                 'ketersediaan_jadwal_id' => $rescheduleRequest->ketersediaan_jadwal_baru_id
             ]);
 
+            // 3.5. Kurangi kuota pada jadwal baru yang disetujui
+            $newKetersediaan = $rescheduleRequest->ketersediaanJadwalBaru;
+            if ($newKetersediaan) {
+                $newKetersediaan->decrement('kuota');
+            }
+
+            // 4. Update Kalender Akademik Dosen dan Mahasiswa
+            $oldTanggal = $oldKetersediaan ? $oldKetersediaan->tanggal : null;
+            $oldJam = $oldKetersediaan ? $oldKetersediaan->waktu_mulai : null;
+            $newKetersediaan = $rescheduleRequest->ketersediaanJadwalBaru;
+
+            if ($oldTanggal && $oldJam && $newKetersediaan) {
+                // Update Kalender Dosen
+                $kalenderDosen = \App\Models\KalenderAkademik::where([
+                    'user_id' => $dosen->user_id,
+                    'tipe_kegiatan' => 'bimbingan',
+                    'tanggal_mulai' => $oldTanggal,
+                    'jam_mulai' => $oldJam,
+                ])->where('nama_kegiatan', 'like', 'Bimbingan dengan Mahasiswa: %')->first();
+
+                if ($kalenderDosen) {
+                    $kalenderDosen->update([
+                        'tanggal_mulai' => $newKetersediaan->tanggal,
+                        'tanggal_selesai' => $newKetersediaan->tanggal,
+                        'jam_mulai' => $newKetersediaan->waktu_mulai,
+                    ]);
+
+                    $user = Auth::user();
+                    if ($user && $user->google_access_token) {
+                        $googleService = new \App\Services\GoogleCalendarService;
+                        $googleService->syncEvent($user, $kalenderDosen);
+                    }
+                }
+
+                // Update Kalender Mahasiswa
+                $mahasiswa = $rescheduleRequest->jadwalBimbingan->mahasiswa;
+                if ($mahasiswa && $mahasiswa->user_id) {
+                    $kalenderMahasiswa = \App\Models\KalenderAkademik::where([
+                        'user_id' => $mahasiswa->user_id,
+                        'tipe_kegiatan' => 'bimbingan',
+                        'tanggal_mulai' => $oldTanggal,
+                        'jam_mulai' => $oldJam,
+                    ])->where('nama_kegiatan', 'like', 'Jadwal Bimbingan: %')->first();
+
+                    if ($kalenderMahasiswa) {
+                        $kalenderMahasiswa->update([
+                            'tanggal_mulai' => $newKetersediaan->tanggal,
+                            'tanggal_selesai' => $newKetersediaan->tanggal,
+                            'jam_mulai' => $newKetersediaan->waktu_mulai,
+                        ]);
+
+                        $mhsUser = $mahasiswa->user;
+                        if ($mhsUser && $mhsUser->google_access_token) {
+                            $googleService = new \App\Services\GoogleCalendarService;
+                            $googleService->syncEvent($mhsUser, $kalenderMahasiswa);
+                        }
+                    }
+                }
+            }
+
             $message = 'Pengajuan reschedule bimbingan berhasil disetujui.';
         } else {
             // 1. Tolak pengajuan reschedule
             $rescheduleRequest->update(['status' => 'rejected']);
 
-            // 2. Kembalikan kuota pada jadwal baru (karena batal dipesan)
-            $newKetersediaan = $rescheduleRequest->ketersediaanJadwalBaru;
-            if ($newKetersediaan) {
-                $newKetersediaan->increment('kuota');
-            }
+            // Catatan: Karena kuota belum dikurangi saat status pending, 
+            // kita TIDAK PERLU me-refund kuota jadwal baru saat pengajuan ditolak.
 
             $message = 'Pengajuan reschedule bimbingan berhasil ditolak.';
         }

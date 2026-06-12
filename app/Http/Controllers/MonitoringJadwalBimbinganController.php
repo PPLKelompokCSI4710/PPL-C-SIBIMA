@@ -163,7 +163,11 @@ class MonitoringJadwalBimbinganController extends Controller
             ->whereDate('tanggal', '>=', now()->addDays(2)->toDateString())
             ->orderBy('tanggal', 'asc')
             ->orderBy('waktu_mulai', 'asc')
-            ->get();
+            ->get()
+            ->map(function ($s) use ($jadwal) {
+                $s->has_clash = $this->checkClash($jadwal->ketersediaanJadwal->dosen->user_id, $s);
+                return $s;
+            });
 
         return Inertia::render('MonitoringJadwal/Reschedule', [
             'jadwal' => $jadwal,
@@ -248,8 +252,13 @@ class MonitoringJadwalBimbinganController extends Controller
             return redirect()->back()->with('error', 'Kuota untuk jadwal yang dipilih sudah penuh.');
         }
 
-        // 7. Booking Kuota Jadwal Baru (Kurangi kuota)
-        $newKetersediaan->decrement('kuota');
+        // 6.5. Validasi Bentrok Kegiatan Dosen
+        if ($this->checkClash($jadwal->ketersediaanJadwal->dosen->user_id, $newKetersediaan)) {
+            return redirect()->back()->with('error', 'Maaf dosen sedang ada kegiatan pada jadwal tersebut, mohon pilih jadwal lain.');
+        }
+
+        // Catatan: Kuota jadwal baru TIDAK dikurangi di sini karena status masih pending.
+        // Kuota akan dikurangi saat dosen menyetujui pengajuan reschedule.
 
         // 8. Buat Request Reschedule (Data Asli Tidak Berubah)
         \App\Models\RescheduleRequest::create([
@@ -282,14 +291,31 @@ class MonitoringJadwalBimbinganController extends Controller
             return redirect()->back()->with('error', 'Hanya pengajuan dengan status pending yang dapat dibatalkan.');
         }
 
-        // 3. Refund Kuota
-        if ($rescheduleRequest->ketersediaanJadwalBaru) {
-            $rescheduleRequest->ketersediaanJadwalBaru->increment('kuota');
-        }
+        // Catatan: Karena kuota belum dikurangi saat status pending, 
+        // kita TIDAK PERLU me-refund kuota saat pengajuan dibatalkan.
 
         // 4. Hapus Pengajuan
         $rescheduleRequest->delete();
 
-        return redirect()->back()->with('success', 'Pengajuan reschedule berhasil dibatalkan dan kuota jadwal telah dikembalikan.');
+        return redirect()->back()->with('success', 'Pengajuan reschedule berhasil dibatalkan.');
+    }
+
+    /**
+     * Check if a specific slot clashes with the lecturer's academic calendar events.
+     */
+    private function checkClash($dosenUserId, $slot)
+    {
+        return \App\Models\KalenderAkademik::where('user_id', $dosenUserId)
+            ->where('tipe_kegiatan', '!=', 'bimbingan')
+            ->where(function ($query) use ($slot) {
+                $query->where(function ($q) use ($slot) {
+                    $q->whereDate('tanggal_mulai', '<=', $slot->tanggal)
+                      ->whereDate('tanggal_selesai', '>=', $slot->tanggal);
+                })->orWhere(function ($q) use ($slot) {
+                    $q->whereDate('tanggal_mulai', '=', $slot->tanggal)
+                      ->whereNull('tanggal_selesai');
+                });
+            })
+            ->exists();
     }
 }

@@ -27,6 +27,13 @@
             },
         });
     };
+
+    import { computed } from 'vue';
+    const selectedSlotHasClash = computed(() => {
+        if (!form.ketersediaan_jadwal_id) return false;
+        const selected = props.ketersediaanJadwals.find(s => s.id === form.ketersediaan_jadwal_id);
+        return selected ? !!selected.has_clash : false;
+    });
 </script>
 
 <template>
@@ -126,11 +133,17 @@
                                                 v-for="schedule in ketersediaanJadwals"
                                                 :key="schedule.id"
                                                 :value="schedule.id"
-                                                :disabled="schedule.kuota <= 0"
+                                                :disabled="schedule.kuota <= 0 || schedule.has_clash"
                                             >
                                                 {{ schedule.tanggal }} |
                                                 {{ schedule.waktu_mulai.substring(0, 5) }} -
-                                                {{ schedule.waktu_selesai.substring(0, 5) }} (Sisa Kuota: {{ schedule.kuota }})
+                                                {{ schedule.waktu_selesai.substring(0, 5) }}
+                                                <template v-if="schedule.has_clash">
+                                                    (Dosen Sedang Ada Kegiatan)
+                                                </template>
+                                                <template v-else>
+                                                    (Sisa Kuota: {{ schedule.kuota }})
+                                                </template>
                                             </option>
                                         </select>
                                     </div>
@@ -185,7 +198,7 @@
                                     </Link>
                                     <button
                                         type="submit"
-                                        :disabled="form.processing || ketersediaanJadwals.length === 0"
+                                        :disabled="form.processing || ketersediaanJadwals.length === 0 || selectedSlotHasClash"
                                         class="inline-flex items-center justify-center px-6 py-2.5 bg-brand-primary hover:bg-brand-primary-dark text-white rounded-xl font-bold shadow-lg shadow-brand-primary/30 hover:shadow-brand-primary/50 transform transition-all duration-300 hover:-translate-y-0.5 focus:ring-4 focus:ring-brand-primary/30 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none"
                                     >
                                         <svg
