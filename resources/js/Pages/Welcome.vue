@@ -1,4 +1,4 @@
-﻿<script setup>
+<script setup>
     import { Head, Link } from '@inertiajs/vue3';
     import { LayoutDashboardIcon } from 'lucide-vue-next';
     import AiAssistantWidget from '@/Components/AiAssistantWidget.vue';
@@ -66,7 +66,7 @@
                             <Link
                                 v-if="canRegister"
                                 :href="route('register')"
-                                class="btn btn-primary !bg-blue-600 hover:!bg-blue-700 !text-white !rounded-xl !px-6"
+                                class="btn btn-primary !bg-[#1f4c7a] hover:!bg-[#1b3f66] !text-white !rounded-xl !px-6"
                             >
                                 Daftar Sekarang
                             </Link>
@@ -356,14 +356,14 @@
    DESIGN TOKENS
 ───────────────────────────────────────────────────────── */
     .sibima-root {
-        --color-primary: #4f46e5; /* indigo-600 */
-        --color-primary-dark: #3730a3; /* indigo-800 */
-        --color-primary-light: #e0e7ff; /* indigo-100 */
-        --color-accent: #2563eb; /* blue-600 */
-        --color-text: #0f172a; /* slate-900 */
-        --color-muted: #64748b; /* slate-500 */
+        --color-primary: #1f4c7a; /* SIBIMA Deep Blue */
+        --color-primary-dark: #1b3f66; /* SIBIMA Navy Blue */
+        --color-primary-light: #e9f0f8; /* SIBIMA Light tint */
+        --color-accent: #f39c12; /* SIBIMA Orange */
+        --color-text: #2f2f2f; /* SIBIMA Dark Gray */
+        --color-muted: #7a7a7a; /* SIBIMA Medium Gray */
         --color-border: #e2e8f0; /* slate-200 */
-        --color-surface: #f8fafc; /* slate-50 */
+        --color-surface: #f5f7fa; /* SIBIMA Light Gray */
         --radius-xl: 1rem;
         --radius-2xl: 1.5rem;
         --shadow-card:
@@ -596,7 +596,7 @@
     }
 
     .hero-headline-accent {
-        background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #2563eb 100%);
+        background: linear-gradient(135deg, #1f4c7a 0%, #2fa7a0 50%, #1b3f66 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         background-clip: text;
@@ -696,7 +696,7 @@
         width: 2.25rem;
         height: 2.25rem;
         border-radius: 50%;
-        background: linear-gradient(135deg, #818cf8, #4f46e5);
+        background: linear-gradient(135deg, #6ccbc3, #2fa7a0);
         flex-shrink: 0;
     }
 
@@ -754,7 +754,7 @@
 
     .preview-progress-fill {
         height: 100%;
-        background: linear-gradient(90deg, #6366f1, #4f46e5);
+        background: linear-gradient(90deg, #2fa7a0, #1f4c7a);
         border-radius: 999px;
         transition: width 1s ease;
     }
@@ -877,7 +877,7 @@
         position: absolute;
         top: 1rem;
         right: 1rem;
-        background: linear-gradient(135deg, #f59e0b, #d97706);
+        background: linear-gradient(135deg, #f4b942, #f39c12);
         color: #ffffff;
         font-size: 0.68rem;
         font-weight: 700;
@@ -900,8 +900,8 @@
         color: #2563eb;
     }
     .feature-icon-wrap--indigo {
-        background: #e0e7ff;
-        color: #4f46e5;
+        background: #e9f0f8;
+        color: #1f4c7a;
     }
     .feature-icon-wrap--violet {
         background: #ede9fe;
@@ -956,7 +956,7 @@
 ───────────────────────────────────────────────────────── */
     .cta-banner {
         padding: 4.5rem 1.5rem;
-        background: linear-gradient(135deg, #4338ca 0%, #4f46e5 40%, #6d28d9 100%);
+        background: linear-gradient(135deg, #1b3f66 0%, #1f4c7a 40%, #2fa7a0 100%);
         position: relative;
         overflow: hidden;
     }

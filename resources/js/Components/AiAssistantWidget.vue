@@ -362,12 +362,11 @@
                 style="
                     background: conic-gradient(
                         from 0deg,
-                        #4f46e5,
-                        #ec4899,
-                        #8b5cf6,
-                        #3b82f6,
-                        #14b8a6,
-                        #4f46e5
+                        #1f4c7a,
+                        #2fa7a0,
+                        #6ccbc3,
+                        #f39c12,
+                        #1f4c7a
                     );
                     padding: 2px;
                 "
@@ -376,7 +375,7 @@
                     class="w-full h-full bg-slate-900 rounded-full flex items-center justify-center relative overflow-hidden"
                 >
                     <div
-                        class="absolute inset-0 bg-gradient-to-tr from-indigo-500/30 to-fuchsia-500/30 blur-md animate-pulse"
+                        class="absolute inset-0 bg-gradient-to-tr from-brand-primary/30 to-brand-secondary/30 blur-md animate-pulse"
                     />
                     <SparklesIcon class="w-7 h-7 text-white relative z-10 drop-shadow-md" />
                 </div>
@@ -424,7 +423,7 @@
                 class="absolute bottom-20 right-0 w-[350px] sm:w-[400px] max-h-[600px] h-[85vh] bg-white rounded-2xl shadow-[0_10px_40px_rgba(0,0,0,0.15)] border border-slate-100 flex flex-col overflow-hidden"
             >
                 <!-- Header -->
-                <div class="bg-gradient-to-r from-blue-600 to-indigo-600 p-4 text-white shrink-0">
+                <div class="bg-gradient-to-r from-brand-primary to-brand-primary-dark p-4 text-white shrink-0">
                     <div class="flex items-center justify-between">
                         <div class="flex items-center gap-3">
                             <div
@@ -486,7 +485,7 @@
                     <div class="p-4 border-b border-slate-100 bg-white flex items-center justify-between shrink-0 shadow-sm">
                         <span class="text-xs font-bold text-slate-800">Riwayat Sesi Percakapan</span>
                         <button
-                            class="flex items-center gap-1 text-[10px] font-bold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 px-2.5 py-1.5 rounded-lg transition-colors"
+                            class="flex items-center gap-1 text-[10px] font-bold text-brand-primary bg-brand-primary/5 hover:bg-brand-primary/10 px-2.5 py-1.5 rounded-lg transition-colors"
                             @click="createNewSession"
                         >
                             <PlusIcon class="w-3 h-3" />
@@ -500,12 +499,12 @@
                             :key="session.id"
                             class="group relative flex items-center justify-between p-3 rounded-xl border transition-all cursor-pointer"
                             :class="activeSessionId === session.id
-                                ? 'bg-indigo-50/60 border-indigo-200 text-indigo-700 font-semibold shadow-sm'
+                                ? 'bg-brand-primary/5 border-brand-primary/20 text-brand-primary-dark font-semibold shadow-sm'
                                 : 'bg-white border-slate-100 hover:border-slate-200 text-slate-700 hover:bg-slate-50/40'"
                             @click="selectSession(session.id)"
                         >
                             <div class="min-w-0 pr-8 flex-1">
-                                <p class="text-xs truncate font-medium" :class="activeSessionId === session.id ? 'text-indigo-700' : 'text-slate-700'">
+                                <p class="text-xs truncate font-medium" :class="activeSessionId === session.id ? 'text-brand-primary-dark' : 'text-slate-700'">
                                     {{ session.title }}
                                 </p>
                                 <span class="text-[9px] text-slate-400 font-normal mt-1 block">
@@ -545,8 +544,8 @@
                                     class="shrink-0 w-7 h-7 rounded-full flex items-center justify-center mt-1 shadow-sm"
                                     :class="
                                         msg.role === 'user'
-                                            ? 'bg-indigo-100 text-indigo-600'
-                                            : 'bg-gradient-to-br from-blue-500 to-indigo-500 text-white'
+                                            ? 'bg-brand-primary/10 text-brand-primary'
+                                            : 'bg-gradient-to-br from-brand-primary to-brand-primary-dark text-white'
                                     "
                                 >
                                     <span v-if="msg.role === 'user'" class="text-[10px] font-bold"
@@ -564,7 +563,7 @@
                                         class="px-3.5 py-2.5 rounded-2xl text-sm shadow-sm"
                                         :class="[
                                             msg.role === 'user'
-                                                ? 'bg-indigo-600 text-white rounded-tr-sm'
+                                                ? 'bg-brand-primary text-white rounded-tr-sm'
                                                 : msg.isError
                                                   ? 'bg-red-50 text-red-700 border border-red-100 rounded-tl-sm'
                                                   : 'bg-white text-slate-700 border border-slate-100 rounded-tl-sm',
@@ -583,7 +582,7 @@
                         <!-- Typing Indicator -->
                         <div v-if="isLoading" class="flex items-start gap-2">
                             <div
-                                class="shrink-0 w-7 h-7 rounded-full bg-gradient-to-br from-blue-500 to-indigo-500 text-white flex items-center justify-center mt-1 shadow-sm"
+                                class="shrink-0 w-7 h-7 rounded-full bg-gradient-to-br from-brand-primary to-brand-primary-dark text-white flex items-center justify-center mt-1 shadow-sm"
                             >
                                 <BotIcon class="w-4 h-4" />
                             </div>
@@ -592,15 +591,15 @@
                             >
                                 <div class="flex gap-1.5 items-center h-4">
                                     <div
-                                        class="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce"
+                                        class="w-1.5 h-1.5 bg-brand-primary rounded-full animate-bounce"
                                         style="animation-delay: 0ms"
                                     />
                                     <div
-                                        class="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce"
+                                        class="w-1.5 h-1.5 bg-brand-primary rounded-full animate-bounce"
                                         style="animation-delay: 150ms"
                                     />
                                     <div
-                                        class="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce"
+                                        class="w-1.5 h-1.5 bg-brand-primary rounded-full animate-bounce"
                                         style="animation-delay: 300ms"
                                     />
                                 </div>
@@ -617,13 +616,13 @@
                             Saran pertanyaan:
                         </p>
                         <button
-                            class="text-[10px] bg-white border border-slate-200 text-slate-600 px-2.5 py-1.5 rounded-full hover:bg-indigo-50 hover:text-indigo-600 hover:border-indigo-200 transition-colors"
+                            class="text-[10px] bg-white border border-slate-200 text-slate-600 px-2.5 py-1.5 rounded-full hover:bg-brand-primary/5 hover:text-brand-primary hover:border-brand-primary/20 transition-colors"
                             @click="useSuggestion('Apa itu metode penelitian kualitatif?')"
                         >
                             Metode kualitatif
                         </button>
                         <button
-                            class="text-[10px] bg-white border border-slate-200 text-slate-600 px-2.5 py-1.5 rounded-full hover:bg-indigo-50 hover:text-indigo-600 hover:border-indigo-200 transition-colors"
+                            class="text-[10px] bg-white border border-slate-200 text-slate-600 px-2.5 py-1.5 rounded-full hover:bg-brand-primary/5 hover:text-brand-primary hover:border-brand-primary/20 transition-colors"
                             @click="
                                 useSuggestion(
                                     'Bagaimana cara membuat latar belakang skripsi yang baik?',
@@ -646,7 +645,7 @@
 
                         <form class="relative flex items-end gap-2" @submit.prevent="sendMessage">
                             <div
-                                class="flex-1 bg-slate-50 rounded-xl border border-slate-200 focus-within:border-indigo-400 focus-within:ring-2 focus-within:ring-indigo-100 transition-all flex items-center min-h-[44px] overflow-hidden"
+                                class="flex-1 bg-slate-50 rounded-xl border border-slate-200 focus-within:border-brand-primary focus-within:ring-2 focus-within:ring-brand-primary/20 transition-all flex items-center min-h-[44px] overflow-hidden"
                                 :class="{ 'opacity-50 bg-slate-100': quota <= 0 }"
                             >
                                 <textarea
@@ -669,7 +668,7 @@
                             <button
                                 type="submit"
                                 :disabled="isLoading || !message.trim() || quota <= 0"
-                                class="shrink-0 w-11 h-11 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl flex items-center justify-center transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
+                                class="shrink-0 w-11 h-11 bg-brand-primary hover:bg-brand-primary-dark text-white rounded-xl flex items-center justify-center transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
                             >
                                 <Loader2Icon v-if="isLoading" class="w-5 h-5 animate-spin" />
                                 <SendIcon v-else class="w-5 h-5 ml-0.5" />

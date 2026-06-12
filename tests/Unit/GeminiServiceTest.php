@@ -76,7 +76,7 @@ class GeminiServiceTest extends TestCase
         $service = new GeminiService;
 
         $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('Batas limit API tercapai.');
+        $this->expectExceptionMessage('Batas limit kuota API tercapai dari penyedia AI.');
 
         $service->generateResponse([
             ['role' => 'user', 'content' => 'Test'],

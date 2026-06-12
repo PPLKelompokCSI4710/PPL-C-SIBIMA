@@ -4,25 +4,25 @@
 
         <div class="max-w-7xl mx-auto space-y-8 pb-10">
             <!-- Header Section with Student Brief Info -->
-            <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 p-8 md:p-10 text-white shadow-xl">
+            <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-slate-900 via-brand-primary-dark/30 to-slate-900 p-8 md:p-10 text-white shadow-xl">
                 <!-- Abstract glowing backgrounds -->
-                <div class="absolute -right-20 -top-20 w-80 h-80 bg-indigo-500/20 rounded-full blur-3xl opacity-70 pointer-events-none" />
-                <div class="absolute -left-20 -bottom-20 w-80 h-80 bg-violet-600/10 rounded-full blur-3xl opacity-50 pointer-events-none" />
+                <div class="absolute -right-20 -top-20 w-80 h-80 bg-brand-primary/20 rounded-full blur-3xl opacity-70 pointer-events-none" />
+                <div class="absolute -left-20 -bottom-20 w-80 h-80 bg-brand-secondary/10 rounded-full blur-3xl opacity-50 pointer-events-none" />
                 
                 <div class="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
                     <div>
-                        <div class="flex items-center gap-2 text-indigo-300 text-xs font-semibold uppercase tracking-wider mb-2">
+                        <div class="flex items-center gap-2 text-brand-secondary-light text-xs font-semibold uppercase tracking-wider mb-2">
                             <SparklesIcon class="w-4 h-4 animate-pulse" />
                             Academic Journey
                         </div>
                         <h1 class="text-3xl font-black tracking-tight">Progress Studi & Target</h1>
-                        <p class="text-indigo-200/80 mt-1 text-sm md:text-base">
+                        <p class="text-brand-secondary-light/80 mt-1 text-sm md:text-base">
                             Pantau pencapaian akademik Anda dan ukur langkah menuju kelulusan impian.
                         </p>
                     </div>
                     
                     <div class="flex flex-wrap gap-2.5 bg-white/5 backdrop-blur-md rounded-2xl p-4 border border-white/10 text-sm">
-                        <div class="px-3 py-1.5 bg-indigo-500/20 rounded-lg text-indigo-200 font-semibold">
+                        <div class="px-3 py-1.5 bg-brand-primary/20 rounded-lg text-brand-secondary-light font-semibold">
                             Sem {{ currentSemester }}
                         </div>
                         <div class="px-3 py-1.5 bg-white/5 rounded-lg text-slate-300 font-medium">
@@ -43,12 +43,12 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                         <!-- Card A: GPA / IPK Tracker -->
                         <div class="bg-white/95 border border-slate-200/60 rounded-3xl p-8 shadow-md hover:shadow-lg transition-all duration-300 relative overflow-hidden flex flex-col justify-between group">
-                            <div class="absolute top-0 right-0 w-32 h-32 bg-indigo-50/50 rounded-full blur-2xl opacity-70 pointer-events-none group-hover:scale-125 transition-all duration-500" />
+                            <div class="absolute top-0 right-0 w-32 h-32 bg-brand-primary/5 rounded-full blur-2xl opacity-70 pointer-events-none group-hover:scale-125 transition-all duration-500" />
                             
                             <div>
                                 <div class="flex justify-between items-center mb-6">
                                     <h3 class="text-sm font-bold text-slate-500 uppercase tracking-wider">Indeks Prestasi Kumulatif (IPK)</h3>
-                                    <div class="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600 shadow-inner">
+                                    <div class="w-10 h-10 rounded-xl bg-brand-primary/5 flex items-center justify-center text-brand-primary shadow-inner">
                                         <AwardIcon class="w-5 h-5" />
                                     </div>
                                 </div>
@@ -82,13 +82,13 @@
                                                 stroke-linecap="round" fill="transparent"
                                                 :stroke-dasharray="ipkCircumference"
                                                 :stroke-dashoffset="ipkOffset"
-                                                class="transition-all duration-1000 drop-shadow-[0_2px_4px_rgba(99,102,241,0.2)]" 
+                                                class="transition-all duration-1000 drop-shadow-[0_2px_4px_rgba(31,76,122,0.2)]" 
                                             />
                                             
                                             <defs>
                                                 <linearGradient id="ipkGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                                                    <stop offset="0%" stop-color="#818cf8" />
-                                                    <stop offset="100%" stop-color="#4f46e5" />
+                                                    <stop offset="0%" stop-color="#2fa7a0" />
+                                                    <stop offset="100%" stop-color="#1f4c7a" />
                                                 </linearGradient>
                                             </defs>
                                         </svg>
@@ -108,7 +108,7 @@
                             <div class="mt-6 pt-6 border-t border-slate-100 space-y-4">
                                 <div class="flex justify-between items-center text-xs">
                                     <span class="flex items-center gap-1.5 text-slate-500 font-medium">
-                                        <span class="w-2.5 h-2.5 rounded-full bg-indigo-600 block"></span>
+                                        <span class="w-2.5 h-2.5 rounded-full bg-brand-primary block"></span>
                                         IPK Aktif
                                     </span>
                                     <span class="font-bold text-slate-700">{{ formatIpk(auth.progress?.ipk) || '0.00' }} / 4.00</span>
@@ -217,13 +217,13 @@
                         <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
                             <div>
                                 <h3 class="text-lg font-extrabold text-slate-800 flex items-center gap-2">
-                                    <CompassIcon class="w-5 h-5 text-indigo-500" />
+                                    <CompassIcon class="w-5 h-5 text-brand-primary" />
                                     Roadmap Target Kelulusan
                                 </h3>
                                 <p class="text-slate-500 text-sm mt-0.5">Jalur perjalanan studi berdasarkan target semester lulus Anda</p>
                             </div>
 
-                            <span v-if="semesterRemaining > 0" class="inline-flex items-center gap-1 px-3 py-1.5 bg-indigo-50 border border-indigo-100 text-indigo-700 text-xs font-bold rounded-xl shadow-sm">
+                            <span v-if="semesterRemaining > 0" class="inline-flex items-center gap-1 px-3 py-1.5 bg-brand-primary/5 border border-brand-primary/10 text-brand-primary text-xs font-bold rounded-xl shadow-sm">
                                 <ClockIcon class="w-3.5 h-3.5 animate-pulse" /> Sisa {{ semesterRemaining }} Semester lagi
                             </span>
                             <span v-else-if="targetSemester" class="inline-flex items-center gap-1 px-3 py-1.5 bg-emerald-50 border border-emerald-100 text-emerald-700 text-xs font-bold rounded-xl shadow-sm">
@@ -237,13 +237,13 @@
                             <div class="absolute left-6 right-6 h-1 bg-slate-100 top-[18px] -translate-y-1/2 rounded-full"></div>
                             <!-- Filled Line (Active timeline indicator) -->
                             <div 
-                                class="absolute left-6 h-1 bg-gradient-to-r from-indigo-500 to-violet-600 top-[18px] -translate-y-1/2 rounded-full transition-all duration-1000" 
+                                class="absolute left-6 h-1 bg-gradient-to-r from-brand-secondary to-brand-primary top-[18px] -translate-y-1/2 rounded-full transition-all duration-1000" 
                                 :style="`width: ${semesterTimelineWidth}%`"
                             ></div>
                             
                             <!-- Point 1: Mulai (Sem 1) -->
                             <div class="relative z-10 flex flex-col items-center">
-                                <div class="w-9 h-9 rounded-full bg-indigo-500 text-white flex items-center justify-center text-xs font-black ring-4 ring-white shadow">
+                                <div class="w-9 h-9 rounded-full bg-brand-primary/80 text-white flex items-center justify-center text-xs font-black ring-4 ring-white shadow">
                                     1
                                 </div>
                                 <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-2.5">Awal Studi</span>
@@ -251,10 +251,10 @@
 
                             <!-- Point 2: Sekarang (Sem X) -->
                             <div class="relative z-10 flex flex-col items-center">
-                                <div class="w-9 h-9 rounded-full bg-indigo-600 text-white flex items-center justify-center text-xs font-black ring-4 ring-indigo-100 shadow-md">
+                                <div class="w-9 h-9 rounded-full bg-brand-primary text-white flex items-center justify-center text-xs font-black ring-4 ring-brand-primary/20 shadow-md">
                                     {{ currentSemester }}
                                 </div>
-                                <span class="text-[10px] font-extrabold text-indigo-600 uppercase tracking-widest mt-2.5">Sem {{ currentSemester }} (Aktif)</span>
+                                <span class="text-[10px] font-extrabold text-brand-primary uppercase tracking-widest mt-2.5">Sem {{ currentSemester }} (Aktif)</span>
                             </div>
 
                             <!-- Point 3: Target Lulus (Sem Y) -->
@@ -302,15 +302,15 @@
                     </div>
 
                     <!-- Row 3: Graduation Predictor & Study Strategist -->
-                    <div class="bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-950 border border-slate-800 rounded-3xl p-8 text-white shadow-xl relative overflow-hidden">
+                    <div class="bg-gradient-to-br from-slate-900 via-brand-primary-dark/30 to-slate-950 border border-slate-800 rounded-3xl p-8 text-white shadow-xl relative overflow-hidden">
                         <!-- Abstract glowing backgrounds -->
-                        <div class="absolute -right-16 -top-16 w-60 h-60 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
-                        <div class="absolute -left-16 -bottom-16 w-60 h-60 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
+                        <div class="absolute -right-16 -top-16 w-60 h-60 bg-brand-primary/10 rounded-full blur-3xl pointer-events-none" />
+                        <div class="absolute -left-16 -bottom-16 w-60 h-60 bg-brand-secondary/10 rounded-full blur-3xl pointer-events-none" />
 
                         <div class="relative z-10">
                             <!-- Header -->
                             <div class="flex items-center gap-3 mb-6">
-                                <div class="w-10 h-10 rounded-xl bg-indigo-500/20 border border-indigo-500/30 flex items-center justify-center text-indigo-300 shadow-inner">
+                                <div class="w-10 h-10 rounded-xl bg-brand-primary/20 border border-brand-primary/30 flex items-center justify-center text-brand-secondary-light shadow-inner">
                                     <SparklesIcon class="w-5 h-5 animate-pulse" />
                                 </div>
                                 <div>
@@ -327,7 +327,7 @@
                                 </div>
                                 <div class="bg-white/5 border border-white/10 rounded-2xl p-4">
                                     <p class="text-[10px] text-slate-400 uppercase tracking-widest font-bold">Kapasitas SKS/Semester</p>
-                                    <p class="text-2xl font-black text-indigo-300 mt-1">{{ maxSksCapacity }} <span class="text-xs text-slate-400 font-medium">SKS</span></p>
+                                    <p class="text-2xl font-black text-brand-secondary-light mt-1">{{ maxSksCapacity }} <span class="text-xs text-slate-400 font-medium">SKS</span></p>
                                 </div>
                                 <div class="bg-white/5 border border-white/10 rounded-2xl p-4">
                                     <p class="text-[10px] text-slate-400 uppercase tracking-widest font-bold">Target Feasibility</p>
@@ -353,8 +353,8 @@
                                     <!-- Scenario 1: Optimistic -->
                                     <div class="bg-white/5 border border-white/10 rounded-2xl p-5 hover:bg-white/10 transition-all duration-300">
                                         <div class="flex justify-between items-center mb-3">
-                                            <span class="text-xs font-bold text-indigo-400 uppercase">Skenario Optimis (SKS Maksimal)</span>
-                                            <span class="px-2 py-0.5 bg-indigo-500/20 text-indigo-300 text-[10px] font-bold rounded-md uppercase">Efisien</span>
+                                            <span class="text-xs font-bold text-brand-secondary-light uppercase">Skenario Optimis (SKS Maksimal)</span>
+                                            <span class="px-2 py-0.5 bg-brand-primary/20 text-brand-secondary-light text-[10px] font-bold rounded-md uppercase">Efisien</span>
                                         </div>
                                         <p class="text-xs text-slate-400">Mengambil batas maksimal {{ maxSksCapacity }} SKS berdasarkan performa IPK saat ini.</p>
                                         <div class="mt-4 flex justify-between items-baseline">
@@ -364,7 +364,7 @@
                                             </div>
                                             <div class="text-right">
                                                 <p class="text-[10px] text-slate-500 uppercase tracking-wider">Perkiraan Lulus</p>
-                                                <p class="text-lg font-extrabold text-indigo-300 mt-0.5">Semester {{ optimisticGraduationSemester }}</p>
+                                                <p class="text-lg font-extrabold text-brand-secondary-light mt-0.5">Semester {{ optimisticGraduationSemester }}</p>
                                             </div>
                                         </div>
                                     </div>
@@ -393,7 +393,7 @@
                             <!-- GPA Forecast Study Strategy -->
                             <div v-if="auth.progress?.target_ipk" class="bg-white/5 border border-white/10 rounded-2xl p-5">
                                 <h4 class="text-xs font-bold text-slate-300 uppercase tracking-wider mb-3 flex items-center gap-1.5">
-                                    <CompassIcon class="w-4 h-4 text-indigo-400" /> Analisis Strategi IPK (GPA Forecast)
+                                    <CompassIcon class="w-4 h-4 text-brand-secondary-light" /> Analisis Strategi IPK (GPA Forecast)
                                 </h4>
                                 
                                 <div class="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
@@ -429,9 +429,9 @@
                 <!-- Update Form (Right Col) -->
                 <div class="bg-white/95 border border-slate-200/60 rounded-3xl shadow-lg flex flex-col overflow-hidden">
                     <!-- Form Header with subtle gradient background -->
-                    <div class="p-8 bg-gradient-to-r from-indigo-50/50 to-blue-50/50 border-b border-slate-100">
+                    <div class="p-8 bg-gradient-to-r from-brand-primary/5 to-brand-secondary/5 border-b border-slate-100">
                         <h3 class="text-lg font-extrabold text-slate-800 flex items-center gap-2">
-                            <Edit3Icon class="w-5 h-5 text-indigo-600" /> 
+                            <Edit3Icon class="w-5 h-5 text-brand-primary" /> 
                             Update Progress & Target
                         </h3>
                         <p class="text-slate-500 text-xs mt-1">Perbarui data terkini untuk menyesuaikan visualisasi tracker.</p>
@@ -442,7 +442,7 @@
                             <!-- Section: Data Aktual Saat Ini -->
                             <div>
                                 <h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-1.5">
-                                    <span class="w-1.5 h-1.5 rounded-full bg-indigo-500 block" /> Data Aktual Saat Ini
+                                    <span class="w-1.5 h-1.5 rounded-full bg-brand-primary block" /> Data Aktual Saat Ini
                                 </h4>
                                 
                                 <div class="space-y-4">
@@ -457,7 +457,7 @@
                                                 v-model="form.nim"
                                                 type="text"
                                                 required
-                                                class="w-full rounded-2xl border-slate-200 border px-4 py-3 text-sm focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 outline-none transition-all bg-slate-50/50 focus:bg-white text-slate-800 font-bold"
+                                                class="w-full rounded-2xl border-slate-200 border px-4 py-3 text-sm focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/20 outline-none transition-all bg-slate-50/50 focus:bg-white text-slate-800 font-bold"
                                             />
                                             <p v-if="form.errors.nim" class="text-xs text-rose-500 mt-1.5 font-medium">{{ form.errors.nim }}</p>
                                         </div>
@@ -470,7 +470,7 @@
                                                 id="semester"
                                                 v-model="form.semester"
                                                 required
-                                                class="w-full rounded-2xl border-slate-200 border px-4 py-3 text-sm focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 outline-none transition-all bg-slate-50/50 focus:bg-white text-slate-800 font-bold"
+                                                class="w-full rounded-2xl border-slate-200 border px-4 py-3 text-sm focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/20 outline-none transition-all bg-slate-50/50 focus:bg-white text-slate-800 font-bold"
                                             >
                                                 <option v-for="n in 14" :key="n" :value="n">
                                                     Semester {{ n }}
@@ -490,7 +490,7 @@
                                             v-model="form.program_studi"
                                             type="text"
                                             required
-                                            class="w-full rounded-2xl border-slate-200 border px-4 py-3 text-sm focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 outline-none transition-all bg-slate-50/50 focus:bg-white text-slate-800 font-bold"
+                                            class="w-full rounded-2xl border-slate-200 border px-4 py-3 text-sm focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/20 outline-none transition-all bg-slate-50/50 focus:bg-white text-slate-800 font-bold"
                                         />
                                         <p v-if="form.errors.program_studi" class="text-xs text-rose-500 mt-1.5 font-medium">{{ form.errors.program_studi }}</p>
                                     </div>
@@ -510,7 +510,7 @@
                                                     min="0"
                                                     max="4"
                                                     required
-                                                    class="w-full rounded-2xl border-slate-200 border px-4 py-3 text-sm focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 outline-none transition-all bg-slate-50/50 focus:bg-white text-slate-800 font-bold"
+                                                    class="w-full rounded-2xl border-slate-200 border px-4 py-3 text-sm focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/20 outline-none transition-all bg-slate-50/50 focus:bg-white text-slate-800 font-bold"
                                                 />
                                             </div>
                                             <p v-if="form.errors.ipk" class="text-xs text-rose-500 mt-1.5 font-medium">{{ form.errors.ipk }}</p>
@@ -527,7 +527,7 @@
                                                 min="0"
                                                 max="144"
                                                 required
-                                                class="w-full rounded-2xl border-slate-200 border px-4 py-3 text-sm focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 outline-none transition-all bg-slate-50/50 focus:bg-white text-slate-800 font-bold"
+                                                class="w-full rounded-2xl border-slate-200 border px-4 py-3 text-sm focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/20 outline-none transition-all bg-slate-50/50 focus:bg-white text-slate-800 font-bold"
                                             />
                                             <p v-if="form.errors.total_sks" class="text-xs text-rose-500 mt-1.5 font-medium">{{ form.errors.total_sks }}</p>
                                         </div>
@@ -544,7 +544,7 @@
                                                 v-model="form.passed_courses"
                                                 type="number"
                                                 min="0"
-                                                class="w-full rounded-2xl border-slate-200 border px-4 py-3 text-sm focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 outline-none transition-all bg-slate-50/50 focus:bg-white text-slate-800 font-semibold"
+                                                class="w-full rounded-2xl border-slate-200 border px-4 py-3 text-sm focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/20 outline-none transition-all bg-slate-50/50 focus:bg-white text-slate-800 font-semibold"
                                             />
                                             <p v-if="form.errors.passed_courses" class="text-xs text-rose-500 mt-1.5 font-medium">{{ form.errors.passed_courses }}</p>
                                         </div>
@@ -559,7 +559,7 @@
                                                 type="number"
                                                 min="0"
                                                 max="120"
-                                                class="w-full rounded-2xl border-slate-200 border px-4 py-3 text-sm focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 outline-none transition-all bg-slate-50/50 focus:bg-white text-slate-800 font-semibold"
+                                                class="w-full rounded-2xl border-slate-200 border px-4 py-3 text-sm focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/20 outline-none transition-all bg-slate-50/50 focus:bg-white text-slate-800 font-semibold"
                                             />
                                             <p v-if="form.errors.tak" class="text-xs text-rose-500 mt-1.5 font-medium">{{ form.errors.tak }}</p>
                                         </div>
@@ -588,7 +588,7 @@
                                                 :min="form.ipk"
                                                 max="4"
                                                 placeholder="contoh: 3.80"
-                                                class="w-full rounded-2xl border-slate-200 border px-4 py-3 text-sm focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 outline-none transition-all bg-slate-50/50 focus:bg-white text-slate-800 font-bold placeholder-slate-300"
+                                                class="w-full rounded-2xl border-slate-200 border px-4 py-3 text-sm focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/20 outline-none transition-all bg-slate-50/50 focus:bg-white text-slate-800 font-bold placeholder-slate-300"
                                             />
                                             <p v-if="form.errors.target_ipk" class="text-xs text-rose-500 mt-1.5 font-medium">{{ form.errors.target_ipk }}</p>
                                         </div>
@@ -604,7 +604,7 @@
                                                 :min="form.total_sks"
                                                 max="144"
                                                 placeholder="maks: 144"
-                                                class="w-full rounded-2xl border-slate-200 border px-4 py-3 text-sm focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 outline-none transition-all bg-slate-50/50 focus:bg-white text-slate-800 font-bold placeholder-slate-300"
+                                                class="w-full rounded-2xl border-slate-200 border px-4 py-3 text-sm focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/20 outline-none transition-all bg-slate-50/50 focus:bg-white text-slate-800 font-bold placeholder-slate-300"
                                             />
                                             <p v-if="form.errors.target_sks" class="text-xs text-rose-500 mt-1.5 font-medium">{{ form.errors.target_sks }}</p>
                                         </div>
@@ -618,7 +618,7 @@
                                         <select
                                             id="target_semester"
                                             v-model="form.target_semester"
-                                            class="w-full rounded-2xl border-slate-200 border px-4 py-3 text-sm focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 outline-none transition-all bg-slate-50/50 focus:bg-white text-slate-800 font-bold"
+                                            class="w-full rounded-2xl border-slate-200 border px-4 py-3 text-sm focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/20 outline-none transition-all bg-slate-50/50 focus:bg-white text-slate-800 font-bold"
                                         >
                                             <option value="">-- Pilih target --</option>
                                             <option v-for="n in 14" :key="n" :value="n">
@@ -636,7 +636,7 @@
                             <button
                                 type="submit"
                                 :disabled="form.processing"
-                                class="w-full py-3.5 px-4 text-sm font-extrabold text-white bg-indigo-600 rounded-2xl hover:bg-indigo-700 hover:shadow-lg hover:shadow-indigo-500/20 active:scale-[0.99] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-md shadow-indigo-600/10 cursor-pointer"
+                                class="w-full py-3.5 px-4 text-sm font-extrabold text-white bg-brand-primary rounded-2xl hover:bg-brand-primary-dark hover:shadow-lg hover:shadow-brand-primary/20 active:scale-[0.99] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-md shadow-brand-primary/10 cursor-pointer"
                             >
                                 <SaveIcon class="w-4 h-4" /> Simpan Perubahan
                             </button>

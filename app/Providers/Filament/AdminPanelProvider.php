@@ -37,7 +37,6 @@ class AdminPanelProvider extends PanelProvider
 
             // ─── SIBIMA Color Scheme ──────────────────────────────────────
             ->colors([
-                'primary' => Color::Amber,
                 'primary' => Color::hex('#1F4C7A'),   // Deep Blue — Navbar, header, primary button
                 'gray' => Color::hex('#1B3F66'),    // Navy Blue — Hover state, footer, sidebar
                 'info' => Color::hex('#2FA7A0'),    // Teal      — Links, icons, accent UI

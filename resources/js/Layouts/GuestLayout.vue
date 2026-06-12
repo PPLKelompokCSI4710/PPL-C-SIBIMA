@@ -1,6 +1,5 @@
 <script setup>
     import { Link } from '@inertiajs/vue3';
-    import { GraduationCapIcon } from 'lucide-vue-next';
 </script>
 
 <template>
@@ -22,14 +21,9 @@
             <div class="flex flex-col items-center mb-8">
                 <Link
                     href="/"
-                    class="group flex items-center gap-3 bg-white p-4 rounded-2xl shadow-xl shadow-blue-900/5 transition-all hover:scale-105 active:scale-95"
+                    class="group flex items-center bg-white p-4 rounded-2xl shadow-xl shadow-blue-900/5 transition-all hover:scale-105 active:scale-95"
                 >
-                    <div
-                        class="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-600/30"
-                    >
-                        <GraduationCapIcon class="w-7 h-7" />
-                    </div>
-                    <span class="text-2xl font-black tracking-tight text-slate-800">SIBIMA</span>
+                    <img src="/images/logo-sibima.svg" alt="SIBIMA Logo" class="h-10 w-auto" />
                 </Link>
             </div>
 

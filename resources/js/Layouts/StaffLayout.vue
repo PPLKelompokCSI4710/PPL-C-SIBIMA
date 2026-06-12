@@ -3,16 +3,16 @@
         <!-- Sidebar -->
         <aside class="w-64 bg-white border-r border-slate-200 flex flex-col z-20 overflow-y-auto">
             <div class="h-16 flex items-center px-6 border-b border-slate-200">
-                <div class="flex items-center gap-2 text-indigo-600">
-                    <GraduationCapIcon class="w-8 h-8" />
-                    <span class="text-xl font-bold tracking-tight">SIBIMA STAFF</span>
-                </div>
+                <Link href="/" class="flex items-center gap-2">
+                    <img src="/images/logo-sibima.svg" alt="SIBIMA Logo" class="h-8 w-auto" />
+                    <span class="text-xs font-bold text-brand-primary bg-brand-primary/10 px-2 py-0.5 rounded-full uppercase tracking-wider">Staff</span>
+                </Link>
             </div>
 
             <div class="p-4">
                 <div class="flex items-center gap-3 p-3 bg-slate-50 rounded-xl mb-6">
                     <div
-                        class="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-bold border border-indigo-200"
+                        class="w-10 h-10 rounded-full bg-brand-primary/10 flex items-center justify-center text-brand-primary font-bold border border-brand-primary/20"
                     >
                         {{ $page.props.auth.user?.name?.charAt(0) }}
                     </div>
@@ -24,7 +24,7 @@
                             <span class="text-xs text-slate-500 capitalize">{{ userRole }}</span>
                             <Link
                                 :href="route('profile.edit')"
-                                class="text-xs text-indigo-600 hover:text-indigo-700 font-bold hover:underline"
+                                class="text-xs text-brand-primary hover:text-brand-primary-dark font-bold hover:underline"
                             >
                                 Edit Profile
                             </Link>
@@ -37,7 +37,7 @@
                         :href="route('staff.dashboard')"
                         :class="[
                             route().current('staff.dashboard')
-                                ? 'bg-indigo-50 text-indigo-700 font-semibold'
+                                ? 'bg-brand-primary/5 text-brand-primary font-semibold'
                                 : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900',
                         ]"
                         class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors"
@@ -52,7 +52,7 @@
                         :href="route('staff.courses.index')"
                         :class="[
                             route().current('staff.courses.index')
-                                ? 'bg-indigo-50 text-indigo-700 font-semibold'
+                                ? 'bg-brand-primary/5 text-brand-primary font-semibold'
                                 : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900',
                         ]"
                         class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors"
@@ -68,7 +68,7 @@
                         :href="route('staff.progress.index')"
                         :class="[
                             route().current('staff.progress.index')
-                                ? 'bg-indigo-50 text-indigo-700 font-semibold'
+                                ? 'bg-brand-primary/5 text-brand-primary font-semibold'
                                 : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900',
                         ]"
                         class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors"
@@ -82,7 +82,7 @@
                         :href="isAdmin ? route('preview.kalender-admin') : route('staff.calendar')"
                         :class="[
                             (route().current('staff.calendar') || route().current('preview.kalender-admin'))
-                                ? 'bg-indigo-50 text-indigo-700 font-semibold'
+                                ? 'bg-brand-primary/5 text-brand-primary font-semibold'
                                 : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900',
                         ]"
                         class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors"
@@ -96,7 +96,7 @@
                         :href="route('dosen.ketersediaan-jadwal.index')"
                         :class="[
                             route().current('dosen.ketersediaan-jadwal.*')
-                                ? 'bg-indigo-50 text-indigo-700 font-semibold'
+                                ? 'bg-brand-primary/5 text-brand-primary font-semibold'
                                 : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900',
                         ]"
                         class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors"
@@ -111,7 +111,7 @@
                         :href="route('dosen.monitoring-jadwal.index')"
                         :class="[
                             route().current('dosen.monitoring-jadwal.*')
-                                ? 'bg-indigo-50 text-indigo-700 font-semibold'
+                                ? 'bg-brand-primary/5 text-brand-primary font-semibold'
                                 : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900',
                         ]"
                         class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors"
@@ -126,7 +126,7 @@
                         :href="route('dosen.reschedule.index')"
                         :class="[
                             route().current('dosen.reschedule.*')
-                                ? 'bg-indigo-50 text-indigo-700 font-semibold'
+                                ? 'bg-brand-primary/5 text-brand-primary font-semibold'
                                 : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900',
                         ]"
                         class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors"
@@ -141,7 +141,7 @@
                         :href="route('dosen.riwayat-bimbingan.index')"
                         :class="[
                             route().current('dosen.riwayat-bimbingan.*')
-                                ? 'bg-indigo-50 text-indigo-700 font-semibold'
+                                ? 'bg-brand-primary/5 text-brand-primary font-semibold'
                                 : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900',
                         ]"
                         class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors"
@@ -203,7 +203,6 @@
     import { Link, usePage } from '@inertiajs/vue3';
     import NotificationBell from '@/Components/NotificationBell.vue';
     import {
-        GraduationCapIcon,
         LayoutDashboardIcon,
         BookOpenIcon,
         TrendingUpIcon,

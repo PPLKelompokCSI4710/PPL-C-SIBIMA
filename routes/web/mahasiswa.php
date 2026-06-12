@@ -8,6 +8,7 @@ use App\Http\Controllers\Mahasiswa\DashboardController;
 use App\Http\Controllers\Mahasiswa\ProgressController;
 use App\Http\Controllers\Mahasiswa\ProgressReminderController;
 use App\Http\Controllers\Mahasiswa\StudyPlanController;
+use App\Http\Controllers\Mahasiswa\ExportBimbinganController;
 use App\Http\Controllers\MonitoringJadwalBimbinganController;
 use App\Http\Controllers\DraftSkripsiController;
 use Illuminate\Support\Facades\Route;

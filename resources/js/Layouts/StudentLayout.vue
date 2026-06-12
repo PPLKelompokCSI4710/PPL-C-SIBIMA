@@ -5,17 +5,16 @@
             class="w-64 bg-white border-r border-slate-200 flex flex-col hidden md:flex z-30 shrink-0"
         >
             <div class="h-16 flex items-center px-6 border-b border-slate-200">
-                <div class="flex items-center gap-2 text-blue-600">
-                    <GraduationCapIcon class="w-8 h-8" />
-                    <span class="text-xl font-bold tracking-tight">SIBIMA</span>
-                </div>
+                <Link href="/" class="flex items-center">
+                    <img src="/images/logo-sibima.svg" alt="SIBIMA Logo" class="h-8 w-auto" />
+                </Link>
             </div>
             <nav class="flex-1 p-4 space-y-1 overflow-y-auto">
                 <Link
                     :href="route('mahasiswa.dashboard')"
                     :class="[
                         route().current('mahasiswa.dashboard')
-                            ? 'bg-blue-50 text-blue-700 font-semibold'
+                            ? 'bg-brand-primary/5 text-brand-primary font-semibold'
                             : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900',
                     ]"
                     class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors"
@@ -27,7 +26,7 @@
                     :href="route('mahasiswa.courses.index')"
                     :class="[
                         route().current('mahasiswa.courses.index')
-                            ? 'bg-blue-50 text-blue-700 font-semibold'
+                            ? 'bg-brand-primary/5 text-brand-primary font-semibold'
                             : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900',
                     ]"
                     class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors"
@@ -39,7 +38,7 @@
                     :href="route('mahasiswa.study-plans.index')"
                     :class="[
                         route().current('mahasiswa.study-plans.index')
-                            ? 'bg-blue-50 text-blue-700 font-semibold'
+                            ? 'bg-brand-primary/5 text-brand-primary font-semibold'
                             : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900',
                     ]"
                     class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors"
@@ -51,7 +50,7 @@
                     :href="route('mahasiswa.progress.index')"
                     :class="[
                         route().current('mahasiswa.progress.index')
-                            ? 'bg-blue-50 text-blue-700 font-semibold'
+                            ? 'bg-brand-primary/5 text-brand-primary font-semibold'
                             : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900',
                     ]"
                     class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors"
@@ -63,7 +62,7 @@
                     :href="route('mahasiswa.draft-skripsi.index')"
                     :class="[
                         route().current('mahasiswa.draft-skripsi.*')
-                            ? 'bg-blue-50 text-blue-700 font-semibold'
+                            ? 'bg-brand-primary/5 text-brand-primary font-semibold'
                             : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900',
                     ]"
                     class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors"
@@ -76,7 +75,7 @@
                     :class="[
                         route().current('mahasiswa.jadwal.*') ||
                             route().current('mahasiswa.jadwal-bimbingan.*')
-                            ? 'bg-blue-50 text-blue-700 font-semibold'
+                            ? 'bg-brand-primary/5 text-brand-primary font-semibold'
                             : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900',
                     ]"
                     class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors"
@@ -88,7 +87,7 @@
                     :href="route('mahasiswa.jadwal.riwayat-reschedule')"
                     :class="[
                         route().current('mahasiswa.jadwal.riwayat-reschedule')
-                            ? 'bg-blue-50 text-blue-700 font-semibold'
+                            ? 'bg-brand-primary/5 text-brand-primary font-semibold'
                             : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900',
                     ]"
                     class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors"
@@ -100,7 +99,7 @@
                     :href="route('mahasiswa.calendar')"
                     :class="[
                         route().current('mahasiswa.calendar')
-                            ? 'bg-blue-50 text-blue-700 font-semibold'
+                            ? 'bg-brand-primary/5 text-brand-primary font-semibold'
                             : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900',
                     ]"
                     class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors"
@@ -112,7 +111,7 @@
             <div class="p-4 border-t border-slate-200">
                 <div class="flex items-center gap-3 p-2 bg-slate-50 rounded-xl">
                     <div
-                        class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-bold border border-blue-200 text-xs shrink-0"
+                        class="w-10 h-10 rounded-full bg-brand-primary/10 flex items-center justify-center text-brand-primary font-bold border border-brand-primary/20 text-xs shrink-0"
                     >
                         {{ $page.props.auth.user.name.charAt(0) }}
                     </div>
@@ -124,7 +123,7 @@
                             <span class="text-xs text-slate-500">Student</span>
                             <Link
                                 :href="route('profile.edit')"
-                                class="text-xs text-blue-600 hover:text-blue-700 font-bold hover:underline"
+                                class="text-xs text-brand-primary hover:text-brand-primary-dark font-bold hover:underline"
                             >
                                 Edit Profile
                             </Link>
@@ -185,7 +184,6 @@
     import AiAssistantWidget from '@/Components/AiAssistantWidget.vue';
     import NotificationBell from '@/Components/NotificationBell.vue';
     import {
-        GraduationCapIcon,
         LayoutDashboardIcon,
         BookOpenIcon,
         CalendarDaysIcon,
