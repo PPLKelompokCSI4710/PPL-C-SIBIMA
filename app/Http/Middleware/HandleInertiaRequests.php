@@ -37,6 +37,11 @@ class HandleInertiaRequests extends Middleware
                     'name' => $request->user()->name,
                     'email' => $request->user()->email,
                     'roles' => $request->user()->getRoleNames(),
+                    'program_studi' => $request->user()->program_studi,
+                    'fakultas' => $request->user()->fakultas,
+                    'kode_dosen' => $request->user()->kode_dosen,
+                    'kuota_pembimbingan' => $request->user()->kuota_pembimbingan,
+                    'mahasiswa' => $request->user()->mahasiswa,
                 ] : null,
             ],
             'flash' => [
