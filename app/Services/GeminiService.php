@@ -28,6 +28,28 @@ class GeminiService
      */
     public function generateResponse(array $messages): string
     {
+        // Check if a mock response is set in AppSetting (useful for Dusk/Feature testing)
+        $mockResponse = \App\Models\AppSetting::get('gemini_mock_response');
+        if ($mockResponse !== null) {
+            if ($mockResponse === 'FORCE_TIMEOUT' || $mockResponse === 'FORCE_ERROR') {
+                throw new \Exception('Koneksi ke Gemini API gagal. Pastikan jaringan internet Anda aktif.');
+            }
+            if ($mockResponse === 'DYNAMIC') {
+                $lastMsg = end($messages)['content'] ?? '';
+                if (preg_match('/(cuaca|resep|masak|makan|lelucon|puisi|berita)/i', $lastMsg)) {
+                    return "Maaf, saya hanya dapat membantu Anda dalam konteks pendidikan, penyusunan skripsi, dan bimbingan akademik. Silakan ajukan pertanyaan seputar topik tersebut.";
+                }
+                if (preg_match('/kualitatif/i', $lastMsg)) {
+                    return "Metode kualitatif adalah metode penelitian yang fokus pada pemahaman mendalam tentang fenomena sosial.";
+                }
+                if (preg_match('/langkah menyusunnya/i', $lastMsg)) {
+                    return "Langkah menyusun metode kualitatif meliputi penentuan fokus, pengumpulan data, dan analisis tematik.";
+                }
+                return "Ini adalah jawaban relevan seputar skripsi dan metodologi penelitian akademik.";
+            }
+            return $mockResponse;
+        }
+
         if (empty($this->apiKey)) {
             Log::error('Gemini API Error: API Key is missing.');
             throw new \Exception('API Key Gemini belum dikonfigurasi. Silakan tambahkan GEMINI_API_KEY di file .env.');

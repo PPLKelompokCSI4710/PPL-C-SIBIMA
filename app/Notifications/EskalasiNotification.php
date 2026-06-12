@@ -79,26 +79,13 @@ class EskalasiNotification extends Notification
         ];
     }
     /**
-     * Get the database representation of the notification for Filament.
+     * Get the database representation of the notification.
+     * Falls back to toArray() to avoid Filament package dependency errors in non-Filament contexts.
      *
      * @return array<string, mixed>
      */
     public function toDatabase(object $notifiable): array
     {
-        if ($this->mahasiswaId) {
-            return \Filament\Notifications\Notification::make()
-                ->warning()
-                ->title('Eskalasi Bimbingan: ' . $this->mahasiswaName)
-                ->body("Mahasiswa ini sudah {$this->daysSinceLast} hari tidak bimbingan. Segera tindak lanjuti.")
-                ->actions([
-                    \Filament\Notifications\Actions\Action::make('view_mahasiswa')
-                        ->label('Lihat Detail Mahasiswa')
-                        ->button()
-                        ->url(\App\Filament\Resources\Mahasiswas\MahasiswaResource::getUrl('edit', ['record' => $this->mahasiswaId])),
-                ])
-                ->getDatabaseMessage();
-        }
-
         return $this->toArray($notifiable);
     }
 }

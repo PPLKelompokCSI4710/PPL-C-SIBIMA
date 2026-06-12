@@ -113,14 +113,21 @@
     };
 
     // DB Session Functions
+    const isFetchingSessions = ref(false);
     const fetchSessions = async () => {
+        if (isFetchingSessions.value) return;
+        isFetchingSessions.value = true;
+        isLoading.value = true;
         try {
             const response = await axios.get('/api/ai-chat/sessions');
+            console.log('SESSIONS RESPONSE:', JSON.stringify(response.data));
             sessionsList.value = response.data.sessions;
             quota.value = response.data.quota;
             maxQuota.value = response.data.max_quota;
 
+            console.log('SESSIONS LIST LENGTH:', sessionsList.value.length);
             if (sessionsList.value.length > 0) {
+                console.log('FIRST SESSION ID:', sessionsList.value[0].id);
                 if (!activeSessionId.value) {
                     await selectSession(sessionsList.value[0].id);
                 }
@@ -129,6 +136,9 @@
             }
         } catch (error) {
             console.error('Gagal mengambil sesi chat:', error);
+        } finally {
+            isLoading.value = false;
+            isFetchingSessions.value = false;
         }
     };
 
@@ -350,6 +360,7 @@
     <div class="fixed bottom-6 right-6 z-[9999] font-sans">
         <!-- Floating Action Button -->
         <button
+            dusk="toggle-chat"
             class="relative flex items-center justify-center w-16 h-16 rounded-full shadow-2xl transition-all duration-300 overflow-hidden group hover:scale-110 active:scale-95"
             :class="isOpen ? 'bg-slate-800' : 'bg-transparent'"
             @click="toggleChat"
@@ -446,6 +457,7 @@
                         <div class="flex items-center gap-1">
                             <!-- Toggle history panel for authenticated users -->
                             <button
+                                dusk="history-button"
                                 v-if="isAuthenticated && !showSessionsPanel"
                                 title="Riwayat Percakapan"
                                 class="p-1.5 rounded-lg hover:bg-white/20 transition-colors text-white/80 hover:text-white"
@@ -486,6 +498,7 @@
                     <div class="p-4 border-b border-slate-100 bg-white flex items-center justify-between shrink-0 shadow-sm">
                         <span class="text-xs font-bold text-slate-800">Riwayat Sesi Percakapan</span>
                         <button
+                            dusk="new-session-button"
                             class="flex items-center gap-1 text-[10px] font-bold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 px-2.5 py-1.5 rounded-lg transition-colors"
                             @click="createNewSession"
                         >
@@ -650,6 +663,7 @@
                                 :class="{ 'opacity-50 bg-slate-100': quota <= 0 }"
                             >
                                 <textarea
+                                    dusk="chat-input"
                                     ref="inputRef"
                                     v-model="message"
                                     rows="1"
@@ -667,6 +681,7 @@
                                 />
                             </div>
                             <button
+                                dusk="send-button"
                                 type="submit"
                                 :disabled="isLoading || !message.trim() || quota <= 0"
                                 class="shrink-0 w-11 h-11 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl flex items-center justify-center transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"

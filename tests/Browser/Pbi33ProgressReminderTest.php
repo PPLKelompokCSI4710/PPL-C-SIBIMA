@@ -102,7 +102,8 @@ class Pbi33ProgressReminderTest extends DuskTestCase
         $this->browse(function (Browser $browser) use ($mahasiswaUser) {
             $browser->loginAs($mahasiswaUser)
                 ->visitRoute('mahasiswa.bimbingan.progress_reminder')
-                ->assertSee('Monitoring Progres Akademik');
+                ->pause(2000)
+                ->assertSee('Konfigurasi Reminder Progres');
         });
     }
 }

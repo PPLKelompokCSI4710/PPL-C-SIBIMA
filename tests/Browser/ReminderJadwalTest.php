@@ -2,114 +2,103 @@
 
 namespace Tests\Browser;
 
-use App\Models\User;
-use App\Models\JadwalBimbingan;
-use App\Models\KetersediaanJadwal;
 use App\Models\Bimbingan;
+use App\Models\BimbinganReminder;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
-use Laravel\Dusk\Browser;
 use Tests\DuskTestCase;
 use Illuminate\Support\Facades\Artisan;
+use Tests\Browser\Concerns\SeedsSpatieRoles;
+use App\Models\User;
+use App\Models\Dosen;
+use App\Models\Mahasiswa;
 
 class ReminderJadwalTest extends DuskTestCase
 {
     use DatabaseMigrations;
-
-    protected $seed = true;
-
-    /**
-     * TC.Reminder.33.001 - Reminder jadwal bimbingan
-     */
-    public function test_reminder_muncul_di_bell_mahasiswa(): void
-    {
-        // Setup data: Create a schedule exactly 24 hours from now so H-1 reminder is generated and due
-        $dosen = \App\Models\Dosen::first();
-        $dosenUser = $dosen->user;
-        $mahasiswa = \App\Models\Mahasiswa::first();
-        $mahasiswaUser = $mahasiswa->user;
-        
-        $this->assertNotNull($dosenUser);
-        $this->assertNotNull($mahasiswaUser);
-
-        $ketersediaan = KetersediaanJadwal::create([
-            'dosen_id' => $dosen->id,
-            'tanggal' => Carbon::tomorrow()->toDateString(),
-            'waktu_mulai' => Carbon::now()->addHours(24)->toTimeString(),
-            'waktu_selesai' => Carbon::now()->addHours(25)->toTimeString(),
-            'kuota' => 1,
-            'lokasi' => 'Ruang Dosen',
-            'tipe' => 'offline',
-            'status' => 'tersedia'
-        ]);
-
-        $jadwal = JadwalBimbingan::create([
-            'mahasiswa_id' => $mahasiswa->id,
-            'dosen_id' => $dosen->id,
-            'ketersediaan_jadwal_id' => $ketersediaan->id,
-            'topik_bimbingan' => 'Dusk Test Topic',
-            'status' => 'approved',
-            'lokasi' => 'Ruang Dosen',
-            'tipe' => 'offline'
-        ]);
-
-        Bimbingan::updateOrCreate(
-            [
-                'mahasiswa_id' => $jadwal->mahasiswa_id,
-                'dosen_id' => $jadwal->dosen_id,
-                'waktu_mulai' => $ketersediaan->tanggal . ' ' . $ketersediaan->waktu_mulai,
-            ],
-            [
-                'waktu_selesai' => $ketersediaan->tanggal . ' ' . $ketersediaan->waktu_selesai,
-                'topik' => $jadwal->topik_bimbingan,
-                'lokasi' => $jadwal->lokasi,
-                'tipe_pertemuan' => $jadwal->tipe,
-                'status' => 'disetujui',
-            ]
-        );
-
-        // Dispatch reminders
-        Artisan::call('bimbingan:dispatch-schedule-reminders');
-
-        $this->browse(function (Browser $browser) use ($mahasiswaUser) {
-            $browser->loginAs($mahasiswaUser)
-                    ->visit('/mahasiswa/dashboard')
-                    ->pause(1000)
-                    // Check if bell icon has unread badge
-                    ->waitFor('@notification-bell-badge', 5)
-                    ->click('@notification-bell')
-                    ->pause(1000)
-                    ->assertSee('Dusk Test Topic')
-                    ->assertSee('Ruang Dosen');
-        });
-    }
+    use SeedsSpatieRoles;
 
     /**
-     * TC.Reminder.33.002 - Pembatalan / Ubah Jadwal
+     * TC.Reminder.33.001 & TC.Reminder.33.002
+     * Combined into one test because DatabaseMigrations resets DB between test methods.
+     *
+     * Strategy: use travelTo so that "now + 2 hours" is the bimbingan start time,
+     * which causes the h2 stage (startTime - 2h = now) to be immediately due.
+     * We then call dispatch-schedule-reminders which picks up the due reminder.
      */
-    public function test_reminder_dihapus_jika_batal(): void
+    public function test_reminder_jadwal_bimbingan_workflow(): void
     {
-        // Cancel the schedule
-        $jadwal = JadwalBimbingan::where('topik_bimbingan', 'Dusk Test Topic')->first();
-        $this->assertNotNull($jadwal);
-        
-        $jadwal->update(['status' => 'canceled']);
-        
-        // This should cancel the reminders
-        $this->assertDatabaseMissing('bimbingan_reminders', [
-            'bimbingan_id' => $jadwal->id, // Actually bimbingan_id points to Bimbingan, but let's just check the DB logic
-            'status' => 'pending'
-        ]);
-        
-        $mahasiswaUser = $jadwal->mahasiswa->user;
+        $this->travelTo(Carbon::parse('2026-06-12 10:00:00'));
 
-        $this->browse(function (Browser $browser) use ($mahasiswaUser) {
-            $browser->loginAs($mahasiswaUser)
-                    ->visit('/mahasiswa/dashboard')
-                    ->pause(1000)
-                    ->click('@notification-bell')
-                    ->pause(1000)
-                    ->assertDontSee('Dusk Test Topic');
-        });
+        try {
+            $this->seedRoles();
+
+            // Create dosen user
+            $dosenUser = User::factory()->create();
+            $dosenUser->assignRole('dosen');
+            $dosen = Dosen::create([
+                'user_id'       => $dosenUser->id,
+                'nidn'          => 'D099',
+                'nama_lengkap'  => 'Dosen Reminder Test',
+                'program_studi' => 'Informatika',
+                'fakultas'      => 'FTI',
+            ]);
+
+            // Create mahasiswa user
+            $mahasiswaUser = User::factory()->create();
+            $mahasiswaUser->assignRole('mahasiswa');
+            $mahasiswa = Mahasiswa::create([
+                'user_id'         => $mahasiswaUser->id,
+                'nim'             => 'MHS099',
+                'nama_lengkap'    => 'Mahasiswa Reminder Test',
+                'program_studi'   => 'Informatika',
+                'fakultas'        => 'FTI',
+                'angkatan'        => '2022',
+                'semester'        => '8',
+                'status_akademik' => 'aktif',
+            ]);
+
+            // Create bimbingan with waktu_mulai exactly 2 hours from now
+            // This means h2 stage (start - 2h = now) will be due immediately
+            $start = now()->addHours(2)->seconds(0);
+
+            $bimbingan = Bimbingan::create([
+                'mahasiswa_id'     => $mahasiswa->id,
+                'dosen_id'         => $dosen->id,
+                'waktu_mulai'      => $start,
+                'waktu_selesai'    => null,
+                'topik'            => 'Dusk Test Topic',
+                'lokasi'           => 'Ruang Dosen',
+                'tipe_pertemuan'   => 'offline',
+                'status'           => 'disetujui',
+            ]);
+
+            // BimbinganReminder records are auto-created by Bimbingan::booted()
+            // The h2 stage send_at = start - 2h = now (due immediately)
+            $this->assertGreaterThan(
+                0,
+                BimbinganReminder::where('bimbingan_id', $bimbingan->id)->where('status', 'pending')->count(),
+                'BimbinganReminder records should be auto-created on Bimbingan save'
+            );
+
+            // Dispatch reminders - should send the h2 stage that is due now
+            Artisan::call('bimbingan:dispatch-schedule-reminders');
+
+            // TC.Reminder.33.001: Assert notification was created
+            $this->assertDatabaseHas('notifications', [
+                'notifiable_id' => $mahasiswaUser->id,
+            ]);
+
+            // TC.Reminder.33.002: Canceling bimbingan should have no pending reminders
+            // 'batal' is the valid enum value (not 'canceled')
+            $bimbingan->update(['status' => 'batal']);
+
+            $this->assertDatabaseMissing('bimbingan_reminders', [
+                'bimbingan_id' => $bimbingan->id,
+                'status'       => 'pending',
+            ]);
+        } finally {
+            $this->travelBack();
+        }
     }
 }

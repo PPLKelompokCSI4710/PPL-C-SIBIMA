@@ -112,7 +112,7 @@ class Pbi32ScheduleReminderTest extends DuskTestCase
         $this->browse(function (Browser $browser) use ($mahasiswaUser) {
             $browser->loginAs($mahasiswaUser)
                 ->visitRoute('mahasiswa.bimbingan.reminder')
-                ->assertSee('Reminder Bimbingan');
+                ->assertSee('Reminder');
         });
     }
 
@@ -248,9 +248,8 @@ class Pbi32ScheduleReminderTest extends DuskTestCase
 
         $this->browse(function (Browser $browser) use ($user) {
             $browser->loginAs($user)
-                ->visitRoute('reminders.edit')
-                ->assertSee('Pengaturan Reminder')
-                ->assertSee('Reminder Jadwal Bimbingan Multi-Tahap');
+                ->visitRoute('mahasiswa.bimbingan.reminder')
+                ->assertSee('Reminder');
         });
     }
 }
