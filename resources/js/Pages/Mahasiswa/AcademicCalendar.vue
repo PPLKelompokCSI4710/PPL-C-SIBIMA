@@ -37,31 +37,7 @@
                                 </p>
                             </div>
 
-                            <!-- Google Calendar Connect Section -->
-                            <div class="flex items-center gap-3">
-                                <a
-                                    v-if="!isGoogleConnected"
-                                    :href="route('google.connect')"
-                                    class="inline-flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-xl text-xs font-bold text-slate-600 hover:text-blue-600 hover:border-blue-200 shadow-sm transition-all"
-                                >
-                                    <svg
-                                        class="w-4 h-4 fill-current text-blue-500"
-                                        viewBox="0 0 24 24"
-                                    >
-                                        <path
-                                            d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"
-                                        />
-                                    </svg>
-                                    <span>Hubungkan Google Calendar</span>
-                                </a>
-                                <div
-                                    v-else
-                                    class="inline-flex items-center gap-2 px-4 py-2 bg-emerald-50 border border-emerald-200 rounded-xl text-xs font-bold text-emerald-700 shadow-sm animate-pulse"
-                                >
-                                    <span class="w-2 h-2 rounded-full bg-emerald-500" />
-                                    <span>Terhubung ke Google Calendar</span>
-                                </div>
-                            </div>
+
 
                             <div class="flex gap-2.5">
                                 <button
@@ -157,40 +133,31 @@
                                     event.day === selectedDay &&
                                     event.month === currentDate.getMonth()
                                         ? 'border-blue-500 bg-blue-50/40 ring-1 ring-blue-100 scale-[0.99]'
-                                        : 'border-slate-200 hover:border-blue-200 hover:bg-slate-50/50',
+                                        : 'border-slate-200 hover:border-blue-400 hover:shadow-md',
                                 ]"
-                                class="bg-white p-4 rounded-2xl border transition-all duration-200 cursor-pointer group flex gap-3.5"
+                                class="bg-white p-5 rounded-[24px] border shadow-sm flex items-center gap-5 transition cursor-pointer group"
                                 @click="goToEventDate(event)"
                             >
-                                <!-- Event Date Badge -->
-                                <div
-                                    :class="event.color"
-                                    class="w-12 h-12 rounded-xl flex flex-col items-center justify-center shrink-0 border shadow-sm group-hover:scale-105 transition-transform"
+                                <!-- Date block -->
+                                <div 
+                                    class="rounded-[20px] flex flex-col justify-center items-center min-w-[76px] h-[80px] border shrink-0 bg-white"
+                                    :class="(event.badge || '').toLowerCase().includes('bimbingan') ? 'border-fuchsia-200 shadow-sm shadow-fuchsia-100/50' : 'border-blue-200 shadow-sm shadow-blue-100/50'"
                                 >
-                                    <span class="text-[9px] font-bold uppercase tracking-wider">{{
-                                        monthShortNames[event.month]
-                                    }}</span>
-                                    <span class="text-lg font-black leading-none mt-0.5">{{
-                                        event.day < 10 ? '0' + event.day : event.day
-                                    }}</span>
+                                    <span class="text-[11px] font-bold uppercase tracking-widest leading-none mb-1.5" :class="(event.badge || '').toLowerCase().includes('bimbingan') ? 'text-fuchsia-600' : 'text-blue-600'">{{ monthShortNames[event.month] }}</span>
+                                    <span class="text-3xl font-bold leading-none" :class="(event.badge || '').toLowerCase().includes('bimbingan') ? 'text-fuchsia-700' : 'text-blue-700'">{{ String(event.day).padStart(2, '0') }}</span>
                                 </div>
-                                <div class="overflow-hidden flex-1">
-                                    <div class="flex items-center gap-1.5">
-                                        <span
-                                            class="text-[8px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded"
-                                            :class="event.color"
+                                <!-- Detail -->
+                                <div class="flex-1 min-w-0 py-1">
+                                    <div class="mb-2">
+                                        <span 
+                                            class="text-[9px] font-bold px-2 py-0.5 rounded-md uppercase tracking-widest inline-block"
+                                            :class="(event.badge || '').toLowerCase().includes('bimbingan') ? 'bg-fuchsia-50 text-fuchsia-600' : 'bg-blue-50 text-blue-600'"
                                         >
-                                            {{ event.badge }}
+                                            {{ event.badge || 'Kegiatan' }}
                                         </span>
                                     </div>
-                                    <h4
-                                        class="font-bold text-slate-800 text-sm mt-1 group-hover:text-blue-600 transition-colors line-clamp-1"
-                                    >
-                                        {{ event.title }}
-                                    </h4>
-                                    <p class="text-xs text-slate-500 mt-0.5 line-clamp-1">
-                                        {{ event.desc }}
-                                    </p>
+                                    <h4 class="font-bold text-slate-800 text-[17px] leading-snug mb-1 truncate">{{ event.title }}</h4>
+                                    <p class="text-sm text-slate-500 truncate">{{ event.desc || ((event.badge || '').toLowerCase().includes('bimbingan') ? 'Konsultasi bimbingan' : 'Kegiatan akademik') }}</p>
                                 </div>
                             </div>
                         </div>
@@ -347,28 +314,7 @@
                                 </p>
                             </div>
 
-                            <!-- Request Advisement Direct Link -->
-                            <div class="pt-4 border-t border-slate-250 flex flex-col gap-3">
-                                <button
-                                    class="w-full inline-flex items-center justify-center gap-2 px-5 py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-2xl shadow-sm hover:shadow-md transition-all duration-200 active:scale-95 text-sm"
-                                    @click="initBookingForm"
-                                >
-                                    <svg
-                                        class="w-4.5 h-4.5"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        viewBox="0 0 24 24"
-                                        stroke-width="2"
-                                    >
-                                        <path
-                                            stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                            d="M12 4.5v15m7.5-7.5h-15"
-                                        />
-                                    </svg>
-                                    <span>Ajukan Bimbingan Baru</span>
-                                </button>
-                            </div>
+
                         </div>
 
                         <!-- Advisement Booking Form -->
@@ -454,9 +400,12 @@
                                 <!-- Warning Clash Pop-up Alert -->
                                 <div
                                     v-if="selectedSlotHasClash"
-                                    class="p-4 bg-amber-50 border border-amber-200 rounded-2xl text-xs text-amber-800 font-medium"
+                                    class="px-4 py-3 bg-[#FFF9EA] border border-[#FDE68A] rounded-2xl text-sm text-[#92400E] font-medium flex items-center gap-2"
                                 >
-                                    ⚠️ Maaf dosen sedang ada kegiatan, mohon pilih jadwal lain.
+                                    <svg class="w-5 h-5 text-[#D97706] shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                                    </svg>
+                                    <span>Maaf dosen sedang ada kegiatan, mohon pilih jadwal lain.</span>
                                 </div>
 
                                 <!-- Judul TA -->
@@ -514,7 +463,7 @@
                     </div>
 
                     <!-- Modal Footer -->
-                    <div class="px-6 py-4 bg-slate-50 border-t border-slate-100 flex justify-end">
+                    <div class="px-6 py-4 bg-slate-50 border-t border-slate-100 flex justify-end gap-3">
                         <button
                             class="px-5 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-600 hover:bg-slate-50 transition active:scale-95"
                             @click="
@@ -523,6 +472,13 @@
                             "
                         >
                             Tutup
+                        </button>
+                        <button
+                            v-if="!showBookingForm"
+                            class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-bold transition active:scale-95 shadow-sm"
+                            @click="initBookingForm"
+                        >
+                            Ajukan Jadwal
                         </button>
                     </div>
                 </div>
@@ -558,8 +514,9 @@
     });
 
     // Calendar States
-    const currentDate = ref(new Date(2026, 4, 1)); // Default starts on May 2026
-    const selectedDay = ref(15); // Default active date (selected date: 15)
+    const today = new Date();
+    const currentDate = ref(new Date(today.getFullYear(), today.getMonth(), 1)); // Default starts on current month
+    const selectedDay = ref(today.getDate()); // Default active date (selected date: today)
     const isDetailModalOpen = ref(false); // Modal visibility state
 
     const page = usePage();
@@ -586,8 +543,9 @@
 
             isLoadingSchedules.value = true;
             try {
+                const timestamp = new Date().getTime();
                 const response = await axios.get(
-                    route('mahasiswa.jadwal-bimbingan.schedules', newDosenId),
+                    route('mahasiswa.jadwal-bimbingan.schedules', newDosenId) + '?t=' + timestamp,
                 );
                 schedulesList.value = response.data;
             } catch (error) {
@@ -607,10 +565,20 @@
     });
 
     const selectedSlotHasClash = computed(() => {
-        const selectedSlot = availableSchedules.value.find(
-            (s) => s.id === bookingForm.ketersediaan_jadwal_id,
-        );
-        return selectedSlot ? !!selectedSlot.has_clash : false;
+        if (bookingForm.ketersediaan_jadwal_id) {
+            const selectedSlot = availableSchedules.value.find(
+                (s) => s.id === bookingForm.ketersediaan_jadwal_id,
+            );
+            return selectedSlot ? !!selectedSlot.has_clash : false;
+        }
+
+        if (bookingForm.dosen_id && availableSchedules.value.length > 0) {
+            const hasClash = availableSchedules.value.every(s => s.has_clash);
+            console.log('Clash check for dosen:', bookingForm.dosen_id, 'Result:', hasClash);
+            return hasClash;
+        }
+        
+        return false;
     });
 
     const initBookingForm = () => {

@@ -2,10 +2,11 @@
 
 namespace App\Filament\Resources\Dosens\Pages;
 
-use App\Filament\Resources\Dosens\DosenResource;
 use App\Filament\Imports\DosenImporter;
-use Filament\Actions\ImportAction;
+use App\Filament\Resources\Dosens\DosenResource;
+use Filament\Actions\Action;
 use Filament\Actions\CreateAction;
+use Filament\Actions\ImportAction;
 use Filament\Resources\Pages\ListRecords;
 
 class ListDosens extends ListRecords
@@ -21,7 +22,14 @@ class ListDosens extends ListRecords
                 ->icon('heroicon-o-arrow-up-tray')
                 ->color('info')
                 ->maxRows(1000)
-                ->chunkSize(100),
+                ->chunkSize(100)
+                ->registerModalActions([
+                    Action::make('downloadExample')
+                        ->label(__('filament-actions::import.modal.actions.download_example.label'))
+                        ->link()
+                        ->url(route('import.template.download', 'dosen'))
+                        ->openUrlInNewTab(),
+                ]),
             CreateAction::make(),
         ];
     }

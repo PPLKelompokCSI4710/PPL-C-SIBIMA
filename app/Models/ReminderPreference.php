@@ -16,6 +16,7 @@ class ReminderPreference extends Model
         'schedule_reminder_enabled',
         'stage_h3_enabled',
         'stage_h1_enabled',
+        'stage_h3jam_enabled',
         'stage_h2_enabled',
     ];
 
@@ -23,6 +24,7 @@ class ReminderPreference extends Model
         'schedule_reminder_enabled' => 'boolean',
         'stage_h3_enabled' => 'boolean',
         'stage_h1_enabled' => 'boolean',
+        'stage_h3jam_enabled' => 'boolean',
         'stage_h2_enabled' => 'boolean',
     ];
 
@@ -39,6 +41,7 @@ class ReminderPreference extends Model
                 'schedule_reminder_enabled' => true,
                 'stage_h3_enabled' => true,
                 'stage_h1_enabled' => true,
+                'stage_h3jam_enabled' => true,
                 'stage_h2_enabled' => true,
             ],
         );

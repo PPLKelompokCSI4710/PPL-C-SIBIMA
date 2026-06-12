@@ -21,9 +21,10 @@
     }
 
     // ── Calendar state & Logic ──────────────────────────────────────────────────
-    const currentMonth = ref(4); // Mei (0-indexed)
-    const currentYear = ref(2026);
-    const selectedDay = ref(null);
+    const today = new Date();
+    const currentMonth = ref(today.getMonth());
+    const currentYear = ref(today.getFullYear());
+    const selectedDay = ref(today.getDate());
 
     const monthLabel = computed(() => {
         const date = new Date(currentYear.value, currentMonth.value);
@@ -42,8 +43,7 @@
         for (let i = 1; i <= daysInMonth; i++) {
             const hasKalenderEvent = props.kalender.some((k) => {
                 if (!k.tanggal_mulai) return false;
-                // k.tanggal_mulai is "YYYY-MM-DD"
-                const [y, m, d] = k.tanggal_mulai.split('-').map(Number);
+                const [y, m, d] = k.tanggal_mulai.substring(0, 10).split('-').map(Number);
                 return d === i && m - 1 === currentMonth.value && y === currentYear.value;
             });
 
@@ -89,12 +89,12 @@
         const fromDB = props.kalender
             .filter((k) => {
                 if (!k.tanggal_mulai) return false;
-                const [y, m] = k.tanggal_mulai.split('-').map(Number);
+                const [y, m] = k.tanggal_mulai.substring(0, 10).split('-').map(Number);
                 return m - 1 === currentMonth.value && y === currentYear.value;
             })
             .map((k) => ({
                 id: 'db-' + k.id,
-                day: new Date(k.tanggal_mulai).getDate(),
+                day: parseInt(k.tanggal_mulai.substring(8, 10), 10),
                 title: k.nama_kegiatan,
                 type: k.tipe_kegiatan ?? 'Kegiatan',
                 time: k.jam_mulai ?? '-',
@@ -107,14 +107,18 @@
     const activeFilter = ref('semua');
     const filterOptions = [
         { value: 'semua', label: 'Semua' },
-        { value: 'kuliah', label: 'Kuliah' },
         { value: 'bimbingan', label: 'Bimbingan' },
-        { value: 'rapat', label: 'Rapat' },
-        { value: 'ujian', label: 'Ujian' },
+        { value: 'lainnya', label: 'Lainnya' },
     ];
 
     const filteredEvents = computed(() => {
         if (activeFilter.value === 'semua') return allEvents.value;
+        if (activeFilter.value === 'lainnya') {
+            return allEvents.value.filter((e) => {
+                const t = (e.type || '').toLowerCase();
+                return t === 'kuliah' || t === 'rapat';
+            });
+        }
         return allEvents.value.filter((e) => (e.type || '').toLowerCase() === activeFilter.value);
     });
 
@@ -129,8 +133,8 @@
         const location = encodeURIComponent('SIBIMA - Universitas');
 
         // Format dates: YYYYMMDDTHHmmSSZ
-        let startStr = k.tanggal_mulai.replace(/-/g, '');
-        let endStr = (k.tanggal_selesai || k.tanggal_mulai).replace(/-/g, '');
+        let startStr = k.tanggal_mulai.substring(0, 10).replace(/-/g, '');
+        let endStr = (k.tanggal_selesai ? k.tanggal_selesai.substring(0, 10) : k.tanggal_mulai.substring(0, 10)).replace(/-/g, '');
 
         if (k.jam_mulai) {
             const time = k.jam_mulai.replace(/[:.]/g, '').padEnd(4, '0') + '00';
@@ -386,26 +390,6 @@
                     </div>
                 </div>
                 <div class="flex items-center gap-3">
-                    <!-- Google Calendar Connect Section -->
-                    <a
-                        v-if="!isGoogleConnected"
-                        :href="route('google.connect')"
-                        class="inline-flex items-center gap-2 px-4 py-3 bg-white border border-slate-200 rounded-full text-xs font-bold text-slate-600 hover:text-blue-600 hover:border-blue-200 shadow-sm transition-all"
-                    >
-                        <svg class="w-4 h-4 fill-current text-blue-500" viewBox="0 0 24 24">
-                            <path
-                                d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"
-                            />
-                        </svg>
-                        <span>Hubungkan Google Calendar</span>
-                    </a>
-                    <div
-                        v-else
-                        class="inline-flex items-center gap-2 px-4 py-3 bg-emerald-50 border border-emerald-200 rounded-full text-xs font-bold text-emerald-700 shadow-sm"
-                    >
-                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                        <span>Terhubung ke Google Calendar</span>
-                    </div>
 
                     <button
                         class="inline-flex items-center gap-2 rounded-full bg-[#1F4C7A] px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-900/20 transition hover:bg-[#163a5e]"
@@ -491,44 +475,28 @@
             </div>
             <!-- end header card -->
 
-            <!-- Stats -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div class="rounded-[32px] bg-white p-6 shadow-xl shadow-slate-900/5">
-                    <p class="text-sm text-slate-500 mb-1">Minggu ini</p>
-                    <p class="text-3xl font-bold text-slate-900">8</p>
-                    <p class="text-xs text-slate-500 mt-1">jadwal aktif</p>
-                </div>
-                <div class="rounded-[32px] bg-white p-6 shadow-xl shadow-slate-900/5">
-                    <p class="text-sm text-slate-500 mb-1">SKS diambil</p>
-                    <p class="text-3xl font-bold text-slate-900">12</p>
-                    <p class="text-xs text-slate-500 mt-1">dari 16 maks</p>
-                </div>
-                <div class="rounded-[32px] bg-white p-6 shadow-xl shadow-slate-900/5">
-                    <p class="text-sm text-slate-500 mb-1">Bimbingan</p>
-                    <p class="text-3xl font-bold text-slate-900">
-                        {{ pendingCount }}
-                    </p>
-                    <p class="text-xs text-slate-500 mt-1">permintaan baru</p>
-                </div>
-            </div>
 
             <!-- Lower Grid -->
-            <div class="grid lg:grid-cols-[1fr_1.5fr] gap-6">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 <!-- Calendar -->
-                <div class="rounded-[32px] bg-white p-6 shadow-xl shadow-slate-900/5 h-max">
-                    <div class="flex justify-between items-center mb-6">
-                        <h2 class="text-slate-900 font-bold text-lg capitalize">
-                            {{ monthLabel }}
-                        </h2>
-                        <div class="flex gap-2">
+                <div class="lg:col-span-2 rounded-[32px] bg-white p-6 shadow-xl shadow-slate-900/5 h-max">
+                    <div class="flex justify-between items-center mb-8 flex-wrap gap-4">
+                        <div>
+                            <h3 class="text-2xl font-black text-slate-800 tracking-tight">
+                                {{ monthLabel }}
+                            </h3>
+                        </div>
+                        <div class="flex gap-2.5">
                             <button
-                                class="w-8 h-8 flex justify-center items-center rounded-xl bg-slate-50 border border-slate-200 text-slate-500 hover:bg-slate-100 transition"
+                                class="p-2 bg-slate-50 border border-slate-200 rounded-xl hover:bg-slate-100 hover:text-blue-600 active:scale-95 transition-all flex items-center justify-center"
+                                title="Bulan Sebelumnya"
                                 @click="prevMonth"
                             >
                                 &lt;
                             </button>
                             <button
-                                class="w-8 h-8 flex justify-center items-center rounded-xl bg-slate-50 border border-slate-200 text-slate-500 hover:bg-slate-100 transition"
+                                class="p-2 bg-slate-50 border border-slate-200 rounded-xl hover:bg-slate-100 hover:text-blue-600 active:scale-95 transition-all flex items-center justify-center"
+                                title="Bulan Berikutnya"
                                 @click="nextMonth"
                             >
                                 &gt;
@@ -536,40 +504,34 @@
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-7 text-center gap-y-3">
+                    <div class="grid grid-cols-7 gap-2 md:gap-4 mb-4">
                         <div
                             v-for="d in ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab']"
                             :key="d"
-                            class="text-slate-400 text-xs font-semibold pb-2"
+                            class="text-center text-xs font-bold text-slate-400 uppercase tracking-wider py-2"
                         >
                             {{ d }}
                         </div>
+                    </div>
 
+                    <div class="grid grid-cols-7 gap-2 md:gap-4">
                         <template v-for="(day, idx) in monthDays" :key="idx">
-                            <div v-if="day.empty" class="text-transparent p-2">0</div>
+                            <div v-if="day.empty" class="h-14 md:h-18 text-transparent p-2"></div>
                             <div
                                 v-else
-                                class="relative flex flex-col items-center justify-center w-10 h-10 mx-auto cursor-pointer transition-all rounded-xl select-none"
-                                :class="{
-                                    'bg-[#1F4C7A] text-white shadow-md': day.isSelected,
-                                    'bg-[#E9F0F8] text-[#1F4C7A] font-bold':
-                                        day.isToday && !day.isSelected,
-                                    'text-slate-700 hover:bg-slate-100':
-                                        !day.isSelected && !day.isToday,
-                                }"
+                                :class="[
+                                    day.isSelected
+                                        ? 'bg-blue-600 text-white shadow-xl shadow-blue-200 ring-2 ring-blue-500 ring-offset-2 scale-105 z-10 font-bold'
+                                        : 'bg-slate-50/80 text-slate-700 hover:bg-blue-50 hover:text-blue-600 hover:scale-[1.03]'
+                                ]"
+                                class="h-14 md:h-18 rounded-2xl flex flex-col items-center justify-center relative group transition-all duration-250 cursor-pointer select-none"
                                 @click="clickDay(day)"
                             >
-                                <span
-                                    class="text-sm"
-                                    :class="{
-                                        'font-semibold': day.isSelected || day.isToday,
-                                    }"
-                                    >{{ day.num }}</span
-                                >
-                                <span
+                                <span class="text-sm md:text-base font-bold">{{ day.num }}</span>
+                                <div
                                     v-if="day.hasDot"
-                                    class="absolute bottom-1 w-1 h-1 rounded-full"
-                                    :class="day.isSelected ? 'bg-white' : 'bg-emerald-500'"
+                                    :class="day.isSelected ? 'bg-white' : 'bg-blue-500'"
+                                    class="w-1.5 h-1.5 rounded-full mt-1.5 transition-colors"
                                 />
                             </div>
                         </template>
@@ -579,24 +541,28 @@
                         class="flex gap-4 mt-6 pt-4 border-t border-slate-100 text-xs text-slate-500"
                     >
                         <div class="flex items-center gap-1.5">
-                            <span class="w-2.5 h-2.5 rounded-full bg-[#E9F0F8]" />Hari ini
+                            <span class="w-2.5 h-2.5 rounded-full bg-slate-50/80 ring-1 ring-slate-200" />Biasa
                         </div>
                         <div class="flex items-center gap-1.5">
-                            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500" />Ada jadwal
+                            <span class="w-2.5 h-2.5 rounded-full bg-blue-500" />Ada jadwal
                         </div>
                         <div class="flex items-center gap-1.5">
-                            <span class="w-2.5 h-2.5 rounded-full bg-[#1F4C7A]" />Dipilih
+                            <span class="w-2.5 h-2.5 rounded-full bg-blue-600" />Dipilih
                         </div>
                     </div>
                 </div>
 
                 <!-- Requests & Agenda -->
-                <div class="rounded-[32px] bg-white p-6 shadow-xl shadow-slate-900/5">
-                    <!-- Pending Requests -->
-                    <h3 class="text-lg font-bold text-slate-900 mb-4">
-                        Permintaan Jadwal Bimbingan
-                    </h3>
-                    <div
+                <div class="space-y-6 h-full">
+                    <!-- Pending Requests and Agenda Wrapper -->
+                    <div class="bg-white p-6 md:p-8 rounded-3xl border border-slate-200 shadow-sm flex flex-col h-full max-h-[800px]">
+                        
+                        <!-- Pending Requests -->
+                        <h3 class="text-xl font-bold text-slate-900 mb-4 flex items-center gap-2">
+                            <span class="w-2 h-6 bg-amber-500 rounded-full"></span>
+                            Permintaan Bimbingan
+                        </h3>
+                        <div
                         v-if="requests.filter((r) => r.status === 'pending_dosen').length === 0"
                         class="text-slate-500 text-sm mb-6"
                     >
@@ -619,7 +585,7 @@
                                 </div>
                                 <span
                                     class="shrink-0 px-2.5 py-1 bg-amber-100 text-amber-700 text-[10px] font-bold rounded-lg uppercase"
-                                    >Menunggu ACC</span
+                                    >Menunggu Persetujuan</span
                                 >
                             </div>
                             <p v-if="req.deskripsi" class="text-xs text-slate-600 italic">
@@ -631,7 +597,7 @@
                                     class="px-4 py-1.5 bg-emerald-500 text-white text-xs font-semibold rounded-full hover:bg-emerald-600 transition"
                                     @click="updateStatus(req.id, 'approved_dosen')"
                                 >
-                                    ACC
+                                    Setujui
                                 </button>
                                 <button
                                     :id="'btn-reject-' + req.id"
@@ -645,8 +611,11 @@
                     </div>
 
                     <!-- Agenda -->
-                    <div class="flex justify-between items-center mb-4">
-                        <h3 class="text-lg font-bold text-slate-900">Jadwal Akan Datang</h3>
+                    <div class="flex justify-between items-center mb-6 mt-8">
+                        <h3 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+                            <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
+                            Agenda Mendatang
+                        </h3>
                     </div>
                     <!-- Agenda filter -->
                     <div class="flex flex-wrap gap-2 mb-4">
@@ -665,51 +634,44 @@
                         </button>
                     </div>
                     <!-- Unified event list (filtered) -->
-                    <div class="space-y-3 max-h-[420px] overflow-y-auto pr-1 scrollbar-thin">
+                    <div class="space-y-4 max-h-[420px] overflow-y-auto pr-2 scrollbar-thin">
                         <div
                             v-for="ev in filteredEvents"
                             :key="ev.id"
-                            class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex items-center gap-4 hover:shadow-md transition cursor-pointer"
+                            class="bg-white p-5 rounded-[24px] border border-slate-200 shadow-sm flex items-center gap-5 hover:border-blue-400 hover:shadow-md transition cursor-pointer"
                             @click="
                                 popupDay = ev.day;
                                 showDayPopup = true;
                             "
                         >
                             <!-- Date block -->
-                            <div
-                                class="bg-slate-50 border border-slate-100 rounded-xl p-2.5 flex flex-col justify-center items-center min-w-[60px] h-[60px]"
+                            <div 
+                                class="rounded-[20px] flex flex-col justify-center items-center min-w-[76px] h-[80px] border shrink-0 bg-white"
+                                :class="(ev.type ?? '').toLowerCase().includes('bimbingan') ? 'border-fuchsia-200 shadow-sm shadow-fuchsia-100/50' : 'border-blue-200 shadow-sm shadow-blue-100/50'"
                             >
-                                <span class="text-xl font-bold text-slate-900 leading-none">{{
-                                    ev.day
-                                }}</span>
-                                <span
-                                    class="text-[9px] text-slate-500 font-bold uppercase tracking-widest mt-0.5"
-                                    >{{ monthLabel.split(' ')[0].substring(0, 3) }}</span
-                                >
+                                <span class="text-[11px] font-bold uppercase tracking-widest leading-none mb-1.5" :class="(ev.type ?? '').toLowerCase().includes('bimbingan') ? 'text-fuchsia-600' : 'text-blue-600'">{{ monthLabel.split(' ')[0].substring(0, 3) }}</span>
+                                <span class="text-3xl font-bold leading-none" :class="(ev.type ?? '').toLowerCase().includes('bimbingan') ? 'text-fuchsia-700' : 'text-blue-700'">{{ String(ev.day).padStart(2, '0') }}</span>
                             </div>
                             <!-- Detail -->
-                            <div class="flex-1 min-w-0">
-                                <h4
-                                    class="font-bold text-slate-900 text-sm leading-snug mb-1.5 truncate"
-                                >
-                                    {{ ev.title }}
-                                </h4>
-                                <div
-                                    class="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-500"
-                                >
-                                    <span
-                                        class="px-2 py-0.5 rounded-md font-semibold text-[10px] uppercase"
-                                        :class="typeClass(ev.type)"
-                                        >{{ ev.type }}</span
+                            <div class="flex-1 min-w-0 py-1">
+                                <div class="mb-2">
+                                    <span 
+                                        class="text-[9px] font-bold px-2 py-0.5 rounded-md uppercase tracking-widest inline-block"
+                                        :class="(ev.type ?? '').toLowerCase().includes('bimbingan') ? 'bg-fuchsia-50 text-fuchsia-600' : 'bg-blue-50 text-blue-600'"
                                     >
-                                    <span v-if="ev.time && ev.time !== '-'">⏰ {{ ev.time }}</span>
-                                    <span v-if="ev.location && ev.location !== '-'" class="truncate"
-                                        >📍 {{ ev.location }}</span
-                                    >
+                                        {{ ev.type ?? 'Kegiatan' }}
+                                    </span>
                                 </div>
+                                <h4 class="font-bold text-slate-800 text-[17px] leading-snug mb-1 truncate">{{ ev.title }}</h4>
+                                <p class="text-sm text-slate-500 truncate">{{ ev.location || ev.deskripsi || ((ev.type ?? '').toLowerCase().includes('bimbingan') ? 'Konsultasi bimbingan' : 'Kegiatan akademik') }}</p>
                             </div>
                         </div>
+                        <div v-if="filteredEvents.length === 0" class="text-sm text-slate-500 text-center py-6 border-2 border-dashed border-slate-100 rounded-[24px]">
+                            Tidak ada jadwal di filter ini.
+                        </div>
                     </div>
+                </div>
+                <!-- End of wrapper added earlier -->
                 </div>
             </div>
         </div>
@@ -718,103 +680,95 @@
         <transition name="modal">
             <div
                 v-if="showDayPopup"
-                class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/50 p-4 backdrop-blur-sm"
+                class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4 backdrop-blur-sm"
                 @click.self="showDayPopup = false"
             >
-                <div class="w-full max-w-sm rounded-[28px] overflow-hidden shadow-2xl">
-                    <!-- Dark header -->
-                    <div class="bg-[#1F4C7A] px-6 pt-6 pb-5">
-                        <div class="flex justify-between items-start">
-                            <div>
-                                <p
-                                    class="text-blue-300 text-xs font-bold uppercase tracking-widest"
-                                >
-                                    {{ popupDayLabel }}, {{ monthLabel }}
-                                </p>
-                                <h2 class="text-white text-5xl font-bold mt-1 leading-none">
-                                    {{ popupDay }}
-                                </h2>
-                                <div class="flex gap-1.5 mt-3">
-                                    <span
-                                        v-for="ev in popupEvents"
-                                        :key="'dot-' + ev.id"
-                                        class="w-2.5 h-2.5 rounded-full"
-                                        :class="typeClass(ev.type).split(' ')[0]"
-                                    />
-                                </div>
-                            </div>
-                            <button
-                                class="w-9 h-9 flex items-center justify-center rounded-full bg-white/15 text-white hover:bg-white/25 transition text-lg"
-                                @click="showDayPopup = false"
-                            >
-                                ✕
-                            </button>
+                <div class="w-full max-w-xl bg-white rounded-[24px] shadow-2xl overflow-hidden flex flex-col">
+                    <!-- Header -->
+                    <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-white shrink-0">
+                        <div class="flex items-center gap-2 text-slate-500 font-bold text-sm tracking-wide">
+                            <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                            AGENDA KEGIATAN
+                        </div>
+                        <button
+                            class="p-1.5 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-colors"
+                            @click="showDayPopup = false"
+                        >
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                        </button>
+                    </div>
+
+                    <!-- Date Header -->
+                    <div class="px-6 pt-6 pb-4 flex justify-between items-center shrink-0">
+                        <h3 class="text-slate-900 font-bold text-lg uppercase tracking-wide">
+                            {{ popupDayLabel }}
+                        </h3>
+                        <div class="bg-blue-50/50 text-blue-600 border border-blue-100 px-4 py-1.5 rounded-full text-sm font-semibold">
+                            {{ popupDay }} {{ monthLabel }}
                         </div>
                     </div>
 
-                    <!-- Event cards -->
-                    <div
-                        class="bg-white px-4 py-4 space-y-3 max-h-72 overflow-y-auto scrollbar-thin"
-                    >
-                        <p
-                            v-if="popupEvents.length === 0"
-                            class="py-6 text-center text-slate-400 text-sm"
-                        >
+                    <!-- Event Cards -->
+                    <div class="px-6 pb-6 max-h-[60vh] overflow-y-auto scrollbar-thin space-y-4">
+                        <p v-if="popupEvents.length === 0" class="py-8 text-center text-slate-400 text-sm border-2 border-dashed border-slate-100 rounded-2xl">
                             Tidak ada kegiatan pada hari ini.
                         </p>
                         <div
                             v-for="ev in popupEvents"
                             :key="ev.id"
-                            class="rounded-2xl border p-4"
-                            :class="cardBg(ev.type)"
+                            class="bg-slate-50 border border-slate-100 rounded-[20px] p-5 hover:border-blue-100 transition-colors"
                         >
-                            <div class="flex justify-between items-center mb-2">
-                                <span
-                                    class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider"
-                                    :class="typeClass(ev.type)"
-                                    >{{ ev.type }}</span
-                                >
-                                <span class="text-xs font-semibold text-slate-600">{{
-                                    ev.time !== '-' ? ev.time : ''
-                                }}</span>
-                            </div>
-                            <div class="flex justify-between items-start gap-2">
-                                <h4 class="font-bold text-slate-900 text-sm leading-snug flex-1">
+                            <div class="flex items-start gap-3 mb-2">
+                                <span class="bg-blue-100/50 text-blue-700 text-[10px] font-bold px-2.5 py-1 rounded-md uppercase tracking-wider shrink-0 mt-0.5 border border-blue-200/50">
+                                    {{ ev.type }}
+                                </span>
+                                <h4 class="text-slate-900 font-bold text-lg leading-tight">
                                     {{ ev.title }}
                                 </h4>
-                                <a
-                                    :href="getGoogleCalendarUrl(ev)"
-                                    target="_blank"
-                                    class="p-1.5 rounded-lg bg-white/50 text-[#1F4C7A] hover:bg-white transition group border border-blue-200/50"
-                                    title="Simpan ke Google Calendar"
-                                >
-                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                                        <path
-                                            d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"
-                                        />
-                                    </svg>
-                                </a>
                             </div>
-                            <p
-                                v-if="ev.location && ev.location !== '-'"
-                                class="text-xs text-slate-500 mt-1.5 flex items-center gap-1"
-                            >
-                                <svg
-                                    class="w-3.5 h-3.5 shrink-0"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        stroke-width="2"
-                                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                                    />
-                                </svg>
-                                {{ ev.location }}
+                            <p class="text-slate-500 text-sm mt-1 mb-4 leading-relaxed pl-[3.5rem] sm:pl-0" v-if="ev.deskripsi || true">
+                                {{ ev.deskripsi || 'Jadwal kegiatan akademik' }}
                             </p>
+                            
+                            <div class="border-t border-slate-200/60 pt-4 flex flex-col sm:flex-row sm:justify-between sm:items-end gap-4">
+                                <div class="space-y-2.5">
+                                    <div class="flex items-center gap-2.5 text-slate-600 text-sm font-medium">
+                                        <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3"></path></svg>
+                                        {{ ev.time !== '-' ? ev.time + ' WIB' : 'Sepanjang Hari' }}
+                                    </div>
+                                    <div class="flex items-center gap-2.5 text-slate-600 text-sm font-medium">
+                                        <svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                                        {{ ev.location && ev.location !== '-' ? ev.location : 'Portal SIBIMA' }}
+                                    </div>
+                                </div>
+                                <div class="flex shrink-0">
+                                    <a
+                                        :href="getGoogleCalendarUrl(ev)"
+                                        target="_blank"
+                                        class="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-xl text-sm font-semibold transition-colors shadow-sm w-full sm:w-auto justify-center"
+                                    >
+                                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/></svg>
+                                        Google Calendar
+                                    </a>
+                                </div>
+                            </div>
                         </div>
+                    </div>
+                    
+                    <!-- Bottom Actions -->
+                    <div class="px-6 py-4 border-t border-slate-100 bg-white flex justify-end gap-3 shrink-0">
+                        <button
+                            class="px-6 py-2.5 rounded-xl border border-slate-200 text-slate-700 font-semibold text-sm hover:bg-slate-50 transition-colors"
+                            @click="showDayPopup = false"
+                        >
+                            Tutup
+                        </button>
+                        <button
+                            class="px-6 py-2.5 rounded-xl bg-blue-600 text-white font-semibold text-sm hover:bg-blue-700 transition-colors shadow-sm"
+                            @click="showDayPopup = false; showAddModal = true;"
+                        >
+                            Tambah Jadwal
+                        </button>
                     </div>
                 </div>
             </div>
@@ -833,9 +787,6 @@
                     >
                         <div>
                             <h2 class="text-xl font-semibold text-slate-900">Tambah Jadwal</h2>
-                            <p class="text-xs text-slate-500 mt-0.5">
-                                Bimbingan memerlukan konfirmasi admin
-                            </p>
                         </div>
                         <button
                             class="w-9 h-9 flex items-center justify-center rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 text-lg"
@@ -1104,7 +1055,7 @@
                                 type="submit"
                                 class="px-6 py-2.5 rounded-full bg-emerald-500 hover:bg-emerald-600 text-sm font-semibold text-white transition shadow-lg shadow-emerald-900/20"
                             >
-                                Setujui (ACC)
+                                Setujui
                             </button>
                         </div>
                     </form>

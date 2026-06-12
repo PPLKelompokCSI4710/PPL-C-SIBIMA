@@ -23,6 +23,7 @@ class BimbinganScheduleReminderNotification extends Notification
         $stageLabel = match ($this->stage) {
             'h3' => 'H-3',
             'h1' => 'H-1',
+            'h3jam' => 'H-3 Jam',
             'h2' => 'H-2 Jam',
             default => strtoupper($this->stage),
         };
@@ -73,6 +74,7 @@ class BimbinganScheduleReminderNotification extends Notification
         $stageLabel = match ($this->stage) {
             'h3' => 'H-3',
             'h1' => 'H-1',
+            'h3jam' => 'H-3 Jam',
             'h2' => 'H-2 Jam',
             default => strtoupper($this->stage),
         };
@@ -93,11 +95,16 @@ class BimbinganScheduleReminderNotification extends Notification
             ? "Jangan lupa jadwal bimbingan Anda dengan {$dosenName}."
             : "Anda memiliki jadwal membimbing mahasiswa {$mahasiswaName}.";
 
+        $actionUrl = $isMahasiswa 
+            ? route('mahasiswa.calendar') 
+            : route('staff.calendar');
+
         return [
             'type' => 'bimbingan_schedule_reminder',
             'stage' => $this->stage,
             'title' => $title,
             'message' => $message,
+            'action_url' => $actionUrl,
             'detail' => [
                 'mahasiswa' => $this->payload['mahasiswa'] ?? null,
                 'dosen' => $this->payload['dosen'] ?? null,

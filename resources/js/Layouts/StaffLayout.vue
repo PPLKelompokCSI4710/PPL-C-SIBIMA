@@ -79,9 +79,9 @@
 
                     <!-- Dosen & Admin: Kalender Akademik -->
                     <Link
-                        :href="route('staff.calendar')"
+                        :href="isAdmin ? route('preview.kalender-admin') : route('staff.calendar')"
                         :class="[
-                            route().current('staff.calendar')
+                            (route().current('staff.calendar') || route().current('preview.kalender-admin'))
                                 ? 'bg-indigo-50 text-indigo-700 font-semibold'
                                 : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900',
                         ]"
@@ -90,7 +90,6 @@
                         <CalendarDaysIcon class="w-5 h-5" />
                         <span>Kalender Akademik</span>
                     </Link>
-
                     <!-- Dosen: Ketersediaan Jadwal -->
                     <Link
                         v-if="!isAdmin"
@@ -207,7 +206,6 @@
         GraduationCapIcon,
         LayoutDashboardIcon,
         BookOpenIcon,
-        ClipboardCheckIcon,
         TrendingUpIcon,
         LogOutIcon,
         CalendarDaysIcon,
@@ -222,7 +220,7 @@
         if (route().current('staff.courses.index')) return 'Manajemen Kursus';
 
         if (route().current('staff.progress.index')) return 'Progres Mahasiswa';
-        if (route().current('staff.calendar')) return 'Kalender Akademik';
+        if (route().current('staff.calendar') || route().current('preview.kalender-admin')) return 'Kalender Akademik';
         if (route().current('dosen.ketersediaan-jadwal.*')) return 'Ketersediaan Jadwal';
         if (route().current('dosen.monitoring-jadwal.*')) return 'Monitoring Jadwal';
         if (route().current('dosen.reschedule.*')) return 'Reschedule Jadwal';

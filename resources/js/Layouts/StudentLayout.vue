@@ -60,9 +60,22 @@
                     <span>Progress Studi</span>
                 </Link>
                 <Link
+                    :href="route('mahasiswa.draft-skripsi.index')"
+                    :class="[
+                        route().current('mahasiswa.draft-skripsi.*')
+                            ? 'bg-blue-50 text-blue-700 font-semibold'
+                            : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900',
+                    ]"
+                    class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors"
+                >
+                    <FileTextIcon class="w-5 h-5" />
+                    <span>Draft Skripsi</span>
+                </Link>
+                <Link
                     :href="route('mahasiswa.jadwal.index')"
                     :class="[
-                        route().current('mahasiswa.jadwal.index')
+                        route().current('mahasiswa.jadwal.*') ||
+                            route().current('mahasiswa.jadwal-bimbingan.*')
                             ? 'bg-blue-50 text-blue-700 font-semibold'
                             : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900',
                     ]"
@@ -179,8 +192,8 @@
         TrendingUpIcon,
         LogOutIcon,
         UsersIcon,
-        CalendarClockIcon,
         HistoryIcon,
+        FileTextIcon,
     } from 'lucide-vue-next';
 
     const pageTitle = computed(() => {
@@ -204,6 +217,7 @@
         if (route().current('mahasiswa.bimbingan.reminder')) return 'Reminder Jadwal Bimbingan';
         if (route().current('mahasiswa.bimbingan.progress_reminder'))
             return 'Monitoring Progres Akademik';
+        if (route().current('mahasiswa.draft-skripsi.*')) return 'Manajemen Draft Skripsi';
         if (route().current('profile.edit')) return 'Profile Settings';
         return 'SIBIMA';
     });
@@ -229,6 +243,7 @@
         if (route().current('mahasiswa.bimbingan.reminder')) return 'Informasi Reminder Jadwal';
         if (route().current('mahasiswa.bimbingan.progress_reminder'))
             return 'Frekuensi Notifikasi Progres';
+        if (route().current('mahasiswa.draft-skripsi.*')) return 'Upload & Catatan Draft';
         if (route().current('profile.edit')) return 'Update Your Account Credentials';
         return 'Portal Mahasiswa';
     });

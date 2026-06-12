@@ -3,6 +3,7 @@
 use App\Http\Controllers\GoogleCalendarAuthController;
 use App\Http\Controllers\AiChatController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ImportTemplateController;
 use App\Http\Controllers\JadwalRequestController;
 use App\Http\Controllers\KalenderAkademikController;
 use App\Http\Controllers\NotificationController;
@@ -11,6 +12,11 @@ use App\Http\Controllers\ReminderSettingsController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+
+// Import template download (direct HTTP, not via Livewire)
+Route::get('/admin/import-template/{importer}', [ImportTemplateController::class, 'download'])
+    ->middleware(['web', 'auth'])
+    ->name('import.template.download');
 
 Route::get('/', function () {
     if (auth()->check()) {
