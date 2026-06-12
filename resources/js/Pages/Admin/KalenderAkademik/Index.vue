@@ -111,6 +111,28 @@
     // ── Filter state ──────────────────────────────────────────────────────────────
     const filteredEvents = computed(() => allEvents.value);
 
+    // ── Google Calendar Integration ──────────────────────────────────────────────
+    function getGoogleCalendarUrl(ev) {
+        const k = ev.raw;
+        if (!k) return '#';
+
+        const title = encodeURIComponent(k.nama_kegiatan);
+        const details = encodeURIComponent(k.deskripsi || '');
+        const location = encodeURIComponent('SIBIMA - Universitas');
+
+        let startStr = k.tanggal_mulai.substring(0, 10).replace(/-/g, '');
+        let endStr = (k.tanggal_selesai ? k.tanggal_selesai.substring(0, 10) : k.tanggal_mulai.substring(0, 10)).replace(/-/g, '');
+
+        if (k.jam_mulai) {
+            const time = k.jam_mulai.replace(/[:.]/g, '').padEnd(4, '0') + '00';
+            startStr += 'T' + time;
+            const endH = (parseInt(time.substring(0, 2)) + 1).toString().padStart(2, '0');
+            endStr += 'T' + endH + time.substring(2);
+        }
+
+        return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&details=${details}&location=${location}&dates=${startStr}/${endStr}`;
+    }
+
     // ── Day-click popup ───────────────────────────────────────────────────────────
     const showDayPopup = ref(false);
     const popupDay = ref(null);
@@ -411,7 +433,7 @@
                                     </div>
                                     <div class="flex shrink-0">
                                         <a
-                                            :href="'#'"
+                                            :href="getGoogleCalendarUrl(ev)"
                                             target="_blank"
                                             class="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-xl text-sm font-semibold transition-colors shadow-sm w-full sm:w-auto justify-center"
                                         >

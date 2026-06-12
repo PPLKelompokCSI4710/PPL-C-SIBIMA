@@ -11,6 +11,7 @@ use App\Http\Controllers\Mahasiswa\StudyPlanController;
 use App\Http\Controllers\Mahasiswa\ExportBimbinganController;
 use App\Http\Controllers\MonitoringJadwalBimbinganController;
 use App\Http\Controllers\DraftSkripsiController;
+use App\Http\Controllers\ExportBimbinganController;
 use Illuminate\Support\Facades\Route;
 
 /*
