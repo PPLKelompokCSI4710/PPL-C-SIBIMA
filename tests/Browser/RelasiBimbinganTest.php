@@ -189,7 +189,7 @@ class RelasiBimbinganTest extends DuskTestCase
             $browser->script($this->jsSelectOption('Dr. Budi Santoso'));
 
             // Klik tombol simpan
-            $browser->pause(300)
+            $browser->pause(1000)
                 ->press('Save changes')
                 ->waitForText('Saved');
         });
@@ -322,7 +322,7 @@ class RelasiBimbinganTest extends DuskTestCase
             $browser->script($this->jsSelectOption('Dr. Rina Wati'));
 
             // Simpan perubahan
-            $browser->pause(300)
+            $browser->pause(1000)
                 ->press('Save changes')
                 ->waitForText('Saved');
         });
