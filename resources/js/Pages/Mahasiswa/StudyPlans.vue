@@ -83,6 +83,7 @@
                         />
                     </div>
                     <button
+                        dusk="tambah-button"
                         class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors shadow-sm flex items-center gap-2"
                         @click="openAddModal"
                     >
@@ -218,6 +219,7 @@
                                         >Course Name <span class="text-red-500">*</span></label
                                     >
                                     <select
+                                        dusk="course-select"
                                         v-model="form.course_id"
                                         name="course_id"
                                         class="w-full rounded-lg border-slate-300 border px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all bg-white text-slate-700"
@@ -267,6 +269,7 @@
                                         >Semester <span class="text-red-500">*</span></label
                                     >
                                     <select
+                                        dusk="semester-select"
                                         v-model="form.semester"
                                         name="semester"
                                         class="w-full rounded-lg border-slate-300 border px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all bg-white text-slate-700"
@@ -282,6 +285,7 @@
                                 class="px-6 py-4 bg-slate-50 border-t border-slate-200 flex justify-end gap-3 rounded-b-xl"
                             >
                                 <button
+                                    dusk="cancel-button"
                                     type="button"
                                     class="px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors"
                                     @click="isModalOpen = false"
@@ -289,6 +293,7 @@
                                     Batal
                                 </button>
                                 <button
+                                    dusk="submit-button"
                                     type="submit"
                                     :disabled="form.processing || !form.course_id"
                                     class="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-sm flex items-center gap-2"
@@ -327,12 +332,14 @@
 
                         <div class="flex justify-center gap-3">
                             <button
+                                dusk="cancel-delete"
                                 class="px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors w-full"
                                 @click="isDeleteModalOpen = false"
                             >
                                 Batal
                             </button>
                             <button
+                                dusk="confirm-delete"
                                 class="px-4 py-2 text-sm font-medium text-white bg-red-600 border border-transparent rounded-lg hover:bg-red-700 transition-colors shadow-sm w-full"
                                 @click="executeDelete"
                             >
@@ -478,6 +485,11 @@
                 onSuccess: () => {
                     isDeleteModalOpen.value = false;
                     planToDelete.value = null;
+                    showToast.value = true;
+                    toastMessage.value = 'Mata kuliah berhasil dihapus dari KRS.';
+                    setTimeout(() => {
+                        showToast.value = false;
+                    }, 3000);
                 },
             });
         }

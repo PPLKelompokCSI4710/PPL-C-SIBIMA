@@ -393,6 +393,11 @@
     }
 
     onMounted(() => {
+        // Skip under Dusk to prevent single-threaded PHP server from blocking requests
+        if (window.navigator.webdriver) {
+            return;
+        }
+
         // Initial fetch for badge count
         fetchNotifications();
 

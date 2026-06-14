@@ -13,6 +13,12 @@ class StudyPlan extends Model
         'status',
     ];
 
+    protected $casts = [
+        'mahasiswa_id' => 'integer',
+        'course_id' => 'integer',
+        'semester' => 'integer',
+    ];
+
     public function mahasiswa()
     {
         return $this->belongsTo(Mahasiswa::class);

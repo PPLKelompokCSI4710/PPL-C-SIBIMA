@@ -82,14 +82,31 @@ class StudyPlanController extends Controller
 
     public function update(Request $request, StudyPlan $studyPlan)
     {
-        $request->validate([
-            'course_id' => 'required|exists:courses,id',
-            'semester' => 'required|integer|min:1|max:8',
-        ]);
-
         $mahasiswa = $request->user()->mahasiswa;
 
+        \Log::info('StudyPlan update check', [
+            'studyPlan_id' => $studyPlan->id,
+            'studyPlan_mahasiswa_id' => $studyPlan->mahasiswa_id,
+            'studyPlan_mahasiswa_id_type' => gettype($studyPlan->mahasiswa_id),
+            'mahasiswa_id' => $mahasiswa?->id,
+            'mahasiswa_id_type' => gettype($mahasiswa?->id),
+        ]);
+
+        try {
+            $request->validate([
+                'course_id' => 'required|exists:courses,id',
+                'semester' => 'required|integer|min:1|max:8',
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            \Log::error('StudyPlan update validation failed', [
+                'errors' => $e->errors(),
+                'input' => $request->all(),
+            ]);
+            throw $e;
+        }
+
         if ($studyPlan->mahasiswa_id !== $mahasiswa?->id) {
+            \Log::warning('StudyPlan update authorization failed');
             abort(403);
         }
 
@@ -116,7 +133,16 @@ class StudyPlanController extends Controller
     {
         $mahasiswa = $request->user()->mahasiswa;
 
+        \Log::info('StudyPlan destroy check', [
+            'studyPlan_id' => $studyPlan->id,
+            'studyPlan_mahasiswa_id' => $studyPlan->mahasiswa_id,
+            'studyPlan_mahasiswa_id_type' => gettype($studyPlan->mahasiswa_id),
+            'mahasiswa_id' => $mahasiswa?->id,
+            'mahasiswa_id_type' => gettype($mahasiswa?->id),
+        ]);
+
         if ($studyPlan->mahasiswa_id !== $mahasiswa?->id) {
+            \Log::warning('StudyPlan destroy authorization failed');
             abort(403);
         }
 

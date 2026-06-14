@@ -454,6 +454,7 @@
                                             </label>
                                             <input
                                                 id="nim"
+                                                dusk="nim"
                                                 v-model="form.nim"
                                                 type="text"
                                                 required
@@ -468,6 +469,7 @@
                                             </label>
                                             <select
                                                 id="semester"
+                                                dusk="semester"
                                                 v-model="form.semester"
                                                 required
                                                 class="w-full rounded-2xl border-slate-200 border px-4 py-3 text-sm focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 outline-none transition-all bg-slate-50/50 focus:bg-white text-slate-800 font-bold"
@@ -487,6 +489,7 @@
                                         </label>
                                         <input
                                             id="program_studi"
+                                            dusk="program-studi"
                                             v-model="form.program_studi"
                                             type="text"
                                             required
@@ -504,6 +507,7 @@
                                             <div class="relative">
                                                 <input
                                                     id="ipk"
+                                                    dusk="ipk"
                                                     v-model="form.ipk"
                                                     type="number"
                                                     step="0.01"
@@ -522,6 +526,7 @@
                                             </label>
                                             <input
                                                 id="total_sks"
+                                                dusk="total-sks"
                                                 v-model="form.total_sks"
                                                 type="number"
                                                 min="0"
@@ -541,6 +546,7 @@
                                             </label>
                                             <input
                                                 id="passed_courses"
+                                                dusk="passed-courses"
                                                 v-model="form.passed_courses"
                                                 type="number"
                                                 min="0"
@@ -555,6 +561,7 @@
                                             </label>
                                             <input
                                                 id="tak"
+                                                dusk="tak"
                                                 v-model="form.tak"
                                                 type="number"
                                                 min="0"
@@ -582,6 +589,7 @@
                                             </label>
                                             <input
                                                 id="target_ipk"
+                                                dusk="target-ipk"
                                                 v-model="form.target_ipk"
                                                 type="number"
                                                 step="0.01"
@@ -599,6 +607,7 @@
                                             </label>
                                             <input
                                                 id="target_sks"
+                                                dusk="target-sks"
                                                 v-model="form.target_sks"
                                                 type="number"
                                                 :min="form.total_sks"
@@ -617,6 +626,7 @@
                                         </label>
                                         <select
                                             id="target_semester"
+                                            dusk="target-semester"
                                             v-model="form.target_semester"
                                             class="w-full rounded-2xl border-slate-200 border px-4 py-3 text-sm focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 outline-none transition-all bg-slate-50/50 focus:bg-white text-slate-800 font-bold"
                                         >
@@ -635,6 +645,7 @@
                         <div class="pt-8 border-t border-slate-100 mt-8 shrink-0">
                             <button
                                 type="submit"
+                                dusk="submit-button"
                                 :disabled="form.processing"
                                 class="w-full py-3.5 px-4 text-sm font-extrabold text-white bg-indigo-600 rounded-2xl hover:bg-indigo-700 hover:shadow-lg hover:shadow-indigo-500/20 active:scale-[0.99] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-md shadow-indigo-600/10 cursor-pointer"
                             >

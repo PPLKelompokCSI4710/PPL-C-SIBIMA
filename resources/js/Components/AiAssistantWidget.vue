@@ -40,6 +40,9 @@
     const activeSessionId = ref(null);
 
     onMounted(async () => {
+        if (window.navigator.webdriver) {
+            return;
+        }
         if (isAuthenticated.value) {
             await fetchSessions();
         } else {
