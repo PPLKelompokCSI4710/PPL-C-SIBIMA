@@ -43,7 +43,7 @@ class ExportBimbinganController extends Controller
         // 3. Query data bimbingan milik mahasiswa dengan filter ID terpilih
         $query = JadwalBimbingan::select('jadwal_bimbingans.*')
             ->join('ketersediaan_jadwals', 'jadwal_bimbingans.ketersediaan_jadwal_id', '=', 'ketersediaan_jadwals.id')
-            ->with(['dosen', 'mahasiswa', 'ketersediaanJadwal'])
+            ->with(['dosen', 'mahasiswa', 'ketersediaanJadwal', 'catatanKonsultasi'])
             ->where('jadwal_bimbingans.mahasiswa_id', $mahasiswa->id)
             ->whereIn('jadwal_bimbingans.id', $selectedIds);
 
@@ -90,9 +90,19 @@ class ExportBimbinganController extends Controller
             return \Maatwebsite\Excel\Facades\Excel::download(new \App\Exports\BimbinganExport($jadwalBimbingans, $mahasiswa), $fileBase . '.xlsx');
         }
 
+        // HTML Preview for debugging/viewing
+        if ($request->query('preview')) {
+            return view('mahasiswa.bimbingan.export-pdf', $data);
+        }
+
         // Default PDF export
         $pdf = Pdf::loadView('mahasiswa.bimbingan.export-pdf', $data);
         $fileName = $fileBase . '.pdf';
+
+        if ($request->query('stream')) {
+            return $pdf->stream($fileName);
+        }
+
         return $pdf->download($fileName);
     }
 }

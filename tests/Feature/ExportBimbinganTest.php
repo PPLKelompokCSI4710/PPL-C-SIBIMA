@@ -66,12 +66,30 @@ class ExportBimbinganTest extends TestCase
             'status' => 'approved',
         ]);
 
+        // Tambah Catatan Konsultasi Dosen
+        \App\Models\CatatanKonsultasi::create([
+            'jadwal_bimbingan_id' => $bimbingan->id,
+            'catatan' => 'Catatan Dosen Test Paling Keren',
+        ]);
+
+        // 1. Test PDF Download
         $response = $this->actingAs($user)->get(route('mahasiswa.jadwal.exportPdf', [
             'format' => 'pdf',
             'ids' => $bimbingan->id
         ]));
         $response->assertStatus(200);
         $response->assertHeader('content-type', 'application/pdf');
+
+        // 2. Test HTML Preview and verify Lecturer Notes
+        $previewResponse = $this->actingAs($user)->get(route('mahasiswa.jadwal.exportPdf', [
+            'format' => 'pdf',
+            'ids' => $bimbingan->id,
+            'preview' => true
+        ]));
+        $previewResponse->assertStatus(200);
+        $previewResponse->assertSee('Catatan Dosen Test Paling Keren');
+        $previewResponse->assertSee('Test Mahasiswa');
+        $previewResponse->assertSee('12345678');
     }
 
     /** @test */

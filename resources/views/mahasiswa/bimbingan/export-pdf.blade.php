@@ -54,38 +54,78 @@
     <div class="doc-title">Laporan Hasil Bimbingan Akademik</div>
     <table class="student-box">
         <tr>
-            <td class="label">Nama Lengkap</td><td class="colon">:</td><td class="value"><strong></strong></td>
-            <td class="label">Program Studi</td><td class="colon">:</td><td class="value"></td>
+            <td class="label">Nama Lengkap</td><td class="colon">:</td><td class="value"><strong>{{ $mahasiswa->nama_lengkap ?? '-' }}</strong></td>
+            <td class="label">Program Studi</td><td class="colon">:</td><td class="value">{{ $mahasiswa->program_studi ?? '-' }}</td>
         </tr>
         <tr>
-            <td class="label">NIM</td><td class="colon">:</td><td class="value"></td>
-            <td class="label">Fakultas</td><td class="colon">:</td><td class="value"></td>
+            <td class="label">NIM</td><td class="colon">:</td><td class="value">{{ $mahasiswa->nim ?? '-' }}</td>
+            <td class="label">Fakultas</td><td class="colon">:</td><td class="value">{{ $mahasiswa->fakultas ?? '-' }}</td>
         </tr>
         <tr>
-            <td class="label">Angkatan / Sem</td><td class="colon">:</td><td class="value"></td>
-            <td class="label">Status Akademik</td><td class="colon">:</td><td class="value"></td>
+            <td class="label">Angkatan / Sem</td><td class="colon">:</td><td class="value">{{ $mahasiswa->angkatan ?? '-' }} / {{ $mahasiswa->semester ?? '-' }}</td>
+            <td class="label">Status Akademik</td><td class="colon">:</td><td class="value">{{ $mahasiswa->status_akademik?->getLabel() ?? '-' }}</td>
         </tr>
     </table>
     <table class="data-table">
         <thead>
             <tr>
                 <th style="width:5%; text-align:center;">No</th>
-                <th style="width:25%;">Dosen Pembimbing</th>
                 <th style="width:20%;">Tanggal &amp; Waktu</th>
+                <th style="width:25%;">Dosen Pembimbing</th>
                 <th style="width:35%;">Topik &amp; Judul TA</th>
-                <th style="width:15%; text-align:center;">Tanda Tangan Dosen</th>
+                <th style="width:15%; text-align:center;">Status</th>
             </tr>
         </thead>
         <tbody>
-            @for($i = 1; $i <= 8; $i++)
+            @foreach($jadwalBimbingans as $index => $jadwal)
                 <tr>
-                    <td style="text-align:center; height: 50px;">{{ $i }}</td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
+                    <td style="text-align:center;">{{ $index + 1 }}</td>
+                    <td>
+                        @if($jadwal->ketersediaanJadwal)
+                            {{ \Carbon\Carbon::parse($jadwal->ketersediaanJadwal->tanggal)->locale('id')->translatedFormat('d F Y') }}
+                            <br>
+                            <span style="color: #7A7A7A; font-size: 9px;">
+                                {{ substr($jadwal->ketersediaanJadwal->waktu_mulai, 0, 5) }} - {{ substr($jadwal->ketersediaanJadwal->waktu_selesai, 0, 5) }} WIB
+                            </span>
+                        @else
+                            -
+                        @endif
+                    </td>
+                    <td>
+                        <strong>{{ $jadwal->dosen?->nama_lengkap ?? '-' }}</strong>
+                        @if($jadwal->dosen?->nidn)
+                            <br><span style="color: #7A7A7A; font-size: 9px;">NIDN: {{ $jadwal->dosen->nidn }}</span>
+                        @endif
+                    </td>
+                    <td>
+                        <strong>Topik:</strong> {{ $jadwal->topik_bimbingan ?? '-' }}
+                        <br>
+                        <strong>Judul TA:</strong> {{ $jadwal->judul_ta ?? '-' }}
+                    </td>
+                    <td style="text-align:center;">
+                        <span class="badge badge-{{ $jadwal->status }}">
+                            {{ $jadwal->status === 'pending' ? 'MENUNGGU' : ($jadwal->status === 'approved' ? 'DISETUJUI' : ($jadwal->status === 'completed' ? 'SELESAI' : ($jadwal->status === 'rejected' ? 'DITOLAK' : 'DIBATALKAN'))) }}
+                        </span>
+                    </td>
                 </tr>
-            @endfor
+                <tr>
+                    <td colspan="5" style="background-color: #F8FAFC; padding: 10px; border-bottom: 2px solid #E2E8F0;">
+                        <strong style="color: #1B3F66;">Catatan / Hasil Evaluasi Dosen:</strong>
+                        <div style="margin-top: 5px; color: #475569;">
+                            @if($jadwal->catatanKonsultasi && $jadwal->catatanKonsultasi->catatan)
+                                {{ $jadwal->catatanKonsultasi->catatan }}
+                            @else
+                                <span style="color: #94A3B8; font-style: italic;">Tidak ada catatan bimbingan dari dosen.</span>
+                            @endif
+                        </div>
+                    </td>
+                </tr>
+            @endforeach
+            @if($jadwalBimbingans->isEmpty())
+                <tr>
+                    <td colspan="5" style="text-align:center; padding: 20px; color: #94A3B8;">Tidak ada data bimbingan yang terpilih.</td>
+                </tr>
+            @endif
         </tbody>
     </table>
     <table class="signature-table">
@@ -93,15 +133,15 @@
             <td>
                 <div class="signature-title">Mahasiswa bersangkutan,</div>
                 <div style="height:50px;"></div>
-                <div class="signature-name">............................................</div>
-                <div class="signature-nip">NIM. ........................................</div>
+                <div class="signature-name">{{ $mahasiswa->nama_lengkap }}</div>
+                <div class="signature-nip">NIM. {{ $mahasiswa->nim }}</div>
             </td>
             <td style="text-align:right;">
                 <div class="signature-title">Mengetahui,<br>Dosen Pembimbing Utama</div>
                 <div style="height:50px;"></div>
-                <div class="signature-name">............................................</div>
+                <div class="signature-name">{{ $mahasiswa->dosen?->nama_lengkap ?? '............................................' }}</div>
                 <div class="signature-nip">
-                    NIDN. ........................................
+                    NIDN. {{ $mahasiswa->dosen?->nidn ?? '........................................' }}
                 </div>
             </td>
         </tr>
